@@ -310,39 +310,39 @@ Six tools were compared on the 3.1 Gb human GRCh38 genome using the GIAB adotto 
 		 A tool built to be useful before a curated repeat catalog exists is answering a different question than a tool built to refine calls within one. If T2T assemblies continue to accumulate across non model species faster than repeat libraries can be built for them — which we expect but have not quantified — that distinction will matter more than which tool reports the tightest boundary on any single benchmark.
 
 		 References
-		 Benson G. Tandem repeats finder: a program to analyze DNA sequences. Nucleic Acids Research 27(2):573–580 (1999).
+		 Benson G. Tandem repeats finder: a program to analyze DNA sequences. Nucleic Acids Research 27(2):573–580 (1999). https://doi.org/10.1093/nar/27.2.573
 
-		 Chen J, Wang Z, Tan K, et al. A complete telomere-to-telomere assembly of the maize genome. Nature Genetics 55:1221–1231 (2023).
+		 Chen J, Wang Z, Tan K, et al. A complete telomere-to-telomere assembly of the maize genome. Nature Genetics 55:1221–1231 (2023). https://doi.org/10.1038/s41588-023-01419-6
 
-		 English AC, Dolzhenko E, Ziaei Jam H, et al. Analysis and benchmarking of small and large genomic variants across tandem repeats. Nature Biotechnology 43(3):431–442 (2025). doi:10.1038/s41587-024-02225-z. Published online 26 April 2024, which is the year used for the in-text citation.
+		 English AC, Dolzhenko E, Ziaei Jam H, et al. Analysis and benchmarking of small and large genomic variants across tandem repeats. Nature Biotechnology 43(3):431–442 (2025). https://doi.org/10.1038/s41587-024-02225-z. Published online 26 April 2024, which is the year used for the in-text citation.
 
-		 Ferragina P, Manzini G. Opportunistic data structures with applications. Proceedings of the 41st Annual Symposium on Foundations of Computer Science (FOCS):390–398 (2000).
+		 Ferragina P, Manzini G. Opportunistic data structures with applications. Proceedings of the 41st Annual Symposium on Foundations of Computer Science (FOCS):390–398 (2000). https://doi.org/10.1109/sfcs.2000.892127
 
-		 Frith MC. A new repeat-masking method enables specific detection of homologous sequences. Nucleic Acids Research 39(4):e23 (2011).
+		 Frith MC. A new repeat-masking method enables specific detection of homologous sequences. Nucleic Acids Research 39(4):e23 (2011). https://doi.org/10.1093/nar/gkq1212
 
-		 Gao Y, Liu B, Wang Y, Xing Y. TideHunter: efficient and sensitive tandem repeat detection from noisy long-reads using seed-and-chain. Bioinformatics 35(14):i200–i207 (2019).
+		 Gao Y, Liu B, Wang Y, Xing Y. TideHunter: efficient and sensitive tandem repeat detection from noisy long-reads using seed-and-chain. Bioinformatics 35(14):i200–i207 (2019). https://doi.org/10.1093/bioinformatics/btz376
 
 		 Grossi R, Gupta A, Vitter JS. High-order entropy-compressed text indexes. Proceedings of the 14th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA):841–850 (2003).
 
-		 Harris RS, Cechova M, Makova KD. Noise-cancelling repeat finder: uncovering tandem repeats in error-prone long-read sequencing data. Bioinformatics 35(22):4809–4811 (2019).
+		 Harris RS, Cechova M, Makova KD. Noise-cancelling repeat finder: uncovering tandem repeats in error-prone long-read sequencing data. Bioinformatics 35(22):4809–4811 (2019). https://doi.org/10.1093/bioinformatics/btz484
 
-		 Kasai T, Lee G, Arimura H, Arikawa S, Park K. Linear-time longest-common-prefix computation in suffix arrays and its applications. Proceedings of the 12th Annual Symposium on Combinatorial Pattern Matching (CPM):181–192 (2001).
+		 Kasai T, Lee G, Arimura H, Arikawa S, Park K. Linear-time longest-common-prefix computation in suffix arrays and its applications. Proceedings of the 12th Annual Symposium on Combinatorial Pattern Matching (CPM):181–192 (2001). https://doi.org/10.1007/3-540-48194-x_17
 
-		 Kolpakov R, Bana G, Kucherov G. mreps: efficient and flexible detection of tandem repeats in DNA. Nucleic Acids Research 31(13):3672–3678 (2003).
+		 Kolpakov R, Bana G, Kucherov G. mreps: efficient and flexible detection of tandem repeats in DNA. Nucleic Acids Research 31(13):3672–3678 (2003). https://doi.org/10.1093/nar/gkg617
 
-		 Mirkin SM. Expandable DNA repeats and human disease. Nature 447:932–940 (2007).
+		 Mirkin SM. Expandable DNA repeats and human disease. Nature 447:932–940 (2007). https://doi.org/10.1038/nature05977
 
 		 Mori Y. libdivsufsort: a lightweight suffix-sorting library. Available at: https://github.com/y-256/libdivsufsort (2008).
 
-		 Naish M, Alonge M, Wlodzimierz P, et al. The genetic and epigenetic landscape of the Arabidopsis centromeres. Science 374(6569):eabi7489 (2021). doi:10.1126/science.abi7489
+		 Naish M, Alonge M, Wlodzimierz P, et al. The genetic and epigenetic landscape of the Arabidopsis centromeres. Science 374(6569):eabi7489 (2021). https://doi.org/10.1126/science.abi7489
 
-		 Nurk S, Koren S, Rhie A, et al. The complete sequence of a human genome. Science 376:44–53 (2022).
+		 Nurk S, Koren S, Rhie A, et al. The complete sequence of a human genome. Science 376:44–53 (2022). https://doi.org/10.1126/science.abj6987
 
-		 Olson DR, Wheeler TJ. ULTRA-effective labeling of tandem repeats in genomic sequence. Bioinformatics Advances 4(1):vbae149 (2024). doi:10.1093/bioadv/vbae149
+		 Olson DR, Wheeler TJ. ULTRA-effective labeling of tandem repeats in genomic sequence. Bioinformatics Advances 4(1):vbae149 (2024). https://doi.org/10.1093/bioadv/vbae149
 
-		 Willard HF. Centromeres: the missing link in the development of human artificial chromosomes. Current Opinion in Genetics & Development 8:219–225 (1998).
+		 Willard HF. Centromeres: the missing link in the development of human artificial chromosomes. Current Opinion in Genetics & Development 8:219–225 (1998). https://doi.org/10.1016/s0959-437x(98)80144-5
 
-		 Wlodzimierz P, Hong M, Henderson IR. TRASH: Tandem Repeat Annotation and Structural Hierarchy. Bioinformatics 39(5):btad308 (2023).
+		 Wlodzimierz P, Hong M, Henderson IR. TRASH: Tandem Repeat Annotation and Structural Hierarchy. Bioinformatics 39(5):btad308 (2023). https://doi.org/10.1093/bioinformatics/btad308
 		 Supplementary Methods
 		 S1. BWTandem Parameter Specifications
 		 S1.1 Tier 1: Short Tandem Repeat Detection

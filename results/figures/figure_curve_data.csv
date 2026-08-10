@@ -1,0 +1,9 @@
+series,label,region_recall,region_precision,bp_recall,bp_precision
+BWTandem,P,54.69,62.17,26.81,62.56
+BWTandem,B,71.9,53.27,31.14,34.77
+BWTandem,F,79.88,50.62,32.72,34.5
+BWTandem,H,81.6,48.43,33.57,34.17
+competitor,ULTRA,81.62,53.66,38.14,61.33
+competitor,tantan,78.0,57.66,23.54,70.22
+competitor,TRF,30.8,94.73,20.81,93.16
+competitor,TRASH,0.91,96.98,5.01,54.49

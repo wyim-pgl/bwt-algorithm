@@ -23,3 +23,6 @@ benchmarking/TideHunter-v1.5.6_arm64-macos/
 # Session handoff note — working memo, rewritten each session, not project history
 resume.md
 resume.md.*
+
+# Manuscript working backups — one per revision pass, not project history
+manuscript.md.*-bak

@@ -4,7 +4,7 @@ import numpy as np  # NumPy for numerical operations and array processing
 from typing import List, Tuple, Set, Optional  # typing module for type hints
 from .bwt_core import BWTCore, effective_length  # BWT/FM-index core data structure
 from .coverage import mask_from_repeats  # shared interval -> boolean mask
-from .models import TandemRepeat  # Tandem repeat data class
+from .models import TandemRepeat, TIER_SATELLITE, TIER_CATCHALL  # Tandem repeat data class + post-tier pass ids
 from .tier1 import Tier1STRFinder  # Tier 1: Short perfect repeat finder
 from .tier2 import Tier2LCPFinder  # Tier 2: Medium-length imperfect repeat finder
 from .tier3 import Tier3LongReadFinder  # Tier 3: Long repeat sequence finder
@@ -47,10 +47,36 @@ class TandemRepeatFinder:
         if not sequence.endswith('$'):
             sequence += '$'  # Append sentinel character '$' to end of sequence for BWT construction
 
-        self.bwt = BWTCore(sequence, sa_sample_rate=1)  # Build FM-index (suffix array, BWT, occurrence arrays)
-        if show_progress:
-            # Print BWT construction completion and elapsed time
-            print(f"  [{chromosome}] BWT built in {time.time() - t0:.2f}s", flush=True)
+        # Reuse a cached index when one exists for this exact sequence. The index
+        # depends only on the sequence, never on detection settings, so a
+        # parameter sweep would otherwise rebuild the identical structure once
+        # per configuration. BWT_INDEX_CACHE names a directory; unset disables.
+        cache_dir = os.environ.get("BWT_INDEX_CACHE", "").strip()
+        self.bwt = None
+        cache_path = None
+        if cache_dir:
+            cache_path = os.path.join(
+                cache_dir, f"idx_{BWTCore.cache_key(sequence)}.npz")
+            self.bwt = BWTCore.load_index(cache_path, sequence, sa_sample_rate=1)
+            if self.bwt is not None and show_progress:
+                print(f"  [{chromosome}] FM-index loaded from cache in "
+                      f"{time.time() - t0:.2f}s", flush=True)
+
+        if self.bwt is None:
+            self.bwt = BWTCore(sequence, sa_sample_rate=1)  # suffix array, BWT, occurrence arrays
+            if show_progress:
+                print(f"  [{chromosome}] BWT built in {time.time() - t0:.2f}s", flush=True)
+            if cache_path:
+                try:
+                    ts = time.time()
+                    self.bwt.save_index(cache_path)
+                    if show_progress:
+                        print(f"  [{chromosome}] FM-index cached in "
+                              f"{time.time() - ts:.2f}s", flush=True)
+                except OSError as e:
+                    # A cache that cannot be written must never fail the run
+                    print(f"  [{chromosome}] index cache write skipped: {e}",
+                          flush=True)
 
         # Initialize Tiers
         self.tier1 = None  # Initialize Tier 1 finder (default None)
@@ -430,7 +456,12 @@ class TandemRepeatFinder:
         high inter-copy divergence.
         """
         text_arr = self.bwt.text_arr
-        n = len(text_arr)
+        # `text_arr` carries the BWT sentinel, so len() is one past the last real
+        # base. Scanning to it let a terminal gap be reported with end == seqlen+1
+        # — a BED interval past the end of its chromosome, which is malformed for
+        # bedtools — and let `$` into the motif. `_catchall_periodicity_fill`
+        # already uses effective_length for the same reason.
+        n = effective_length(text_arr)
 
         if n < 1000:
             return repeats
@@ -504,6 +535,12 @@ class TandemRepeatFinder:
                 continue
 
             use_motif = text_arr[best_w_start:best_w_start + best_period].tobytes().decode('ascii', errors='replace')
+            # The motif is a raw window off the text, so an assembly gap or the
+            # sentinel would otherwise be reported as the repeat unit. An N-run is
+            # trivially "periodic" (N == N), which is how motifs of solid Ns got
+            # emitted at telomeres. Same guard the catch-all pass applies.
+            if not use_motif or any(c not in 'ACGT' for c in use_motif):
+                continue
             copies = block_size / best_period
 
             new_tr = TandemRepeat(
@@ -511,7 +548,7 @@ class TandemRepeatFinder:
                 start=block_start, end=block_end,
                 motif=use_motif, copies=copies,
                 length=block_size, consensus_motif=use_motif,
-                mismatch_rate=1.0 - best_identity, tier="satellite",
+                mismatch_rate=1.0 - best_identity, tier=TIER_SATELLITE,
             )
             new_repeats.append(new_tr)
 
@@ -589,7 +626,7 @@ class TandemRepeatFinder:
                 new_repeats.append(TandemRepeat(
                     chrom=self.chromosome, start=start, end=end,
                     motif=canon, copies=(end - start) / period,
-                    length=end - start, tier="catchall",
+                    length=end - start, tier=TIER_CATCHALL,
                     consensus_motif=canon, mismatch_rate=max(0.0, 1.0 - ident),
                     strand=strand,
                 ))

@@ -25,6 +25,7 @@ python3 -m src.main input.fa -t 4 --mask soft -v  # 4 threads, skip soft-masked 
 The Cython extension `_accelerators.pyx` provides the performance-critical hot paths. Without it, the pure-Python fallbacks in `accelerators.py` take over: they are **faithful** — the same repeats are detected, just far more slowly — and `tests/test_accel_parity.py` pins the two paths to byte-identical BED/TRF output. Build the extension for any real run. Set `BWT_DISABLE_NATIVE=1` to force the pure-Python path (used by the parity test; also handy for isolating a suspected accelerator bug).
 
 The one exception is `TIER1_EXT_ROLLING=1`, an experimental rolling-consensus extender that exists only in the `.pyx`; requesting it without the compiled extension raises rather than silently running the default algorithm.
+Its companion knob `TIER1_EXT_BAD_RUN` (default 2, floor 1) sets how many consecutive bad copies the rolling extender tolerates before stopping in that direction; it is read only when `TIER1_EXT_ROLLING=1` and is likewise `.pyx`-only.
 
 ```bash
 # Compile Cython extensions (requires numpy, Cython)
@@ -68,7 +69,53 @@ python3 -m pytest tests/test_ground_truth.py::TestTier1GroundTruth::test_sensiti
   loop when it loads and its own Python loop otherwise. They must return the same
   summary on random repeat regions. (They disagreed on 31% of them until
   2026-07-09; see `docs/2026-07-09-nondeterminism-uninitialised-ptr-table.md`.)
-- Baseline: **84 passed** with the `.so`, ~50 passed + native-only skips without it.
+- Baseline: **115 passed** with the `.so`, ~50 passed + native-only skips without it.
+- ⚠️ **`test_ground_truth.py::TestAdjacentGroundTruth::test_sensitivity` is flaky
+  (2026-08-09).** It fails roughly 60% of full-suite runs (8 of 13), always with the
+  same two missed arrays, `ACG@20075` and `GGT@45371`, at 81.8% against a 95% floor.
+  It is **not** a logic bug and not test-order pollution — it depends on process
+  memory layout:
+
+  | condition | runs | failures |
+  |---|--:|--:|
+  | bare (minimal environment) | 13 | 8 |
+  | any one extra environment variable, even an unused one | 25 | 0 |
+  | ASLR off (`setarch $(uname -m) -R`) | 4 | 0 |
+  | same fixture repeated inside one process | 8 | 0, byte-identical |
+  | the four C extensions rebuilt under AddressSanitizer | full suite | 0 memory errors |
+  | Chr4 (18.8 Mb) under three different environment sizes | 3 | byte-identical output |
+
+  So: an uninitialised read somewhere in the native path (ASan sees no
+  out-of-bounds or use-after-free, and ASan cannot see uninitialised reads). It does
+  **not** reach chromosome-scale output, so no published figure depends on it.
+  Any instrumentation — a pytest plugin, an extra env var — masks it, which is why
+  the offending read is still unlocated. The one native component not yet
+  instrumented is the Cython `_accelerators` extension; ASan covered only the four
+  `c_extensions/*.c` libraries. Finishing this needs `valgrind --tool=memcheck` or a
+  MemorySanitizer build, neither of which is installed here.
+  **Do not read a single green `pytest tests/ -q` as proof — run it three times.**
+- Four output-correctness bugs were fixed 2026-08-06 (STRfinder CSV field count, the C
+  align path dropping per-copy detail, the satellite gap-fill running past the sentinel and
+  emitting non-ACGT motifs, and a non-integer BED tier column). Guards:
+  `test_strfinder_csv.py`, `test_bed_tier_column.py`, `test_satellite_gapfill_bounds.py`,
+  plus new full-field cases in `test_align_parity.py`. **`_c_align_lib` now honours
+  `BWT_DISABLE_NATIVE`**, which is what put it under the existing parity harness at all —
+  `libtier1_scan`, `libtier2_accel` and `libbwt_accel` still load unconditionally and are
+  therefore still outside it.
+- ⚠️ **There is no `gcc` on the login-node PATH.** `build.py` shells out to bare `gcc`, so
+  editing any `src/c_extensions/*.c` without `/data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem/bin`
+  on PATH makes the compile raise, the loader return None, and the C path vanish silently.
+- `tests/test_align_unit_parity.py` closes the last accelerator gap: `align_unit_to_window`
+  was the only one of the five consumed symbols with no C-vs-Python value comparison, and
+  its Python twin is a separate hand-written banded DP — the same code shape as the
+  `align_accel.c` loop that disagreed on 31% of regions until 2026-07-09.
+- `tests/test_env_var_docs.py` pins this file's env-var list to what `src/` actually
+  reads, in both directions. It was added after a catch-all seed cap was found
+  documented here but implemented nowhere, and `TIER1_FMSCAN` implemented but left
+  undocumented while every benchmark run set it. If it fails, fix the docs or the
+  code — not the test. (Naming a removed knob anywhere in this file re-introduces it
+  to the scan, so describe retired knobs without their identifier; the full account
+  lives in `archive/2026-08-05-unreproducible/README.md`.)
 - The dev environment with numpy + pydivsufsort + the compiled `.so` (and where
   the benchmark harness runs) is the conda env
   `/data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem/bin/python`. `pytest` may
@@ -76,6 +123,32 @@ python3 -m pytest tests/test_ground_truth.py::TestTier1GroundTruth::test_sensiti
 - `tests/test_satellite_gapfill.py` is the regression guard for the
   divergent-alpha-satellite interior gap-fill (see the env-var section below);
   it self-generates its sequences (no fixture files).
+
+## FM-index cache (`BWT_INDEX_CACHE`)
+
+The index depends only on the sequence, never on detection settings, so a
+parameter sweep otherwise rebuilds the identical suffix array once per
+configuration. Point `BWT_INDEX_CACHE` at a directory and `finder.py` will load a
+matching index instead of building one, writing it on the first miss:
+
+```bash
+BWT_INDEX_CACHE=/scratch/idxcache python3 -m src.main genome.fa ...
+```
+
+Unset (the default) disables it and the pipeline behaves exactly as before.
+
+- The cache key is a **hash of the sequence**, not a filename, so an edited or
+  renamed FASTA cannot hit a stale entry.
+- On load the stored sequence is re-verified against the input; any mismatch,
+  truncation, or format-version change returns `None` and the run builds
+  normally. Pairing an index with the wrong sequence would corrupt every
+  downstream call, so this fails closed.
+- Writes go to a temporary file and are renamed, so a killed job leaves no
+  half-written cache. A cache that cannot be written warns and does not fail the run.
+- Size is roughly 6 bytes per base (suffix array 4 + BWT 1 + text 1), so ~1.5 GB
+  for a 250 Mb chromosome.
+
+Regression coverage: `tests/test_index_cache.py`.
 
 ## Tuning detection sensitivity (env vars)
 
@@ -141,19 +214,34 @@ means baseline. Set them on the command line, e.g.
   point; raising the identity floor back toward 0.55 re-opens the gaps. Regression
   coverage: `tests/test_satellite_gapfill.py`.
 
+- **Tier 1 FM-index scan mode** (`tier1.py`) — **`TIER1_FMSCAN` (default 0 = off)**.
+  Every benchmark run in `exp1_human/` and the published run set `TIER1_FMSCAN=1`; the
+  Methods sentence "Tier 1 used FM-index enumeration mode" is this knob. Off, Tier 1
+  uses the sliding-window scanner and the pipeline is byte-for-byte the pre-FM-scan
+  behaviour. Sub-knobs, all inert while `TIER1_FMSCAN=0`: `TIER1_FMSCAN_MIN_P`/
+  `TIER1_FMSCAN_MAX_P` (1/6 — the motif lengths enumerated), `TIER1_FMSCAN_MIN_OCC` (3),
+  `TIER1_FMSCAN_MIN_SPAN` (20), `TIER1_FMSCAN_MAX_GAP` (2, in copies),
+  `TIER1_FMSCAN_MIN_DENSITY` (0.50), `TIER1_FMSCAN_MIN_LLR` (8.0),
+  `TIER1_FMSCAN_MAX_OCC_TOTAL` (20000000, the memory guard).
+  Note the Exp1 operating points override two of these to **0.45** and **6.0**.
+- **Tier 2 long-unit DP bound**: `TIER2_LONGUNIT_DP_MAX_PERIOD` (default 8192) caps the
+  period the long-unit phase will refine by dynamic programming.
+
 The dominant short-STR recall levers are `TIER1_MIN_ARRAY_LEN` + `TIER1_MIN_SCORE`
 (copy-count knobs have little effect); lowering them raises recall but drops
 precision. See `docs/2026-06-20-exp1-human-sensitivity.md` for the measured
 recall/precision frontier and the chosen operating point.
 
-**The recall/precision figures below are from the pre-`706fb76` build** (which read
-uninitialised heap in its alignment traceback and was not reproducible). All three
-species were re-measured on the fixed build `d52a4ff` (2026-07-10, in
-`docs/2026-06-25-catch-all-benchmark-for-filip.md`): the fix trades ~0.1 pp region
-recall for ~0.4 pp region precision and leaves every satellite/centromere number
-unchanged, so the op-points and their ordering hold. Refreshed genome figures:
-human catchF **80.54 % / 50.52 %** (adj 79.5 %), catchH **82.23 % / 48.35 %**.
-See `docs/2026-07-09-nondeterminism-uninitialised-ptr-table.md`.
+> ⚠️ **Cost figures only are quarantined (2026-08-05).** The published *runtime*
+> came from a different execution than the BEDs (the Jul 16 array 5912536, not the
+> Jul 21 array 5935102 that produced them). The published *memory* is a separate
+> issue: `--threads` spawns processes (`ProcessPoolExecutor`), and `/usr/bin/time -v`
+> reports the max over children rather than their sum, so 12.99 GB is one worker's
+> share of a two-worker run — use `sacct MaxRSS`. Re-measured, both from one
+> execution: Col-CEN 0.51 h / 1.95 GB, human 12.1 h / 21.86 GB, maize 15.4 h /
+> 22.41 GB. **Accuracy figures reproduce on all three genomes** — an earlier blanket
+> quarantine here was withdrawn after it turned out to rest on a scoring bug of
+> mine. Detail: `archive/2026-08-05-unreproducible/README.md`.
 
 **Exp1 recall op-point (v2.1, precision-leader):** on top of the comboChi base,
 `TIER2_MISMATCH=0.30` + `TIER1_FMSCAN_MIN_DENSITY=0.45` + `TIER1_FMSCAN_MIN_LLR=6.0`
@@ -173,7 +261,7 @@ measured full-genome adotto frontier: **identity 0.76 (+`CATCHALL_MAX_P=50`) →
 recall / 52.72% precision** (≈ULTRA precision, +15pp recall over v2); **identity 0.72
 → 82.35% recall / 47.99% precision (beats ULTRA's 81.62% recall)**; identity 0.68 →
 84.42% / 42.61%. Knobs: `CATCHALL_MIN_IDENTITY` (default 0.72), `CATCHALL_MIN_P`/
-`CATCHALL_MAX_P` (1/20), `CATCHALL_MIN_LEN` (20), `CATCHALL_MAX_SEEDS` (200000). bp
+`CATCHALL_MAX_P` (1/20), `CATCHALL_MIN_LEN` (20). bp
 precision (~32%) is the cost (over-call in low-complexity). Default OFF (baseline
 unchanged).
 

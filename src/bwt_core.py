@@ -1,3 +1,7 @@
+import hashlib
+import os
+import zipfile
+
 import numpy as np
 import ctypes
 from typing import List, Tuple, Dict, Union
@@ -150,6 +154,113 @@ class BWTCore:
         self._c_cp_lengths = None
         if _c_bwt_lib is not None:
             self._prepare_c_bwt_data()
+
+    # ------------------------------------------------------------------
+    # On-disk index cache
+    # ------------------------------------------------------------------
+    #
+    # Building the index is the expensive, sequence-only part of a run: the
+    # suffix array via divsufsort plus the occurrence checkpoints. Nothing in it
+    # depends on detection settings, so a parameter sweep rebuilds the identical
+    # structure once per configuration. Caching it turns an N-point
+    # operating-point curve from N full builds into one build and N searches.
+    #
+    # The cache key is the sequence itself, so a stale or mismatched file cannot
+    # be loaded by accident.
+
+    CACHE_FORMAT = 2
+
+    @staticmethod
+    def cache_key(text: str, occ_sample_rate: int = 128) -> str:
+        """Content hash of the sequence plus the only build parameter that shapes
+        the stored arrays. Hashing the text (not a filename) means a renamed or
+        edited FASTA can never hit a stale entry."""
+        h = hashlib.sha256()
+        h.update(text.encode("utf-8", "surrogateescape"))
+        h.update(f"|occ={occ_sample_rate}|v={BWTCore.CACHE_FORMAT}".encode())
+        return h.hexdigest()[:32]
+
+    def save_index(self, path: str) -> str:
+        """Write the built index to `path` (a .npz). Returns the path.
+
+        Written to a temporary file and renamed, so a killed job cannot leave a
+        half-written cache that a later run would happily load.
+        """
+        codes = np.array([ord(c) for c in self.alphabet], dtype=np.int32)
+        cp_codes = np.array(sorted(self.occ_checkpoints), dtype=np.int32)
+        payload = {
+            "format": np.array([self.CACHE_FORMAT], dtype=np.int32),
+            "n": np.array([self.n], dtype=np.int64),
+            "occ_sample_rate": np.array([self.occ_sample_rate], dtype=np.int32),
+            "text_arr": self.text_arr,
+            "suffix_array": self.suffix_array,
+            "bwt_arr": self.bwt_arr,
+            "alphabet_codes": codes,
+            "char_counts": np.array([self.char_counts[chr(c)] for c in codes],
+                                    dtype=np.int64),
+            "char_totals": np.array([self.char_totals[chr(c)] for c in codes],
+                                    dtype=np.int64),
+            "cp_codes": cp_codes,
+        }
+        for c in cp_codes:
+            payload[f"cp_{int(c)}"] = self.occ_checkpoints[int(c)]
+        os.makedirs(os.path.dirname(os.path.abspath(path)) or ".", exist_ok=True)
+        tmp = f"{path}.tmp{os.getpid()}"
+        np.savez(tmp, **payload)
+        os.replace(tmp + ".npz" if not tmp.endswith(".npz") else tmp, path)
+        return path
+
+    @classmethod
+    def load_index(cls, path: str, text: str, sa_sample_rate: int = 32):
+        """Rebuild a BWTCore from `path` without running divsufsort.
+
+        `text` is required and verified: the cached arrays are only valid for the
+        sequence they were built from, and silently pairing an index with the
+        wrong sequence would corrupt every downstream call rather than fail.
+        Returns None when the cache is absent, damaged, or built by another
+        format version — the caller then builds normally.
+        """
+        try:
+            with np.load(path, allow_pickle=False) as z:
+                if int(z["format"][0]) != cls.CACHE_FORMAT:
+                    return None
+                if int(z["n"][0]) != len(text):
+                    return None
+                self = cls.__new__(cls)
+                self.text = text
+                self.n = int(z["n"][0])
+                self.sa_sample_rate = sa_sample_rate
+                self.occ_sample_rate = int(z["occ_sample_rate"][0])
+                self.text_arr = z["text_arr"]
+                if not np.array_equal(
+                        self.text_arr,
+                        np.frombuffer(text.encode("utf-8"), dtype=np.uint8)):
+                    return None
+                self.suffix_array = z["suffix_array"]
+                self.bwt_arr = z["bwt_arr"]
+                codes = z["alphabet_codes"]
+                self.alphabet = [chr(int(c)) for c in codes]
+                self.char_to_code = {c: ord(c) for c in self.alphabet}
+                self.code_to_char = {ord(c): c for c in self.alphabet}
+                cc, ct = z["char_counts"], z["char_totals"]
+                self.char_counts = {chr(int(c)): int(v) for c, v in zip(codes, cc)}
+                self.char_totals = {chr(int(c)): int(v) for c, v in zip(codes, ct)}
+                self.char_counts_code = {ord(k): v for k, v in self.char_counts.items()}
+                self.char_totals_code = {ord(k): v for k, v in self.char_totals.items()}
+                self.occ_checkpoints = {int(c): z[f"cp_{int(c)}"]
+                                        for c in z["cp_codes"]}
+        except (OSError, KeyError, ValueError, zipfile.BadZipFile):
+            return None
+
+        self._c_bwt_ptr = None
+        self._c_char_counts = None
+        self._c_char_totals = None
+        self._c_cp_flat = None
+        self._c_cp_offsets = None
+        self._c_cp_lengths = None
+        if _c_bwt_lib is not None:
+            self._prepare_c_bwt_data()
+        return self
 
     def clear(self):
         """Release heavy memory structures to let GC reclaim memory."""

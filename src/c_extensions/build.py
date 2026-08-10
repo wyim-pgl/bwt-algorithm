@@ -242,6 +242,14 @@ def load_align():
             c_int,                            # min_copies
             ctypes.POINTER(AlignRegionResult), # out
             ctypes.POINTER(ctypes.c_ubyte),  # consensus_out
+            ctypes.POINTER(c_int),           # copy_consumed_out
+            ctypes.POINTER(c_int),           # copy_errors_out
+            c_int,                            # copies_cap
+            ctypes.POINTER(c_int),           # var_meta_out (5 ints per record)
+            ctypes.POINTER(ctypes.c_ubyte),  # var_chars_out
+            c_int,                            # var_cap
+            c_int,                            # var_chars_cap
+            ctypes.POINTER(c_int),           # n_vars_out
         ]
 
         return lib

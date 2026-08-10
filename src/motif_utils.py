@@ -1,17 +1,29 @@
 import numpy as np
 import ctypes
+import os
 from typing import List, Tuple, Dict, Iterator, Optional
 from collections import Counter
 import math
 from .models import AlignmentResult, RepeatAlignmentSummary, RefinedRepeat, TandemRepeat
 from .accelerators import align_unit_to_window
 
-# Load C acceleration libraries
-try:
-    from .c_extensions.build import load_align as _load_align
-    _c_align_lib = _load_align()
-except Exception:
+# Load C acceleration libraries.
+#
+# `libalign_accel` must honour BWT_DISABLE_NATIVE the same way `src/accelerators`
+# does for the Cython extension. It was loaded unconditionally, so both passes of
+# `tests/test_accel_parity.py` ran with the C aligner active and no divergence
+# originating in this library could show up there. Respecting the flag puts the
+# existing parity harness on it.
+_NATIVE_DISABLED = os.environ.get("BWT_DISABLE_NATIVE") == "1"
+
+if _NATIVE_DISABLED:
     _c_align_lib = None
+else:
+    try:
+        from .c_extensions.build import load_align as _load_align
+        _c_align_lib = _load_align()
+    except Exception:
+        _c_align_lib = None
 
 try:
     from .c_extensions.build import load_tier2 as _load_tier2
@@ -466,6 +478,59 @@ class MotifUtils:
         MotifUtils._c_text_cache_id = seq_id
         return MotifUtils._c_text_ptr, seq_len
 
+    # Variation record kinds written by align_accel.c's VarSink.
+    _VAR_SUB, _VAR_INS, _VAR_DEL = 0, 1, 2
+
+    @staticmethod
+    def _c_detail_capacities(seq_len: int, start: int, end: int, motif_len: int,
+                             mismatch_fraction: float, max_indel: int,
+                             min_copies: int) -> Tuple[int, int, int]:
+        """Upper bounds on the per-copy detail the C loop can produce.
+
+        The C loop cannot grow its own output, so the caller sizes it. Every
+        bound below is exact, not a guess: a copy consumes at least
+        ``max(1, motif_len - max_indel)`` bases and the loop stops at the same
+        safety limit the Python one uses, which caps the copy count; and a copy
+        is only accepted with at most ``tolerance`` mismatches and ``max_indel``
+        inserted and deleted bases, which caps its variation groups. If a buffer
+        does fill, the C reports it rather than truncating.
+        """
+        safety = min(seq_len,
+                     max(end, start + motif_len * min_copies)
+                     + max(motif_len * 3, max_indel * 4))
+        span = max(0, safety - start)
+        step = max(1, motif_len - max_indel)
+        copies_cap = span // step + 2
+
+        tolerance = max(1, int(math.floor(motif_len * mismatch_fraction)))
+        var_cap = copies_cap * (tolerance + 2 * max_indel) + 8
+        chars_cap = copies_cap * (2 * tolerance + max_indel) + 8
+        return copies_cap, var_cap, chars_cap
+
+    @staticmethod
+    def _format_variations(var_meta: np.ndarray, var_chars: np.ndarray,
+                           n_vars: int) -> List[str]:
+        """Render the C's variation records the way the Python loop renders its ops.
+
+        The C reports structure only, so this stays the single place the
+        `copy:pos:...` strings are spelled.
+        """
+        variations: List[str] = []
+        meta = var_meta[:n_vars * 5].reshape(-1, 5)
+        for copy_idx, kind, pos_idx, length, char_off in meta:
+            copy_idx, kind = int(copy_idx), int(kind)
+            pos_idx, length, char_off = int(pos_idx), int(length), int(char_off)
+            if kind == MotifUtils._VAR_SUB:
+                ref_base = chr(var_chars[char_off])
+                alt_base = chr(var_chars[char_off + 1])
+                variations.append(f"{copy_idx}:{pos_idx}:{ref_base}>{alt_base}")
+            elif kind == MotifUtils._VAR_INS:
+                inserted = var_chars[char_off:char_off + length].tobytes().decode('ascii')
+                variations.append(f"{copy_idx}:{pos_idx}:ins({inserted})")
+            else:
+                variations.append(f"{copy_idx}:{pos_idx}:del({length})")
+        return variations
+
     @staticmethod
     def _align_repeat_region_c(sequence: str, start: int, end: int, motif_template: str,
                                mismatch_fraction: float, max_indel: int,
@@ -486,31 +551,56 @@ class MotifUtils:
         result = _c_align_lib.AlignRegionResult()
         consensus_buf = (ctypes.c_ubyte * motif_len)()
 
+        copies_cap, var_cap, chars_cap = MotifUtils._c_detail_capacities(
+            seq_len, start, end, motif_len, mismatch_fraction, max_indel, min_copies)
+        copy_consumed = np.empty(copies_cap, dtype=np.int32)
+        copy_errors = np.empty(copies_cap, dtype=np.int32)
+        var_meta = np.empty(var_cap * 5, dtype=np.int32)
+        var_chars = np.empty(chars_cap, dtype=np.uint8)
+        n_vars = ctypes.c_int(0)
+
         ok = _c_align_lib.align_repeat_region_c(
             text_ptr, seq_len,
             start, end,
             motif_arr, motif_len,
             mismatch_fraction, max_indel, min_copies,
-            ctypes.byref(result), consensus_buf
+            ctypes.byref(result), consensus_buf,
+            copy_consumed.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
+            copy_errors.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
+            copies_cap,
+            var_meta.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
+            var_chars.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)),
+            var_cap, chars_cap,
+            ctypes.byref(n_vars),
         )
 
-        if not ok:
+        # 0 = fewer than min_copies, 2 = a detail buffer filled. Either way the
+        # caller runs the Python loop, which is the reference implementation.
+        if ok != 1:
             return None
 
         consensus = bytes(consensus_buf).decode('ascii')
 
+        copies = result.copies
+        consumed = copy_consumed[:copies]
+        copy_sequences: List[str] = []
+        pos = start
+        for c in consumed.tolist():
+            copy_sequences.append(sequence[pos:pos + c])
+            pos += c
+
         return RepeatAlignmentSummary(
             consensus=consensus,
             motif_len=motif_len,
-            copies=result.copies,
+            copies=copies,
             consumed_length=result.consumed_length,
             mismatch_rate=result.mismatch_rate,
             max_errors_per_copy=result.max_errors_per_copy,
-            variations=[],
-            copy_sequences=[],
+            variations=MotifUtils._format_variations(var_meta, var_chars, n_vars.value),
+            copy_sequences=copy_sequences,
             total_insertions=result.total_insertions,
             total_deletions=result.total_deletions,
-            error_counts=[],
+            error_counts=copy_errors[:copies].tolist(),
             total_mismatches=result.total_mismatches
         )
 

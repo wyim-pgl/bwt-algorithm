@@ -1,6 +1,40 @@
 from dataclasses import dataclass
 from typing import List, Optional, Dict, Tuple
+import csv
+import io
 import math
+
+# The STRfinder CSV header, and the single source of its column count: every row
+# `to_strfinder` emits must parse back to exactly this many fields.
+STRFINDER_HEADER = (
+    "STR_marker,STR_position,STR_motif,STR_genotype_structure,STR_genotype,"
+    "STR_core_seq,Allele_coverage,Alleles_ratio,Reads_Distribution,STR_depth,"
+    "Full_seq,Variations"
+)
+STRFINDER_COLUMNS = len(STRFINDER_HEADER.split(","))
+
+# Which pass produced a call. BED column 6 and the VCF `TIER=` key both carry
+# this, so it has to hold one type: the two post-tier passes used to write the
+# strings "satellite"/"catchall" into a column every other pass filled with an
+# integer, which breaks any consumer doing `int(fields[5])` — and the satellite
+# pass is on by default, so that reached real centromeric output.
+TIER_SATELLITE = 4  # finder._fill_satellite_gaps, the post-tier satellite backstop
+TIER_CATCHALL = 5   # finder._catchall_periodicity_fill, opt-in via CATCHALL_SCAN
+
+
+def _csv_row(fields: List[str]) -> str:
+    """Render one CSV record, quoting whatever needs it.
+
+    `STR_genotype_structure` is specified as `motif_len[MOTIF]copies,truncated`,
+    so the field legitimately contains a comma. Interpolating it into an f-string
+    made every data row carry 13 fields against a 12-field header and shifted
+    every column from `STR_genotype` onward. Going through `csv` keeps the comma
+    and quotes the field instead.
+    """
+    buf = io.StringIO()
+    csv.writer(buf, lineterminator="\n").writerow(fields)
+    return buf.getvalue()[:-1]  # drop the line terminator; callers add their own
+
 
 @dataclass
 class TandemRepeat:
@@ -11,7 +45,7 @@ class TandemRepeat:
     motif: str
     copies: float
     length: int
-    tier: int
+    tier: int  # 1-3 for the detection tiers, TIER_SATELLITE / TIER_CATCHALL after
     confidence: float = 1.0
     consensus_motif: Optional[str] = None  # Consensus motif from all copies
     mismatch_rate: float = 0.0  # Overall mismatch rate across all copies
@@ -136,9 +170,9 @@ class TandemRepeat:
 
             variation_str = "-"
 
-            return (f"{marker},{position},{str_motif},{genotype_struct},{genotype},"
-                    f"{core_seq},{allele_coverage},{alleles_ratio},{reads_dist},"
-                    f"{str_depth},{full_seq},{variation_str}")
+            return _csv_row([marker, position, str_motif, genotype_struct, genotype,
+                             core_seq, allele_coverage, alleles_ratio, reads_dist,
+                             str_depth, full_seq, variation_str])
 
         # Regular (non-compound) repeat handling
         cons = self.consensus_motif or self.motif
@@ -213,9 +247,9 @@ class TandemRepeat:
         else:
             full_seq = full_seq_complete
 
-        return (f"{marker},{position},{str_motif},{genotype_struct},{genotype},"
-            f"{core_seq},{allele_coverage},{alleles_ratio},{reads_dist},"
-            f"{str_depth},{full_seq},{variation_str}")
+        return _csv_row([marker, position, str_motif, genotype_struct, genotype,
+                         core_seq, allele_coverage, alleles_ratio, reads_dist,
+                         str_depth, full_seq, variation_str])
 
 
 @dataclass

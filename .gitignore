@@ -19,3 +19,7 @@ slurm-*.out
 *.settings
 benchmarking/TideHunter-v1.5.6_arm64-macos/
 .vscode
+
+# Session handoff note — working memo, rewritten each session, not project history
+resume.md
+resume.md.*

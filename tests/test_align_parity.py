@@ -42,12 +42,27 @@ def summary_of(r):
             round(r.mismatch_rate, 9), r.total_insertions, r.total_deletions)
 
 
-def align(seq, start, end, motif, mism, max_indel, min_copies, use_c):
+def full_summary_of(r):
+    """Every field of the summary, including the per-copy detail.
+
+    `variations` reaches the user as the STRfinder Variations column;
+    `copy_sequences` and `error_counts` are the per-copy record behind it. The C
+    path returned all three empty while the Python path filled them, so what the
+    tool reported depended on whether a build artefact was present.
+    """
+    if r is None:
+        return None
+    return summary_of(r) + (r.max_errors_per_copy, r.total_mismatches,
+                            tuple(r.variations), tuple(r.copy_sequences),
+                            tuple(r.error_counts))
+
+
+def align(seq, start, end, motif, mism, max_indel, min_copies, use_c, summarize=summary_of):
     saved = mu._c_align_lib
     if not use_c:
         mu._c_align_lib = None
     try:
-        return summary_of(MotifUtils.align_repeat_region(
+        return summarize(MotifUtils.align_repeat_region(
             seq, start, end, motif, mismatch_fraction=mism,
             max_indel=max_indel, min_copies=min_copies))
     finally:
@@ -103,6 +118,81 @@ def test_c_and_python_align_loops_agree():
     assert not mismatches, (
         f"{len(mismatches)}/600 regions align differently with and without "
         f"libalign_accel; first: {mismatches[0]}"
+    )
+
+
+def test_c_and_python_per_copy_detail_agrees():
+    """The same comparison over every field, per-copy detail included."""
+    rng = np.random.default_rng(20260805)
+    mismatches = []
+    for trial in range(600):
+        seq, start, end, motif, mism, max_indel, min_copies = random_region(rng)
+        c = align(seq, start, end, motif, mism, max_indel, min_copies,
+                  use_c=True, summarize=full_summary_of)
+        p = align(seq, start, end, motif, mism, max_indel, min_copies,
+                  use_c=False, summarize=full_summary_of)
+        if c != p:
+            mismatches.append((trial, motif, start, end, mism, max_indel, min_copies, c, p))
+
+    assert not mismatches, (
+        f"{len(mismatches)}/600 regions report different per-copy detail with and "
+        f"without libalign_accel; first: {mismatches[0]}"
+    )
+
+
+def test_the_c_path_actually_reports_detail():
+    """Guard the original defect: parity alone passes if both paths go empty."""
+    rng = np.random.default_rng(4242)
+    with_variations = 0
+    for _ in range(200):
+        seq, start, end, motif, mism, max_indel, min_copies = random_region(rng)
+        r = MotifUtils.align_repeat_region(seq, start, end, motif,
+                                           mismatch_fraction=mism,
+                                           max_indel=max_indel,
+                                           min_copies=min_copies)
+        if r is None:
+            continue
+        assert len(r.copy_sequences) == r.copies
+        assert len(r.error_counts) == r.copies
+        if r.variations:
+            with_variations += 1
+
+    assert with_variations > 0, (
+        "the C path reported no variations at all over 200 mutated repeat "
+        "regions, which is what the empty-list bug looked like"
+    )
+
+
+def resolved_indel(motif, max_indel):
+    """The indel bound align_repeat_region hands the C loop."""
+    if max_indel is not None:
+        return max(0, max_indel)
+    m = len(motif)
+    return max(1, min(10, m // 2 if m >= 4 else 1))
+
+
+def test_the_c_detail_buffers_are_never_too_small():
+    """The C loop cannot grow its own detail buffers, so the caller sizes them.
+
+    An undersized bound corrupts nothing — the C reports the overflow and the
+    caller re-runs the Python loop, which is the reference implementation — but
+    it silently throws the acceleration away on exactly the regions with the most
+    detail to report. So assert the C path never has to bail: wherever Python
+    produces a summary, so must C.
+    """
+    rng = np.random.default_rng(99)
+    bailed = []
+    for trial in range(600):
+        seq, start, end, motif, mism, max_indel, min_copies = random_region(rng)
+        c = MotifUtils._align_repeat_region_c(
+            seq, start, end, motif, mism, resolved_indel(motif, max_indel), min_copies)
+        p = align(seq, start, end, motif, mism, max_indel, min_copies, use_c=False)
+        if p is not None and c is None:
+            bailed.append((trial, motif, start, end, mism, max_indel, min_copies))
+
+    assert not bailed, (
+        f"{len(bailed)}/600 regions fell back to the Python loop; the detail "
+        f"buffer bound in _c_detail_capacities is too small. First: {bailed[0]}"
     )
 
 

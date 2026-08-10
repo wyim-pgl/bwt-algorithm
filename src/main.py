@@ -6,7 +6,7 @@ import re  # Standard library for regular expressions
 from typing import List, Iterator, Tuple  # Type hints from the typing module
 from concurrent.futures import ProcessPoolExecutor, as_completed  # Module for multiprocessing
 from .finder import TandemRepeatFinder  # Multi-tier tandem repeat finding coordinator
-from .models import TandemRepeat  # Tandem repeat data class and output formatters
+from .models import TandemRepeat, STRFINDER_HEADER  # Tandem repeat data class and output formatters
 
 
 def apply_mask(seq: str, mask_mode: str) -> str:
@@ -229,8 +229,8 @@ def main():
     elif args.format == "strfinder":
         out_file = _resolve_output_file(output_prefix, "csv")  # Determine output file path for STRfinder CSV format
         with open(out_file, "w") as f:
-            # Write STRfinder CSV header
-            f.write("STR_marker,STR_position,STR_motif,STR_genotype_structure,STR_genotype,STR_core_seq,Allele_coverage,Alleles_ratio,Reads_Distribution,STR_depth,Full_seq,Variations\n")
+            # Write STRfinder CSV header (shared with to_strfinder's field list)
+            f.write(STRFINDER_HEADER + "\n")
             for r in all_repeats:
                 f.write(r.to_strfinder() + "\n")  # Write each repeat to file in STRfinder format
 

@@ -16,7 +16,7 @@ against.
 | `mo17_knob180_arrays.bed`, `mo17_tr1_arrays.bed`, `mo17_centc_arrays.bed` | the 25, 17 and 17 curated maize arrays from Chen et al. (2023) |
 
 The CEN180 coordinates are blastn hits of `CEN178_consensus.fa` against the
-assembly, filtered from 68,840 raw hits to the 66,683 deposited here. **The blastn
+assembly, filtered from 68,840 raw hits to the 66,683 deposited here; the raw hit set itself was not retained. **The blastn
 version and command line were not retained.** The deposited coordinates are
 therefore the reproducible artefact, not the procedure that made them — every tool
 in Table 2 is scored against this one file, so no comparison in the paper depends

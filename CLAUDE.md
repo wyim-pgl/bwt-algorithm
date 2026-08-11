@@ -85,15 +85,24 @@ python3 -m pytest tests/test_ground_truth.py::TestTier1GroundTruth::test_sensiti
   | the four C extensions rebuilt under AddressSanitizer | full suite | 0 memory errors |
   | Chr4 (18.8 Mb) under three different environment sizes | 3 | byte-identical output |
 
-  So: an uninitialised read somewhere in the native path (ASan sees no
-  out-of-bounds or use-after-free, and ASan cannot see uninitialised reads). It does
+  So: a layout-conditional read somewhere in the native path. It does
   **not** reach chromosome-scale output, so no published figure depends on it.
-  Any instrumentation — a pytest plugin, an extra env var — masks it, which is why
-  the offending read is still unlocated. The one native component not yet
-  instrumented is the Cython `_accelerators` extension; ASan covered only the four
-  `c_extensions/*.c` libraries. Finishing this needs `valgrind --tool=memcheck` or a
-  MemorySanitizer build, neither of which is installed here.
+  **2026-08-10 follow-up campaign (`docs/2026-08-10-flaky-test-instrumentation-campaign.md`):**
+  valgrind memcheck (now installed as the shared conda env `valgrind`) on the
+  production build and an ASan rebuild of the Cython `_accelerators` extension —
+  the one component the earlier ASan pass skipped — are both completely clean,
+  and ~1,640 full-suite runs sweeping the environment-block size (256 sizes ×5)
+  and the mmap base (`ulimit -s` ×9) produced zero failures. The explanation is
+  system-level: every reachable node now has ASLR disabled
+  (`randomize_va_space=0`), and the diagnosis's own `setarch -R` arm shows
+  ASLR-off suppresses the bug — the cluster changed state between the diagnosis
+  and the follow-up, so the failing layouts are currently unreachable from user
+  space. Reproduction needs an admin to re-enable ASLR on one node; a
+  marker-file-gated stage tracer for the ensuing bisection is preserved in the
+  campaign doc.
   **Do not read a single green `pytest tests/ -q` as proof — run it three times.**
+  (With ASLR off cluster-wide the flake cannot currently manifest, but the rule
+  stands in case the sysctl reverts.)
 - Four output-correctness bugs were fixed 2026-08-06 (STRfinder CSV field count, the C
   align path dropping per-copy detail, the satellite gap-fill running past the sentinel and
   emitting non-ACGT motifs, and a non-integer BED tier column). Guards:

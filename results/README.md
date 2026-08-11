@@ -64,11 +64,14 @@ executed. The working tree at that moment carried uncommitted modifications unde
 `src/`; those modifications are now **commit `294f8ac`**, and that is the commit to
 check out to obtain the code behind these results.
 
-One behavioural difference separates `294f8ac` from the tree that actually ran: it
-carries the fix that stops the satellite gap-filling pass from emitting motifs
-containing characters other than A, C, G and T. Re-running the released code on the
-human genome therefore yields 198 fewer calls (4.57 Mb) than `remeas_human.bed`
-contains. Every other output should reproduce.
+Two behavioural differences separate `294f8ac` from the tree that actually ran.
+First, it carries the fix that stops the satellite gap-filling pass from emitting
+motifs containing characters other than A, C, G and T; re-running the released code
+on the human genome therefore yields 198 fewer calls (4.57 Mb) than
+`remeas_human.bed` contains. Second, the released code renders the column recording
+each call's originating pass numerically, where the deposited outputs carry a text
+label on satellite calls — a byte-level formatting change that alters no coordinate,
+motif or statistic. Every other output should reproduce.
 
 ## Known issue: a memory-layout-dependent flaky test
 

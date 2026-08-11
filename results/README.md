@@ -47,7 +47,7 @@ children rather than their sum.
 benchmarking round. The output files and the command lines survive; the job
 accounting records do not. Those rows therefore have empty `threads`, `elapsed`,
 `peak_rss_gb_sacct` and `node` fields, and the runtime and memory printed in
-Tables 1a, 2, 3A, 3B and 3C for those tools are the GNU time values recorded at
+Tables 1a, 1d, 2, 3A, 3B and 3C for those tools are the GNU time values recorded at
 the time. They are reported because they are the best record available, and they
 should be read as approximate. The accuracy figures computed from the same files
 do reproduce.

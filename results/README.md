@@ -95,3 +95,11 @@ the full evidence table.
 
 Rows whose `source_bed` reads `(same source BEDs as …)` are alternative scorings
 of files already listed, not new outputs.
+
+## Deposited interval files
+
+The three whole-genome BWTandem outputs are deposited in `beds/` (gzipped, with
+`SHA256SUMS`), and the manifest's `source_bed` column points at them by
+repository-relative path. Competitor outputs are not deposited: they are the
+inherited files of an earlier benchmarking round and remain on the cluster paths
+recorded in the manifest.

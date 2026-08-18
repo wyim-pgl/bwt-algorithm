@@ -26,17 +26,28 @@ spec = importlib.util.spec_from_file_location("score_exp3", SCORER)
 sx = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sx)
 
+# The three published maize tantan BEDs (exp3A/3B/3C) are byte-identical copies
+# of one genome-wide run whose maximum period is exactly 100 -- tantan's default
+# -w 100 window. Neither the 3B band (100-500) nor the 3C band (100-200) can
+# therefore hold anything but a single period-100 point, so those rows measure
+# the window we passed rather than the tool. TANTAN_MAIZE_BED swaps in a re-run
+# at a wider window; unset, the published BED is used and the table reproduces.
+TANTAN_3B = os.environ.get("TANTAN_MAIZE_BED",
+                           f"{B}/tantan/{MZ}_tantan_exp3B_satellite.bed")
+TANTAN_3C = os.environ.get("TANTAN_MAIZE_BED",
+                           f"{B}/tantan/{MZ}_tantan_exp3C_centc.bed")
+
 BEDS_3B = [
     ("TRF",      f"{B}/trf/{MZ}_trf_exp3B_satellite.bed"),
     ("ULTRA",    f"{HERE}/beds/ultra_maize_exp3B.bed"),
     ("BWTandem", os.environ.get("BWT_MAIZE_BED", f"{B}/bwtandem/bwt_maize.bed")),
-    ("tantan",   f"{B}/tantan/{MZ}_tantan_exp3B_satellite.bed"),
+    ("tantan",   TANTAN_3B),
 ]
 BEDS_3C = [
     ("TRF",      f"{B}/trf/{MZ}_trf_exp3C_centc.bed"),
     ("ULTRA",    f"{HERE}/beds/ultra_maize_exp3C.bed"),
     ("BWTandem", os.environ.get("BWT_MAIZE_BED", f"{B}/bwtandem/bwt_maize.bed")),
-    ("tantan",   f"{B}/tantan/{MZ}_tantan_exp3C_centc.bed"),
+    ("tantan",   TANTAN_3C),
 ]
 
 

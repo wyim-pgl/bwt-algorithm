@@ -18,7 +18,14 @@ import subprocess
 import sys
 import time
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# Every input path below is derived from HERE, which is correct only while the
+# script sits in exp1_human/wp0/. This copy is deposited in the repository at
+# scripts/scoring/, where the same derivation points at a scripts/data/,
+# scripts/scoring/out/ and scripts/scoring/beds/ that do not exist, and would put
+# the bedtools work directory inside the repository. Job 6085152 failed all three
+# rules that way -- and still exited 0. WP0_DIR repoints the whole derivation at
+# the real harness directory; unset, resolution is exactly as before.
+HERE = os.environ.get("WP0_DIR") or os.path.dirname(os.path.abspath(__file__))
 EXP1 = os.path.dirname(HERE)
 BEDTOOLS = os.environ.get(
     "BEDTOOLS", "/data/gpfs/assoc/pgl/bin/bedtools2/bin/bedtools")

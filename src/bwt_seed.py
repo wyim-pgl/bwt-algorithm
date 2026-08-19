@@ -9,6 +9,7 @@ Used by both Tier 2 and Tier 3.  The algorithm is:
 """
 from __future__ import annotations  # Allow string-form type hints for Python 3.9 and below
 
+import os                           # Environment-variable overrides
 from dataclasses import dataclass   # Decorator for defining immutable data containers
 from typing import List, Optional, Set, Tuple  # Generic types for type hints
 
@@ -16,6 +17,80 @@ import numpy as np  # NumPy for array operations and numerical computation
 
 from .accelerators import extend_with_mismatches, find_periodic_runs
 from .bwt_core import BWTCore, effective_length  # FM-index core module (BWT, backward_search, locate_positions, etc.)
+
+
+class KTupleTable:
+    """Sorted k-tuple table: the non-index way to answer "where does this k-mer occur".
+
+    Exists for the seeding ablation (BWT_SEED_KTUPLE), which asks what the
+    FM-index buys the seeding step. It answers the same question as
+    backward_search plus a suffix-array slice and must return the same position
+    set, so the only thing that differs between the two arms is cost.
+
+    Every k-mer of the text is 2-bit encoded into one uint64 (k <= 32), the codes
+    are sorted once, and a lookup is a pair of binary searches over that sorted
+    array. Positions containing a base other than A, C, G or T are excluded, as
+    the FM-index path excludes them at its own k-mer filter.
+    """
+
+    _CODE = np.full(256, 255, dtype=np.uint8)
+    for _b, _v in ((b"A", 0), (b"C", 1), (b"G", 2), (b"T", 3)):
+        _CODE[_b[0]] = _v
+        _CODE[_b.lower()[0]] = _v
+
+    def __init__(self, text_arr: np.ndarray, k: int, n: int):
+        if k > 32:
+            raise ValueError(f"KTupleTable supports k <= 32, got {k}")
+        self.k = k
+        codes = self._CODE[text_arr[:n]]
+        valid = codes != 255
+        # A k-mer is usable only if all k of its bases are valid; a rolling
+        # minimum over the validity flags is the cheapest way to say that.
+        ok = valid[: n - k + 1].copy()
+        for off in range(1, k):
+            ok &= valid[off : n - k + 1 + off]
+        packed = np.zeros(n - k + 1, dtype=np.uint64)
+        safe = np.where(valid, codes, 0).astype(np.uint64)
+        for off in range(k):
+            packed <<= np.uint64(2)
+            packed |= safe[off : n - k + 1 + off]
+        self._pos = np.flatnonzero(ok).astype(np.int64)
+        self._key = packed[self._pos]
+        order = np.argsort(self._key, kind="stable")
+        self._key = self._key[order]
+        self._pos = self._pos[order]
+
+    def encode(self, kmer: str) -> Optional[int]:
+        code = 0
+        for ch in kmer:
+            v = self._CODE[ord(ch)]
+            if v == 255:
+                return None
+            code = (code << 2) | int(v)
+        return code
+
+    def positions(self, kmer: str) -> Optional[np.ndarray]:
+        """Every start position of `kmer`, or None if it contains a non-ACGT base."""
+        code = self.encode(kmer)
+        if code is None:
+            return None
+        lo = int(np.searchsorted(self._key, np.uint64(code), side="left"))
+        hi = int(np.searchsorted(self._key, np.uint64(code), side="right"))
+        return self._pos[lo:hi]
+
+
+_SEED_KTUPLE = os.environ.get("BWT_SEED_KTUPLE", "0") == "1"
+
+
+def _ktuple_table(bwt: BWTCore, k: int, n: int) -> KTupleTable:
+    """Build the ablation's table once per (index, k) and hang it off the index."""
+    cache = getattr(bwt, "_ktuple_cache", None)
+    if cache is None:
+        cache = {}
+        setattr(bwt, "_ktuple_cache", cache)
+    if k not in cache:
+        cache[k] = KTupleTable(bwt.text_arr, k, n)
+    return cache[k]
 
 
 @dataclass
@@ -119,20 +194,36 @@ def bwt_kmer_seed_scan(
             continue
         seen_kmers.add(kmer_str)  # Register queried k-mer in cache
 
-        # --- Query all occurrence positions of k-mer via FM-index (BWT backward search) ---
-        bwt_queries += 1  # Increment FM-index query counter
-        sp, ep = bwt.backward_search(kmer_str)  # Returns suffix array range [sp, ep]
-        if sp == -1:  # Not found (should not happen in theory, but defensive check)
-            i += stride
-            continue
+        # --- Query all occurrence positions of the k-mer ---
+        # Default: FM-index backward search. Under the REV-2 seeding ablation
+        # (BWT_SEED_KTUPLE=1) the same occurrence set comes from a sorted k-tuple
+        # table instead, so the two arms differ in how seeds are located and in
+        # nothing else. Both paths must yield the same positions; the ablation is
+        # a cost measurement, not an accuracy one.
+        bwt_queries += 1  # Increment occurrence-query counter
+        if _SEED_KTUPLE:
+            table = _ktuple_table(bwt, effective_kmer, n)
+            hits = table.positions(kmer_str)
+            if hits is None:  # k-mer holds a non-ACGT base; the FM path skips these too
+                i += stride
+                continue
+            occ_count = int(hits.size)
+        else:
+            sp, ep = bwt.backward_search(kmer_str)  # Returns suffix array range [sp, ep]
+            if sp == -1:  # Not found (should not happen in theory, but defensive check)
+                i += stride
+                continue
+            occ_count = ep - sp + 1  # Calculate total occurrence count of the k-mer
 
-        occ_count = ep - sp + 1  # Calculate total occurrence count of the k-mer
         if occ_count < min_copies or occ_count > max_occurrences:
             # Skip if too few occurrences (no repeat) or too many (low-complexity sequence)
             i += stride
             continue
 
-        positions = bwt.suffix_array[sp:ep + 1].tolist()  # Reuse the SA interval from backward_search
+        if _SEED_KTUPLE:
+            positions = hits.tolist()
+        else:
+            positions = bwt.suffix_array[sp:ep + 1].tolist()  # Reuse the SA interval from backward_search
         if len(positions) < min_copies:  # Skip if actual position count is below minimum copies
             i += stride
             continue

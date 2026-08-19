@@ -236,6 +236,18 @@ means baseline. Set them on the command line, e.g.
 - **Tier 2 long-unit DP bound**: `TIER2_LONGUNIT_DP_MAX_PERIOD` (default 8192) caps the
   period the long-unit phase will refine by dynamic programming.
 
+- **Seeding ablation** (`bwt_seed.py`) — **`BWT_SEED_KTUPLE` (default 0 = off)**. Tier 2 and
+  Tier 3 both seed through `bwt_kmer_seed_scan`, whose only use of the FM-index is turning a
+  sampled k-mer into its occurrence positions. Set to 1 and that lookup comes from a sorted
+  2-bit k-tuple table built in one pass instead, so both arms sample the same k-mers, get the
+  same positions, and run the same extension. **Output is unchanged; only cost differs** —
+  this exists to answer "what does the index buy the seeding step" (review item REV-2) and is
+  not a tuning knob. The table is built once per (index, k) and cached on the `BWTCore`
+  object, costing roughly 12 bytes per base of the sequence. Read once at import time, so it
+  must be set in the environment before `src` is imported. It does **not** touch Tier 1's
+  FM-index enumeration (`TIER1_FMSCAN`), which is a separate mechanism, so a run with this set
+  is not an index-free pipeline.
+
 The dominant short-STR recall levers are `TIER1_MIN_ARRAY_LEN` + `TIER1_MIN_SCORE`
 (copy-count knobs have little effect); lowering them raises recall but drops
 precision. See `docs/2026-06-20-exp1-human-sensitivity.md` for the measured

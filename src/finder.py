@@ -9,7 +9,14 @@ from .tier1 import Tier1STRFinder  # Tier 1: Short perfect repeat finder
 from .tier2 import Tier2LCPFinder  # Tier 2: Medium-length imperfect repeat finder
 from .tier3 import Tier3LongReadFinder  # Tier 3: Long repeat sequence finder
 from .motif_utils import MotifUtils  # Motif canonicalization and statistics utilities
-from .autocorr import autocorr_identity, windowed_match_counts, contiguous_true_runs  # shared periodicity primitives
+from .autocorr import (  # shared periodicity primitives
+    DEFAULT_MIN_VALID_FRAC,
+    autocorr_identity,
+    contiguous_true_runs,
+    valid_base_mask,
+    windowed_match_counts,
+    windowed_valid_counts,
+)
 
 
 class TandemRepeatFinder:
@@ -506,6 +513,7 @@ class TandemRepeatFinder:
             near_satellite[max(0, sat_start - proximity):min(n, sat_end + proximity)] = True
 
         new_repeats = []
+        block_valid = valid_base_mask(text_arr[:n])
         for block_start, block_end in uncovered_blocks:
             block_size = block_end - block_start
             if block_size > 100000 or block_size < 300:
@@ -513,6 +521,15 @@ class TandemRepeatFinder:
 
             # Skip blocks not near existing satellite detections
             if not np.any(near_satellite[block_start:block_end]):
+                continue
+
+            # Periodicity is judged from at most three 5 kb windows but the
+            # whole block gets claimed, so a block that is mostly assembly gap
+            # or masked sequence must not be labelled satellite on the strength
+            # of one real-sequence window at its edge.
+            valid_frac = float(np.count_nonzero(
+                block_valid[block_start:block_end])) / block_size
+            if valid_frac < DEFAULT_MIN_VALID_FRAC:
                 continue
 
             # Autocorrelation-based satellite detection
@@ -613,7 +630,15 @@ class TandemRepeatFinder:
             if winsum is None:
                 continue
             m = winsum.size
-            hit = (winsum >= (min_id * window)) & (~covered[:m])
+            # Ambiguous comparisons no longer count as matches, but a window
+            # that is mostly N can still clear the match gate on its ACGT
+            # remainder and then claim the gap along with it. Require the
+            # window to be real sequence before its score is trusted.
+            validsum = windowed_valid_counts(s, period, window)
+            if validsum is None:
+                continue
+            enough = validsum[:m] >= (DEFAULT_MIN_VALID_FRAC * window)
+            hit = (winsum >= (min_id * window)) & enough & (~covered[:m])
             if not hit.any():
                 continue
             run_s, run_e = contiguous_true_runs(hit)

@@ -99,3 +99,90 @@ def test_assembly_gap_is_not_reported_as_a_repeat_motif():
         motif = r.consensus_motif or r.motif
         assert motif and all(c in "ACGT" for c in motif), \
             f"non-DNA motif emitted: {motif[:40]!r} at {r.start}-{r.end}"
+
+
+def _overlap(r, lo, hi):
+    return max(0, min(r.end, hi) - max(r.start, lo))
+
+
+def test_assembly_gap_is_not_claimed_as_satellite():
+    """The motif guard above is necessary but not sufficient.
+
+    A window at the edge of the gap carries real satellite, so the *motif* comes
+    out ACGT and passes the check above -- while the emitted interval still
+    swallows the N run behind it. Nothing may claim the gap itself.
+    """
+    monomer = _rand_seq(171)
+    left = _diverged_array(monomer, 30, 0.02)
+    n_run = "N" * 4000
+    right = _diverged_array(monomer, 30, 0.02)
+    seq = left + n_run + right
+    lo, hi = len(left), len(left) + len(n_run)
+
+    finder = _finder(seq)
+    anchors = [_anchor(seq, 0, lo), _anchor(seq, hi, len(seq))]
+    try:
+        filled = finder._fill_satellite_gaps(anchors)
+    finally:
+        finder.cleanup()
+
+    for r in [x for x in filled if x not in anchors]:
+        covered = _overlap(r, lo, hi)
+        assert covered == 0, (
+            f"call {r.start}-{r.end} claims {covered} bp of the {hi - lo} bp "
+            "assembly gap"
+        )
+
+
+def test_mostly_n_block_with_a_real_edge_is_refused():
+    """A short real seed must not authorize a call over a mostly-N block.
+
+    This is the shape seen on Arabidopsis Chr4:3,955,856-3,957,243, which was
+    emitted as a 102 bp satellite with 13.6 copies while being 72% N.
+    """
+    monomer = _rand_seq(171)
+    flank = _diverged_array(monomer, 30, 0.02)
+    seq = flank + _rand_seq(200) + "N" * 3000 + _rand_seq(200) + flank
+    lo = len(flank) + 200
+    hi = lo + 3000
+
+    finder = _finder(seq)
+    anchors = [_anchor(seq, 0, len(flank)),
+               _anchor(seq, len(seq) - len(flank), len(seq))]
+    try:
+        filled = finder._fill_satellite_gaps(anchors)
+    finally:
+        finder.cleanup()
+
+    for r in [x for x in filled if x not in anchors]:
+        assert _overlap(r, lo, hi) == 0, \
+            f"call {r.start}-{r.end} rests on the {hi - lo} bp N block"
+
+
+def test_two_arrays_are_not_merged_across_an_assembly_gap():
+    """The merge path scores the gap by autocorrelation; N == N used to pass."""
+    monomer = _rand_seq(171)
+    left = _diverged_array(monomer, 20, 0.02)
+    n_run = "N" * 2000
+    right = _diverged_array(monomer, 20, 0.02)
+    seq = left + n_run + right
+    lo, hi = len(left), len(left) + len(n_run)
+
+    finder = _finder(seq)
+    motif = seq[:171]
+    calls = [
+        TandemRepeat(chrom="syn", start=0, end=lo, motif=motif,
+                     copies=20.0, length=lo, tier=2,
+                     consensus_motif=motif, mismatch_rate=0.02),
+        TandemRepeat(chrom="syn", start=hi, end=len(seq), motif=motif,
+                     copies=20.0, length=len(seq) - hi, tier=2,
+                     consensus_motif=motif, mismatch_rate=0.02),
+    ]
+    try:
+        merged = finder._merge_adjacent_repeats(calls)
+    finally:
+        finder.cleanup()
+
+    for r in merged:
+        assert not (r.start < lo and r.end > hi), \
+            f"call {r.start}-{r.end} was merged across the {hi - lo} bp gap"

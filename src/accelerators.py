@@ -91,18 +91,37 @@ def _max_mismatch_threshold(period: int, copies: int, allowed_rate: float) -> in
     return max(1, math.ceil(allowed_rate * (period * copies)))
 
 
+# An ambiguous base matches nothing, not even itself. Raw equality counts
+# N == N as agreement, which lets a seed extend straight through an assembly
+# gap or a masked block. The .pyx applies the same rule, so the two must move
+# together or the parity tests are comparing different definitions.
+_VALID_BASE = np.zeros(256, dtype=bool)
+_VALID_BASE[[65, 67, 71, 84]] = True   # A, C, G, T
+
+
+def valid_base_mask(arr: np.ndarray) -> np.ndarray:
+    """Boolean mask marking positions holding an unambiguous A/C/G/T base."""
+    return _VALID_BASE[arr]
+
+
+def _matches(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Elementwise agreement, with ambiguous positions never agreeing."""
+    return (a == b) & _VALID_BASE[a]
+
+
 def _total_mismatches(text_arr: np.ndarray, start_pos: int, end_pos: int,
                       consensus: np.ndarray, period: int, n: int) -> int:
     """Sum of per-copy Hamming distance to `consensus` over [start_pos, end_pos).
 
     Copies that would run past `n` are dropped, matching the .pyx `break`.
+    An ambiguous base counts as a mismatch even against an identical one.
     """
     copies = (end_pos - start_pos) // period
     copies = min(copies, (n - start_pos) // period)
     if copies <= 0:
         return 0
     span = text_arr[start_pos:start_pos + copies * period].reshape(copies, period)
-    return int(np.count_nonzero(span != consensus))
+    return int(np.count_nonzero(~_matches(span, consensus)))
 
 
 def _extend_with_mismatches_py(s_arr: np.ndarray, start_pos: int, period: int,
@@ -138,7 +157,7 @@ def _extend_with_mismatches_py(s_arr: np.ndarray, start_pos: int, period: int,
     while end + period <= n:
         temp_copies = copies + 1
         temp_end = end + period
-        if not np.array_equal(s_arr[end:end + period], consensus):
+        if not _matches(s_arr[end:end + period], consensus).all():
             max_mm = _max_mismatch_threshold(period, temp_copies, allowed_mismatch_rate)
             if _total_mismatches(s_arr, start, temp_end, consensus, period, n) > max_mm:
                 break
@@ -148,7 +167,7 @@ def _extend_with_mismatches_py(s_arr: np.ndarray, start_pos: int, period: int,
     while start - period >= 0:
         temp_copies = copies + 1
         temp_start = start - period
-        if not np.array_equal(s_arr[temp_start:temp_start + period], consensus):
+        if not _matches(s_arr[temp_start:temp_start + period], consensus).all():
             max_mm = _max_mismatch_threshold(period, temp_copies, allowed_mismatch_rate)
             if _total_mismatches(s_arr, temp_start, end, consensus, period, n) > max_mm:
                 break
@@ -159,13 +178,15 @@ def _extend_with_mismatches_py(s_arr: np.ndarray, start_pos: int, period: int,
 
     partial_right = 0
     while partial_right < period and full_end + partial_right < n:
-        if s_arr[full_end + partial_right] != consensus[partial_right]:
+        if not _VALID_BASE[s_arr[full_end + partial_right]] or \
+                s_arr[full_end + partial_right] != consensus[partial_right]:
             break
         partial_right += 1
 
     partial_left = 0
     while partial_left < period and full_start - partial_left - 1 >= 0:
-        if s_arr[full_start - partial_left - 1] != consensus[period - 1 - partial_left]:
+        if not _VALID_BASE[s_arr[full_start - partial_left - 1]] or \
+                s_arr[full_start - partial_left - 1] != consensus[period - 1 - partial_left]:
             break
         partial_left += 1
 
@@ -282,7 +303,7 @@ def _anchor_scan_boundaries_py(text_arr: np.ndarray, seed_pos: int, period: int,
         window = text_arr[pos:pos + period]
         if window.size != period:
             break
-        if int(np.count_nonzero(window == motif_arr)) / period < match_threshold:
+        if int(np.count_nonzero(_matches(window, motif_arr))) / period < match_threshold:
             break
         true_start = pos
         pos -= period
@@ -293,7 +314,7 @@ def _anchor_scan_boundaries_py(text_arr: np.ndarray, seed_pos: int, period: int,
         window = text_arr[pos:pos + period]
         if window.size != period:
             break
-        if int(np.count_nonzero(window == motif_arr)) / period < match_threshold:
+        if int(np.count_nonzero(_matches(window, motif_arr))) / period < match_threshold:
             break
         true_end = pos + period
         pos += period

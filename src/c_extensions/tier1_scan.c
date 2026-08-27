@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* A, C, G, T only. Everything else -- N, the $ sentinel, any IUPAC
+   ambiguity code -- is not usable evidence of periodicity. */
+#define IS_VALID_BASE(ch) \
+    ((ch) == 65 || (ch) == 67 || (ch) == 71 || (ch) == 84)
+
 /*
  * Fast period-k run detection for Tier 1 STR finding.
  *
@@ -28,8 +33,12 @@ int find_period_runs(
     int i = 0;
 
     while (i < limit && count < max_candidates) {
-        /* Skip non-matching positions */
-        if (text[i] != text[i + k]) {
+        /* Skip non-matching positions. An ambiguous base matches nothing, not
+           even itself: N == N would otherwise make an assembly gap a perfect
+           period-k run and carry the seed straight through it. The motif check
+           further down only inspects the first k bases, so it cannot catch a
+           run that starts on real sequence and ends inside a gap. */
+        if (!IS_VALID_BASE(text[i]) || text[i] != text[i + k]) {
             i++;
             continue;
         }
@@ -37,7 +46,7 @@ int find_period_runs(
         /* Found start of a matching run */
         int run_start = i;
         int j = i + 1;
-        while (j < limit && text[j] == text[j + k]) {
+        while (j < limit && IS_VALID_BASE(text[j]) && text[j] == text[j + k]) {
             j++;
         }
 

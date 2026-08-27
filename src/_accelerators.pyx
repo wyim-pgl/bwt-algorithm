@@ -47,8 +47,51 @@ cdef void _init_base_map() noexcept nogil:
     _base_map[84] = 3
     _base_map[116] = 3
     # A is 0, so 65/97 are already 0
-    
+
     _base_map_initialized = True
+
+# --- Ambiguous bases ------------------------------------------------------
+#
+# Raw equality counts N == N as a match, so an assembly gap or a masked region
+# is trivially "periodic" and extends a seed through it. Worse, the 2-bit
+# packing below cannot represent an ambiguous base: _base_map leaves N, $ and
+# every IUPAC code at 0, which is also A's code, so the packed comparator scores
+# N == A as a match and diverges from the byte comparator.
+#
+# The rule everywhere below is: an ambiguous base matches nothing, not even
+# itself. Positions where either side is not A/C/G/T count as mismatches.
+# Deliberately a direct test and not a lookup table: a table needs an
+# initialiser, and reaching hamming_distance() before whatever initialised it
+# would make every base look ambiguous. There is no initialisation order to get
+# wrong here.
+cdef inline bint _is_valid(unsigned char ch) noexcept nogil:
+    return ch == 65 or ch == 67 or ch == 71 or ch == 84   # A, C, G, T
+
+
+cdef inline int _ambiguous_equal_count(const unsigned char[:] arr1,
+                                       const unsigned char[:] arr2,
+                                       int length) nogil:
+    """Positions counted as matches by raw equality that must not be.
+
+    Only positions where the two bases are equal *and* ambiguous; an ambiguous
+    base opposite a different base is already a mismatch.
+    """
+    cdef int i
+    cdef int extra = 0
+    for i in range(length):
+        if arr1[i] == arr2[i] and not _is_valid(arr1[i]):
+            extra += 1
+    return extra
+
+
+cdef inline bint _window_is_clean(const unsigned char[:] arr, int start,
+                                  int length) nogil:
+    cdef int i
+    for i in range(start, start + length):
+        if not _is_valid(arr[i]):
+            return False
+    return True
+
 
 cpdef cnp.ndarray[UINT8, ndim=1] pack_sequence(const unsigned char[:] text_arr):
     if not _base_map_initialized:
@@ -175,7 +218,8 @@ cdef inline int _total_mismatches(const unsigned char[:] text_arr, int start_pos
         if copy_end > n:
             break
         for pos in range(period):
-            if text_arr[copy_start + pos] != consensus[pos]:
+            if (text_arr[copy_start + pos] != consensus[pos]
+                    or not _is_valid(consensus[pos])):
                 total += 1
     return total
 
@@ -213,6 +257,8 @@ cdef inline int _hamming_distance(const unsigned char[:] arr1, const unsigned ch
     for i in range(i, length):
         if arr1[i] != arr2[i]:
             mismatches += 1
+    # The SWAR path above scores N == N as a match; take those back.
+    mismatches += _ambiguous_equal_count(arr1, arr2, length)
     return mismatches
 
 cdef tuple _extend_rolling(const unsigned char[:] text_arr,
@@ -282,7 +328,8 @@ cdef tuple _extend_rolling(const unsigned char[:] text_arr,
         # Count mismatches of the candidate copy vs the current consensus.
         mm = 0
         for pos in range(period):
-            if text_arr[copy_start + pos] != consensus[pos]:
+            if (text_arr[copy_start + pos] != consensus[pos]
+                    or not _is_valid(consensus[pos])):
                 mm += 1
         if mm > per_copy_max:
             bad_run += 1
@@ -318,7 +365,8 @@ cdef tuple _extend_rolling(const unsigned char[:] text_arr,
         copy_start = start - period
         mm = 0
         for pos in range(period):
-            if text_arr[copy_start + pos] != consensus[pos]:
+            if (text_arr[copy_start + pos] != consensus[pos]
+                    or not _is_valid(consensus[pos])):
                 mm += 1
         if mm > per_copy_max:
             bad_run += 1
@@ -350,7 +398,8 @@ cdef tuple _extend_rolling(const unsigned char[:] text_arr,
     # Partial right extension (exact matching against the final consensus).
     partial_right = 0
     while partial_right < period and full_end + partial_right < n:
-        if text_arr[full_end + partial_right] != consensus[partial_right]:
+        if (text_arr[full_end + partial_right] != consensus[partial_right]
+                or not _is_valid(consensus[partial_right])):
             break
         partial_right += 1
     array_end = full_end + partial_right
@@ -358,7 +407,8 @@ cdef tuple _extend_rolling(const unsigned char[:] text_arr,
     # Partial left extension (exact matching against the final consensus).
     partial_left = 0
     while partial_left < period and full_start - partial_left - 1 >= 0:
-        if text_arr[full_start - partial_left - 1] != consensus[period - 1 - partial_left]:
+        if (text_arr[full_start - partial_left - 1] != consensus[period - 1 - partial_left]
+                or not _is_valid(consensus[period - 1 - partial_left])):
             break
         partial_left += 1
     array_start = full_start - partial_left
@@ -442,7 +492,8 @@ cpdef tuple extend_with_mismatches(const unsigned char[:] s_arr,
     # Partial right extension (exact matching)
     partial_right = 0
     while partial_right < period and full_end + partial_right < n:
-        if text_arr[full_end + partial_right] != consensus[partial_right]:
+        if (text_arr[full_end + partial_right] != consensus[partial_right]
+                or not _is_valid(consensus[partial_right])):
             break
         partial_right += 1
     array_end = full_end + partial_right
@@ -450,7 +501,8 @@ cpdef tuple extend_with_mismatches(const unsigned char[:] s_arr,
     # Partial left extension (exact matching)
     partial_left = 0
     while partial_left < period and full_start - partial_left - 1 >= 0:
-        if text_arr[full_start - partial_left - 1] != consensus[period - 1 - partial_left]:
+        if (text_arr[full_start - partial_left - 1] != consensus[period - 1 - partial_left]
+                or not _is_valid(consensus[period - 1 - partial_left])):
             break
         partial_left += 1
     array_start = full_start - partial_left
@@ -466,6 +518,7 @@ cpdef list scan_unit_repeats(const unsigned char[:] text_arr, int n, int unit_le
     cdef int allowed_errors
     cdef int dist
     cdef bint found_indel
+    cdef bint clean
     cdef bint use_packed = (packed_arr is not None)
     
     # Calculate dynamic error threshold (15% of unit length or max_mismatch, whichever is higher)
@@ -488,8 +541,14 @@ cpdef list scan_unit_repeats(const unsigned char[:] text_arr, int n, int unit_le
             if b_end > n:
                 break
                 
+            # The packed comparator cannot see ambiguity (N and $ share A's
+            # code), so it must not be used when either window carries any.
+            # A*40 + N*40 at unit 20 was returned as one call spanning both.
+            clean = (_window_is_clean(text_arr, a_start, unit_len)
+                     and _window_is_clean(text_arr, b_start, unit_len))
+
             # 1. Check direct Hamming distance
-            if use_packed:
+            if use_packed and clean:
                 dist = _hamming_distance_2bit(packed_arr, a_start, b_start, unit_len)
             else:
                 dist = _hamming_distance(text_arr[a_start:a_end], text_arr[b_start:b_end], unit_len)
@@ -503,7 +562,7 @@ cpdef list scan_unit_repeats(const unsigned char[:] text_arr, int n, int unit_le
             
             # Check shift -1
             if b_start > 0:
-                if use_packed:
+                if use_packed and clean and _window_is_clean(text_arr, b_start-1, unit_len):
                     dist = _hamming_distance_2bit(packed_arr, a_start, b_start-1, unit_len)
                 else:
                     dist = _hamming_distance(text_arr[a_start:a_end], text_arr[b_start-1:b_end-1], unit_len)
@@ -514,7 +573,7 @@ cpdef list scan_unit_repeats(const unsigned char[:] text_arr, int n, int unit_le
             
             if not found_indel and b_end + 1 <= n:
                 # Check shift +1
-                if use_packed:
+                if use_packed and clean and _window_is_clean(text_arr, b_start+1, unit_len):
                     dist = _hamming_distance_2bit(packed_arr, a_start, b_start+1, unit_len)
                 else:
                     dist = _hamming_distance(text_arr[a_start:a_end], text_arr[b_start+1:b_end+1], unit_len)
@@ -1104,7 +1163,8 @@ cpdef tuple anchor_scan_boundaries(
             break
         matches = 0
         for i in range(period):
-            if text_arr[pos + i] == text_arr[seed_pos + i]:
+            if (text_arr[pos + i] == text_arr[seed_pos + i]
+                    and _is_valid(text_arr[pos + i])):
                 matches += 1
         if <double>matches / <double>period >= match_threshold:
             true_start = pos
@@ -1121,7 +1181,8 @@ cpdef tuple anchor_scan_boundaries(
     while pos + period <= scan_end:
         matches = 0
         for i in range(period):
-            if text_arr[pos + i] == text_arr[seed_pos + i]:
+            if (text_arr[pos + i] == text_arr[seed_pos + i]
+                    and _is_valid(text_arr[pos + i])):
                 matches += 1
         if <double>matches / <double>period >= match_threshold:
             true_end = pos + period

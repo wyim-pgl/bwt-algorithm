@@ -580,16 +580,14 @@ class TandemRepeatFinder:
             # emitted at telomeres. Same guard the catch-all pass applies.
             if not use_motif or any(c not in 'ACGT' for c in use_motif):
                 continue
-            copies = block_size / best_period
 
-            new_tr = TandemRepeat(
-                chrom=self.chromosome,
-                start=block_start, end=block_end,
-                motif=use_motif, copies=copies,
-                length=block_size, consensus_motif=use_motif,
-                mismatch_rate=1.0 - best_identity, tier=TIER_SATELLITE,
-            )
-            new_repeats.append(new_tr)
+            # The sampled windows only *nominate* a period. Claiming
+            # [block_start, block_end) on their strength alone let one periodic
+            # 5 kb edge window label up to 100 kb of unexamined sequence as
+            # satellite. Verify the periodicity across the whole block instead
+            # and emit only the contiguous stretches that actually support it.
+            new_repeats.extend(self._segment_periodic_block(
+                text_arr, block_start, block_end, best_period))
 
         if new_repeats:
             filled = list(repeats) + new_repeats
@@ -597,6 +595,69 @@ class TandemRepeatFinder:
             return filled
 
         return repeats
+
+    def _segment_periodic_block(self, text_arr: np.ndarray, block_start: int,
+                                block_end: int, period: int) -> List[TandemRepeat]:
+        """Emit the stretches of [block_start, block_end) that are periodic.
+
+        The block-level scan nominated ``period`` from at most three sampled
+        windows. This walks the whole block with the same O(n) cumsum the
+        catch-all uses and keeps only contiguous runs where a sliding window
+        clears the identity gate on real sequence, so an uncovered block is
+        claimed exactly as far as the evidence reaches -- not wholesale.
+        """
+        block = text_arr[block_start:block_end]
+        n = block.size
+        window = min(2 * period, max(1, n - period))
+        min_len = max(300, 2 * period)
+
+        winsum = windowed_match_counts(block, period, window)
+        validsum = windowed_valid_counts(block, period, window)
+        if winsum is None or validsum is None:
+            return []
+
+        # Same gates the block-level scan applied, now enforced everywhere:
+        # enough support for the period, on enough real bases.
+        hit = ((winsum >= self.sat_fill_min_identity * window)
+               & (validsum >= DEFAULT_MIN_VALID_FRAC * window))
+        if not hit.any():
+            return []
+
+        out: List[TandemRepeat] = []
+        run_s, run_e = contiguous_true_runs(hit)
+        for a, b in zip(run_s.tolist(), run_e.tolist()):
+            # A window at offset i vouches for block[i : i + window + period].
+            seg_start = int(a)
+            seg_end = min(int(b) - 1 + window + period, n)
+            seg_len = seg_end - seg_start
+            if seg_len < min_len or seg_len / period < 2.0:
+                continue
+
+            motif = block[seg_start:seg_start + period].tobytes().decode(
+                'ascii', errors='replace')
+            if not motif or any(c not in 'ACGT' for c in motif):
+                # The run is periodic but starts on ambiguous sequence; step
+                # forward one window and retry once rather than dropping a
+                # genuine array for a bad first period.
+                alt = seg_start + window
+                if alt + period <= seg_end:
+                    motif = block[alt:alt + period].tobytes().decode(
+                        'ascii', errors='replace')
+                if not motif or any(c not in 'ACGT' for c in motif):
+                    continue
+
+            local = winsum[a:b]
+            identity = float(local.mean()) / window if local.size else 0.0
+            out.append(TandemRepeat(
+                chrom=self.chromosome,
+                start=block_start + seg_start,
+                end=block_start + seg_end,
+                motif=motif, copies=seg_len / period,
+                length=seg_len, consensus_motif=motif,
+                mismatch_rate=max(0.0, 1.0 - identity),
+                tier=TIER_SATELLITE,
+            ))
+        return out
 
     def _catchall_periodicity_fill(self, repeats: List[TandemRepeat]) -> List[TandemRepeat]:
         """Low-stringency autocorrelation sweep over short periods (default 1-20)

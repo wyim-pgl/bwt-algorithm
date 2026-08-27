@@ -186,3 +186,64 @@ def test_two_arrays_are_not_merged_across_an_assembly_gap():
     for r in merged:
         assert not (r.start < lo and r.end > hi), \
             f"call {r.start}-{r.end} was merged across the {hi - lo} bp gap"
+
+
+def test_heterogeneous_block_is_claimed_only_where_periodic():
+    """One periodic edge window must not label a whole mixed block satellite.
+
+    The filler samples at most three 5 kb windows but used to emit
+    [block_start, block_end) wholesale, so a block whose first 5 kb is genuine
+    satellite and whose remaining tens of kb are random sequence was claimed
+    end to end. Only the periodic stretch may be claimed now.
+    """
+    monomer = _rand_seq(171)
+    sat = _diverged_array(monomer, 40, 0.02)        # ~6.8 kb of real satellite
+    junk = _rand_seq(20000)                          # 20 kb of random sequence
+    flank = _diverged_array(monomer, 30, 0.02)
+    seq = flank + sat + junk + flank
+    lo = len(flank)                                  # block = sat + junk
+    hi = len(flank) + len(sat) + len(junk)
+
+    finder = _finder(seq)
+    anchors = [_anchor(seq, 0, lo), _anchor(seq, hi, len(seq))]
+    try:
+        filled = finder._fill_satellite_gaps(anchors)
+    finally:
+        finder.cleanup()
+
+    new = [r for r in filled if r not in anchors]
+    assert new, "the genuine satellite stretch was not claimed at all"
+    junk_lo = lo + len(sat)
+    for r in new:
+        junk_cov = _overlap(r, junk_lo, hi)
+        assert junk_cov <= 1000, (
+            f"call {r.start}-{r.end} claims {junk_cov} bp of the 20 kb "
+            "random block on the strength of the satellite edge"
+        )
+    # And the satellite itself is substantially covered.
+    sat_cov = sum(_overlap(r, lo, junk_lo) for r in new)
+    assert sat_cov >= 0.6 * len(sat), (
+        f"only {sat_cov} of {len(sat)} bp of real satellite claimed"
+    )
+
+
+def test_periodic_block_is_still_claimed_end_to_end():
+    """Segmentation must not fragment a block that really is all satellite."""
+    monomer = _rand_seq(171)
+    gap_sat = _diverged_array(monomer, 40, 0.05)     # divergent but periodic
+    flank = _diverged_array(monomer, 30, 0.02)
+    seq = flank + gap_sat + flank
+    lo, hi = len(flank), len(flank) + len(gap_sat)
+
+    finder = _finder(seq)
+    anchors = [_anchor(seq, 0, lo), _anchor(seq, hi, len(seq))]
+    try:
+        filled = finder._fill_satellite_gaps(anchors)
+    finally:
+        finder.cleanup()
+
+    new = [r for r in filled if r not in anchors]
+    covered = sum(_overlap(r, lo, hi) for r in new)
+    assert covered >= 0.9 * (hi - lo), (
+        f"only {covered} of {hi - lo} bp claimed on a fully periodic block"
+    )

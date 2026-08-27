@@ -1,0 +1,17 @@
+# Exact core freeze of the environment the published numbers were measured on:
+# conda env "bwtandem" at /data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem,
+# recorded 2026-08-27. This is the detector's runtime; comparator tools live in
+# environment.yml. numba is NOT installed in the measured environment -- the
+# numba-accelerated paths were not part of any recorded run.
+name: bwtandem
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11.15
+  - numpy=2.4.6
+  - cython=3.2.5
+  - pytest=9.1.1
+  - gcc=14.3.0
+  - pip
+  - pip:
+      - pydivsufsort==0.0.20

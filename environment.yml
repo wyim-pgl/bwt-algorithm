@@ -1,38 +1,43 @@
+# Benchmarking environment for BWTandem and its comparator tools.
+#
+# The manuscript's measured environment is Python 3.11.15 (conda env
+# "bwtandem"); this file used to request python=3.13 and force
+# CONDA_SUBDIR: osx-64, both of which contradicted every recorded run.
+# Core versions are pinned to what the published numbers were measured on --
+# see environment.core.lock.yml for the exact core freeze.
 name: bwt
 channels:
   - conda-forge
   - defaults
   - bioconda
 dependencies:
-  - python=3.13
-  - numpy
-  - numba
-  - cython
+  - python=3.11.15
+  - numpy=2.4.6
+  - cython=3.2.5
+  - pytest=9.1.1
   - pip
+  - gcc=14.3.0
+  # --- comparator tools and TRASH dependencies (benchmarking only) ---
   - trf
   - tidehunter
   - tantan
   - ncrf
-  - r-base 
-  - r-stringr 
-  - r-stringi 
-  - r-stringdist 
-  - r-optparse 
-  - r-circlize 
-  - r-seqinr 
-  - r-doparallel 
+  - r-base
+  - r-stringr
+  - r-stringi
+  - r-stringdist
+  - r-optparse
+  - r-circlize
+  - r-seqinr
+  - r-doparallel
   - r-remotes
   - mafft
   - zlib
-  - gcc
   - libcurl
   - cmake
-  - bioconductor-biostrings 
+  - bioconductor-biostrings
   - bioconductor-pwalign
   - setuptools
   - mreps
-  - pytest
   - pip:
-      - pydivsufsort
-variables:
-  CONDA_SUBDIR: osx-64
+      - pydivsufsort==0.0.20

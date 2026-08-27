@@ -22,9 +22,18 @@ import os
 import sys
 from collections import defaultdict
 
-GT = "/data/gpfs/assoc/pgl/filip/bwtandem_results/ground_truth"
-B = "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds"
+# Historic defaults point at the cluster tree the published numbers came from;
+# a fresh clone must override them or the run refuses to score (fail-closed).
+GT = os.environ.get("COLCEN_GT",
+                    "/data/gpfs/assoc/pgl/filip/bwtandem_results/ground_truth")
+B = os.environ.get("COLCEN_BEDS",
+                   "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds")
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+# The row this implementation must reproduce before any new number from it is
+# trusted (see the module docstring). --validate enforces it.
+EXPECTED_BWTANDEM = {"coverage": 84.59, "cen180": 1380, "recall": 99.73}
+VALIDATE = "--validate" in sys.argv
 
 CHROMS = {"Chr1", "Chr2", "Chr3", "Chr4", "Chr5"}
 
@@ -169,8 +178,14 @@ def load_flat(path):
 
 
 def main():
+    for req in (f"{GT}/colcen_centromeres.bed", f"{GT}/colcen_cen180.bed"):
+        if not os.path.exists(req):
+            sys.exit(f"FATAL: ground truth not found: {req}\n"
+                     "Set COLCEN_GT (and COLCEN_BEDS) to the benchmark data tree.")
     cens = [(c, s, e) for c, s, e, _ in load_flat(f"{GT}/colcen_centromeres.bed")]
     monomers = load_flat(f"{GT}/colcen_cen180.bed")
+    if not cens or not monomers:
+        sys.exit("FATAL: ground truth loaded empty; refusing to score.")
     print(f"GT: {len(cens)} centromeres, {len(monomers):,} CEN180 monomers\n")
 
     cases = [
@@ -189,6 +204,8 @@ def main():
     # ablation, whose whole point is to be scored by exactly the code that
     # produced the published Col-CEN row rather than by a second implementation.
     for spec in sys.argv[1:]:
+        if spec.startswith("--"):
+            continue
         label, _, path = spec.partition(":")
         if path:
             cases.append((label, path, "  -- ablation --"))
@@ -202,8 +219,12 @@ def main():
     print(f"{'tool':28s} {'regions':>9s} {'cov%':>7s} {'n150-200':>9s} {'bpPrec%':>8s} | "
           f"{'recall(pub)':>11s} {'rec150-200':>11s} {'rec150-400':>11s}   "
           f"published (cov/count/bpPrec/recall)")
+    validated = False
     for label, path, pub in cases:
         if not os.path.exists(path):
+            if VALIDATE and label == "BWTandem":
+                sys.exit(f"FATAL: --validate needs the published BWTandem BED "
+                         f"at {path}, which is missing.")
             print(f"{label:28s} {'(missing)':>9s}")
             continue
         calls = load_bed(path, CHROMS)
@@ -212,12 +233,35 @@ def main():
         b1 = band_calls(calls, 150, 200)
         b2 = band_calls(calls, 150, 400)
         allc = {c: [(s, e) for s, e, _ in v] for c, v in calls.items()}
+        n_cen180 = count_in_centromeres(b1, cens)
+        rec_pub = monomer_recall(allc, monomers)
         print(f"{label:28s} {n_reg:>9,d} {cov:>6.2f}% "
-              f"{count_in_centromeres(b1, cens):>9,d} "
+              f"{n_cen180:>9,d} "
               f"{cen180_bp_precision(calls, monomers):>7.2f}% | "
-              f"{monomer_recall(allc, monomers):>10.2f}% "
+              f"{rec_pub:>10.2f}% "
               f"{monomer_recall(b1, monomers):>10.2f}% "
               f"{monomer_recall(b2, monomers):>10.2f}%   {pub}")
+
+        if label == "BWTandem":
+            exp = EXPECTED_BWTANDEM
+            ok = (abs(cov - exp["coverage"]) < 0.005
+                  and n_cen180 == exp["cen180"]
+                  and abs(rec_pub - exp["recall"]) < 0.005)
+            validated = ok
+            if VALIDATE and not ok:
+                sys.exit(
+                    f"FATAL: failed to reproduce the published BWTandem row.\n"
+                    f"  got      {cov:.2f} / {n_cen180} / {rec_pub:.2f}\n"
+                    f"  expected {exp['coverage']:.2f} / {exp['cen180']} / "
+                    f"{exp['recall']:.2f}\n"
+                    "No number from this run should be used.")
+
+    if VALIDATE:
+        if not validated:
+            sys.exit("FATAL: --validate ran but the BWTandem row was never scored.")
+        print("\nVALIDATION PASSED: published BWTandem row reproduced "
+              f"({EXPECTED_BWTANDEM['coverage']:.2f} / "
+              f"{EXPECTED_BWTANDEM['cen180']} / {EXPECTED_BWTANDEM['recall']:.2f}).")
 
 
 if __name__ == "__main__":

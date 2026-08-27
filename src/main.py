@@ -130,6 +130,15 @@ def main():
     else:
         # Normalize comma-separated tier names to lowercase and create a set
         enabled_tiers = {t.strip().lower() for t in tiers_arg.split(',') if t.strip()}
+        # TandemRepeatFinder refuses unknown names too, but reaching it would
+        # report a typo as a traceback after the index build. Fail here instead.
+        unknown = sorted(enabled_tiers - {"tier1", "tier2", "tier3"})
+        if unknown:
+            parser.error(f"unknown tier(s): {', '.join(unknown)}; "
+                         "choose from tier1, tier2, tier3, or all")
+        if not enabled_tiers:
+            parser.error("--tiers selected no tier; "
+                         "choose from tier1, tier2, tier3, or all")
 
     # Optional profiler
     profiler = None  # Initialize profiler (default None)

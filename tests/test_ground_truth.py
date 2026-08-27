@@ -247,7 +247,8 @@ class TestTier1GroundTruth:
     """Tier 1 ground truth: sensitivity >= 95%, precision >= 90%."""
 
     @pytest.fixture(scope="class")
-    def tier1_results(self):
+    @staticmethod
+    def tier1_results():
         fasta = os.path.join(FIXTURES, "synth_tier1.fa")
         bed = os.path.join(FIXTURES, "synth_tier1_truth.bed")
         truth = parse_truth_bed(bed)
@@ -279,7 +280,8 @@ class TestTier2GroundTruth:
     """Tier 2 ground truth: sensitivity >= 90%, precision >= 90%."""
 
     @pytest.fixture(scope="class")
-    def tier2_results(self):
+    @staticmethod
+    def tier2_results():
         fasta = os.path.join(FIXTURES, "synth_tier2.fa")
         bed = os.path.join(FIXTURES, "synth_tier2_truth.bed")
         truth = parse_truth_bed(bed)
@@ -311,7 +313,8 @@ class TestTier3GroundTruth:
     """Tier 3 ground truth: sensitivity >= 90%, precision >= 90%."""
 
     @pytest.fixture(scope="class")
-    def tier3_results(self):
+    @staticmethod
+    def tier3_results():
         fasta = os.path.join(FIXTURES, "synth_tier3.fa")
         bed = os.path.join(FIXTURES, "synth_tier3_truth.bed")
         truth = parse_truth_bed(bed)
@@ -343,7 +346,8 @@ class TestMixedGroundTruth:
     """Mixed tiers ground truth: per-tier thresholds on a single sequence."""
 
     @pytest.fixture(scope="class")
-    def mixed_results(self):
+    @staticmethod
+    def mixed_results():
         fasta = os.path.join(FIXTURES, "synth_mixed.fa")
         bed = os.path.join(FIXTURES, "synth_mixed_truth.bed")
         truth = parse_truth_bed(bed)
@@ -387,7 +391,8 @@ class TestAdjacentGroundTruth:
     """Adjacent repeat edge cases: overall sensitivity >= 95%, precision >= 90%."""
 
     @pytest.fixture(scope="class")
-    def adjacent_results(self):
+    @staticmethod
+    def adjacent_results():
         fasta = os.path.join(FIXTURES, "synth_adjacent.fa")
         bed = os.path.join(FIXTURES, "synth_adjacent_truth.bed")
         truth = parse_truth_bed(bed)

@@ -82,16 +82,27 @@ def find_shared(regions_a, regions_b, min_overlap=0.3):
 
 
 def bin_regions(regions, bin_size=500):
-    """Bin regions into genomic windows for set-based comparison."""
+    """Bin regions into genomic windows for set-based comparison.
+
+    Intervals are half-open [start, end), so the last base covered is end - 1
+    and the last bin touched is (end - 1) // bin_size. Deriving it from `end`
+    instead credited an extra bin to every interval whose end landed exactly on
+    a bin boundary, inflating that tool's area in the Venn diagram.
+    """
     bins = set()
     for chrom, start, end in regions:
-        for pos in range(start // bin_size, end // bin_size + 1):
+        if end <= start:
+            continue
+        for pos in range(start // bin_size, (end - 1) // bin_size + 1):
             bins.add((chrom, pos))
     return bins
 
 
 def main():
-    results_dir = "results"
+    # The Chr4 corpus these defaults name was removed when the manuscript moved
+    # to GRCh38 / Col-CEN / Mo17, so the directory has to be given explicitly
+    # for the script to find anything.
+    results_dir = sys.argv[1] if len(sys.argv) > 1 else "results"
 
     # Parse all tool results
     tools = {}
@@ -117,7 +128,10 @@ def main():
         print(f"ULTRA: {len(tools['ULTRA'])} repeats")
 
     if len(tools) < 2:
-        print("Need at least 2 tool results for comparison")
+        print(f"Need at least 2 tool results for comparison; "
+              f"found {len(tools)} under {results_dir!r}.")
+        print("Looked for: bwt_Chr4.bed, trf_Chr4.bed, mreps_Chr4.txt, ultra_Chr4.tsv")
+        print("Usage: venn_compare.py [RESULTS_DIR]")
         sys.exit(1)
 
     # Use genomic bins (500bp windows) for set-based Venn comparison

@@ -660,15 +660,27 @@ class TandemRepeatFinder:
             return set(self.VALID_TIERS)  # If no tiers specified, enable all valid tiers
 
         normalized: Set[str] = set()  # Set of normalized tier names
+        unknown: List[str] = []       # Tokens that name no tier
         for tier in tiers:
-            if not tier:
-                continue  # Skip empty strings
+            if not tier or not tier.strip():
+                continue  # Skip empty/whitespace-only tokens from a trailing comma
             name = tier.strip().lower()  # Normalize by stripping whitespace and converting to lowercase
             if name == "all":
                 return set(self.VALID_TIERS)  # If "all", return all valid tiers
             if name in self.VALID_TIERS:
                 normalized.add(name)  # Add to set if it is a valid tier name
+            else:
+                unknown.append(name)
 
+        # A typo used to be dropped silently. When it was the only token the
+        # empty result then fell through to "enable everything", so `--tiers
+        # tier1,typo` quietly ran one tier and `--tiers typo` quietly ran three.
+        # Neither is what the caller asked for, so both are refused.
+        if unknown:
+            raise ValueError(
+                f"Unknown tier(s): {', '.join(sorted(unknown))}. "
+                "Choose from tier1, tier2, tier3, or all."
+            )
         if not normalized:
             raise ValueError(
                 "No valid tiers selected; choose from tier1, tier2, tier3, or all"

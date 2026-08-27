@@ -126,6 +126,7 @@ def main():
     total_fp = {1: 0, 2: 0, 3: 0, "all": 0}
     total_fn = {1: 0, 2: 0, 3: 0, "all": 0}
     total_truth = {1: 0, 2: 0, 3: 0, "all": 0}
+    crashed = []  # Cases whose detector run raised
 
     for i in range(NUM_SEQUENCES):
         seed_val = 1000 + i
@@ -139,7 +140,12 @@ def main():
         try:
             preds = run_finder(fa_path, enabled)
         except Exception as e:
-            print(f"  [{i:03d}] ERROR: {e}")
+            # A crash used to `continue`, which removed the case from every
+            # total below. The suite then scored only the sequences that
+            # happened to work and could report PASS while the detector was
+            # crashing on a third of its input.
+            print(f"  [{i:03d}] ERROR (seed {seed_val}): {type(e).__name__}: {e}")
+            crashed.append((i, seed_val, f"{type(e).__name__}: {e}"))
             continue
 
         tp, fp, fn, missed, extra = match_repeats(truth, preds)
@@ -194,6 +200,20 @@ def main():
 
     # Final pass/fail
     overall = compute_metrics(total_tp["all"], total_fp["all"], total_fn["all"])
+    scored = NUM_SEQUENCES - len(crashed)
+    print(f"\nScored {scored}/{NUM_SEQUENCES} sequences "
+          f"({len(crashed)} crashed)")
+
+    if crashed:
+        print(f"\n*** STRESS TEST FAILED *** "
+              f"({len(crashed)}/{NUM_SEQUENCES} sequences crashed; "
+              f"metrics below cover only the {scored} that ran)")
+        for i, seed_val, err in crashed:
+            print(f"    [{i:03d}] seed {seed_val}: {err}")
+        print(f"  (sens={overall['sensitivity']:.1%}, "
+              f"prec={overall['precision']:.1%} over the scored subset)")
+        return 1
+
     if overall["sensitivity"] >= 0.80 and overall["precision"] >= 0.50:
         print("\n*** STRESS TEST PASSED ***")
         return 0

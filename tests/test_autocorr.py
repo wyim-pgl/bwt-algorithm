@@ -128,25 +128,48 @@ def test_windowed_valid_counts_aligns_with_match_counts():
 
 # --- windowed_match_counts (vector) ---
 
-def test_windowed_match_counts_reproduces_inline_block():
-    """Must equal the exact inline computation from finder/tier2 on ACGT input."""
+def test_windowed_match_counts_matches_bruteforce():
+    """Every index must equal the naive per-window count.
+
+    This replaces a test that pinned the inline block's arithmetic, which used
+    `m = eq.size - window` and so silently dropped the last full window.
+    """
     rng = np.random.RandomState(42)
     a = ACGT[rng.randint(0, 4, 1000)]
     n = a.size
     for period, window in ((1, 12), (5, 20), (13, 52), (20, 40)):
-        s = a[:n]
-        eq = (s[:n - period] == s[period:n])
-        cs = np.empty(eq.size + 1, dtype=np.int64)
-        cs[0] = 0
-        np.cumsum(eq, out=cs[1:])
-        m = eq.size - window
-        expected = cs[window:window + m] - cs[:m] if m > 0 else None
+        eq = (a[:n - period] == a[period:n])
+        expected = np.array([eq[i:i + window].sum()
+                             for i in range(eq.size - window + 1)], dtype=np.int64)
         got = windowed_match_counts(a, period, window)
-        if expected is None:
-            assert got is None
-        else:
-            assert got is not None
-            np.testing.assert_array_equal(got, expected)
+        assert got is not None
+        np.testing.assert_array_equal(got, expected)
+
+
+def test_windowed_counts_include_the_last_full_window():
+    a = _arr("AC" * 20)                 # 40 bp; period 2 -> eq.size 38
+    got = windowed_match_counts(a, 2, 10)
+    assert got is not None
+    assert got.size == 38 - 10 + 1
+
+
+def test_windowed_counts_handle_exactly_one_full_window():
+    a = _arr("AC" * 6)                  # 12 bp; period 2 -> eq.size 10
+    got = windowed_match_counts(a, 2, 10)
+    assert got is not None and got.tolist() == [10]
+
+
+def test_windowed_valid_counts_matches_bruteforce_elementwise():
+    a = _arr("ACGT" * 60 + "N" * 40 + "ACGT" * 60)
+    period, window = 4, 25
+    vm = valid_base_mask(a)
+    pair = vm[:a.size - period] & vm[period:]
+    expected = np.array([pair[i:i + window].sum()
+                         for i in range(pair.size - window + 1)], dtype=np.int64)
+    got = windowed_valid_counts(a, period, window)
+    assert got is not None
+    np.testing.assert_array_equal(got, expected)
+    assert got.shape == windowed_match_counts(a, period, window).shape
 
 
 def test_windowed_match_counts_window_semantics():

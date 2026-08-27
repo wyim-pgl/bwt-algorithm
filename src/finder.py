@@ -118,6 +118,15 @@ class TandemRepeatFinder:
         # period interval. It previously always searched 100..100,000 bp and
         # relied on final filtering, wasting work and making preset diagnostics
         # inconsistent with the CLI arguments.
+        #
+        # This is NOT output-neutral, despite the final bounds filter. The
+        # limits also feed compute_adaptive_params(), where
+        # `tolerance_ratio = 0.02 + 0.02 * (max_period / 100000)`: at the
+        # default --max-period 2000 the tolerance drops from 0.0400 to 0.0204,
+        # so an in-range period can now be grouped differently. min_period
+        # likewise affects the seed k-mer size. One full Arabidopsis Chr4 run
+        # at default arguments happened to produce byte-identical BED, which
+        # does not generalize to other arguments, presets, or genomes.
         tier3_min = max(100, self.min_period)
         tier3_max = min(100_000, self.max_period)
         self.tier3 = None
@@ -634,6 +643,15 @@ class TandemRepeatFinder:
             # that is mostly N can still clear the match gate on its ACGT
             # remainder and then claim the gap along with it. Require the
             # window to be real sequence before its score is trusted.
+            #
+            # Note the denominator: `winsum >= min_id * window` scores matches
+            # against the FULL window, so CATCHALL_MIN_IDENTITY is a
+            # whole-window support threshold, not identity among callable
+            # bases -- 80% valid comparisons at 90% identity scores 0.72 here
+            # and 0.90 from autocorr_identity(). That is deliberate (ambiguous
+            # positions count as non-support) but it means a threshold above
+            # DEFAULT_MIN_VALID_FRAC is unreachable at minimum coverage, and
+            # the stored mismatch_rate uses the same full-window denominator.
             validsum = windowed_valid_counts(s, period, window)
             if validsum is None:
                 continue
@@ -686,12 +704,17 @@ class TandemRepeatFinder:
 
         normalized: Set[str] = set()  # Set of normalized tier names
         unknown: List[str] = []       # Tokens that name no tier
+        saw_all = False
         for tier in tiers:
             if not tier or not tier.strip():
                 continue  # Skip empty/whitespace-only tokens from a trailing comma
             name = tier.strip().lower()  # Normalize by stripping whitespace and converting to lowercase
             if name == "all":
-                return set(self.VALID_TIERS)  # If "all", return all valid tiers
+                # Returning here would skip validation of the remaining tokens,
+                # and because `tiers` is a set the outcome would depend on
+                # iteration order: {"all", "typo"} enabled everything silently.
+                saw_all = True
+                continue
             if name in self.VALID_TIERS:
                 normalized.add(name)  # Add to set if it is a valid tier name
             else:
@@ -706,6 +729,8 @@ class TandemRepeatFinder:
                 f"Unknown tier(s): {', '.join(sorted(unknown))}. "
                 "Choose from tier1, tier2, tier3, or all."
             )
+        if saw_all:
+            return set(self.VALID_TIERS)
         if not normalized:
             raise ValueError(
                 "No valid tiers selected; choose from tier1, tier2, tier3, or all"

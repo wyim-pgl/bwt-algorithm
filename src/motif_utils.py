@@ -201,17 +201,35 @@ class MotifUtils:
         return float(-(p * np.log2(p)).sum())
 
     @staticmethod
-    def _str_autocorr_identity(s: str, p: int) -> float:
-        """Fraction of positions i where ``s[i] == s[i + p]``.
+    def _str_autocorr_identity(s: str, p: int, min_valid_frac: float = 0.8) -> float:
+        """Fraction of positions i where ``s[i] == s[i + p]``, over real bases.
 
-        The string twin of `autocorr.autocorr_identity`. Kept allocation-free
-        (no encode to uint8) because `refine_repeat` calls it in a hot loop.
-        Returns 0.0 when `p` leaves no overlap.
+        The string twin of `autocorr.autocorr_identity`, and it carries the same
+        ambiguity rule: a comparison where either side is not A/C/G/T is dropped
+        rather than counted as agreement, and a region without enough usable
+        comparisons scores 0.0. Without this an N run is trivially periodic at
+        every p (N == N), which reaches primitive-period correction in
+        `refine_repeat` and both satellite-period searches.
+
+        Kept allocation-free (no encode to uint8) because `refine_repeat` calls
+        it in a hot loop. Returns 0.0 when `p` leaves no overlap.
         """
         total = len(s) - p
         if total <= 0:
             return 0.0
-        return sum(1 for i in range(total) if s[i] == s[i + p]) / total
+        valid = 0
+        matches = 0
+        for i in range(total):
+            a = s[i]
+            b = s[i + p]
+            if a not in "ACGT" or b not in "ACGT":
+                continue
+            valid += 1
+            if a == b:
+                matches += 1
+        if valid <= 0 or valid < min_valid_frac * total:
+            return 0.0
+        return matches / valid
 
     @staticmethod
     def hamming_distance(s1: str, s2: str) -> int:

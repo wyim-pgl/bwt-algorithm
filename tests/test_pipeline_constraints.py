@@ -85,6 +85,25 @@ def test_empty_token_from_trailing_comma_is_tolerated():
         finder.cleanup()
 
 
+def test_all_combined_with_an_unknown_name_is_rejected():
+    """`all` used to return early, skipping validation of the other tokens.
+
+    Because the input is a set, whether the typo was caught depended on
+    iteration order.
+    """
+    for sel in ({"all", "typo"}, {"typo", "all"}):
+        with pytest.raises(ValueError, match="Unknown tier"):
+            TandemRepeatFinder("ACGT" * 100, enabled_tiers=sel)
+
+
+def test_all_combined_with_a_valid_name_still_expands():
+    finder = TandemRepeatFinder("ACGT" * 100, enabled_tiers={"all", "tier1"})
+    try:
+        assert finder.enabled_tiers == {"tier1", "tier2", "tier3"}
+    finally:
+        finder.cleanup()
+
+
 def test_all_expands_to_every_tier():
     finder = TandemRepeatFinder("ACGT" * 100, enabled_tiers={"all"})
     try:
@@ -134,16 +153,26 @@ def _run_cli(tmp_path, *args):
 ])
 def test_cli_rejects_invalid_period_intervals(tmp_path, args):
     proc = _run_cli(tmp_path, *args)
-    assert proc.returncode != 0
+    # exit 2 and an argparse usage error, so an unrelated downstream crash
+    # cannot make this green.
+    assert proc.returncode == 2, proc.stderr
+    assert "--min-period" in proc.stderr
     assert not (tmp_path / "out.bed").exists()
 
 
 @pytest.mark.parametrize("tiers", ["typo", "tier1,typo"])
 def test_cli_rejects_unknown_tier_names(tmp_path, tiers):
     proc = _run_cli(tmp_path, "--tiers", tiers)
-    assert proc.returncode != 0
-    assert "unknown tier" in proc.stderr.lower()
+    assert proc.returncode == 2, proc.stderr
+    assert "unknown tier(s): typo" in proc.stderr.lower()
     assert not (tmp_path / "out.bed").exists()
+
+
+@pytest.mark.parametrize("tiers", ["all", "all,tier1", "tier1,tier2"])
+def test_cli_accepts_all_in_a_comma_list(tmp_path, tiers):
+    """`--tiers all,tier1` is legal; only the whole-string form was handled."""
+    proc = _run_cli(tmp_path, "--tiers", tiers)
+    assert proc.returncode == 0, proc.stderr
 
 
 def test_cli_accepts_a_valid_run(tmp_path):

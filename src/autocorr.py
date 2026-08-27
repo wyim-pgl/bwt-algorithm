@@ -8,9 +8,9 @@ sequence at offset ``period``" computation:
   - ``tier2._autocorr_seed``          — the identical cumsum sliding-window count
 
 This module factors those out so the period-detection math lives in one place.
-Every function reproduces the exact numpy operations the inline code used (same
-``int64`` cumsum, same ``int8``-view run detection), so substituting them is
-behavior-preserving.
+It is no longer a behavior-preserving copy of the inline code it replaced: the
+ambiguity rule below was added, and ``_cumsum_windows`` fixes an off-by-one that
+dropped the last full window (and returned ``None`` when exactly one existed).
 
 All functions take a 1-D ``uint8`` view of the sequence (e.g. ``BWTCore.text_arr``).
 
@@ -134,10 +134,14 @@ def _windowed_counts(arr: np.ndarray, period: int, window: int,
 
 
 def _cumsum_windows(eq: np.ndarray, window: int) -> Optional[np.ndarray]:
+    # There are eq.size - window + 1 full windows, not eq.size - window: a
+    # window may start at index eq.size - window. The inline code this was
+    # factored out of dropped the last one, and returned None when exactly one
+    # full window existed.
     cs = np.empty(eq.size + 1, dtype=np.int64)
     cs[0] = 0
     np.cumsum(eq, out=cs[1:])
-    m = eq.size - window
+    m = eq.size - window + 1
     if m <= 0:
         return None
     return cs[window:window + m] - cs[:m]

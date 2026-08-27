@@ -132,7 +132,10 @@ def main():
         enabled_tiers = {t.strip().lower() for t in tiers_arg.split(',') if t.strip()}
         # TandemRepeatFinder refuses unknown names too, but reaching it would
         # report a typo as a traceback after the index build. Fail here instead.
-        unknown = sorted(enabled_tiers - {"tier1", "tier2", "tier3"})
+        # "all" is legal inside a comma list too, e.g. --tiers all,tier1. Only
+        # the whole-string form was handled above, so rejecting it here broke a
+        # previously working invocation.
+        unknown = sorted(enabled_tiers - {"tier1", "tier2", "tier3", "all"})
         if unknown:
             parser.error(f"unknown tier(s): {', '.join(unknown)}; "
                          "choose from tier1, tier2, tier3, or all")

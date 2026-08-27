@@ -107,6 +107,11 @@ def main():
 
     args = parser.parse_args()  # Parse command-line arguments
 
+    if args.min_period < 1 or args.max_period < 1:
+        parser.error("--min-period and --max-period must be positive integers")
+    if args.min_period > args.max_period:
+        parser.error("--min-period cannot exceed --max-period")
+
     if not os.path.exists(args.fasta_file):
         # Print error message and exit if input file does not exist
         print(f"Error: File {args.fasta_file} not found")
@@ -161,6 +166,7 @@ def main():
             print(f"Using {n_threads} parallel processes for {len(sequences)} sequences")
         with ProcessPoolExecutor(max_workers=n_threads) as executor:
             futures = {}
+            failed_chromosomes = []
             for chrom, seq in sequences:
                 future = executor.submit(
                     _process_chromosome,
@@ -179,6 +185,14 @@ def main():
                         print(f"  [{chrom}] Completed: {len(repeats)} repeats found")
                 except Exception as e:
                     print(f"  [{chrom}] ERROR: {e}", file=sys.stderr)
+                    failed_chromosomes.append(chrom)
+
+        if failed_chromosomes:
+            failed = ", ".join(sorted(failed_chromosomes))
+            raise RuntimeError(
+                f"Repeat detection failed for {len(failed_chromosomes)} sequence(s): {failed}. "
+                "No partial output was written."
+            )
 
     # Stop profiler and report
     if profiler is not None:

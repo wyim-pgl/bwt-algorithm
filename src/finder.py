@@ -107,7 +107,20 @@ class TandemRepeatFinder:
             )
 
         # Only create Tier 3 instance if enabled, otherwise None
-        self.tier3 = Tier3LongReadFinder(self.bwt, mode=tier3_mode) if "tier3" in self.enabled_tiers else None
+        # Tier 3 owns periods >=100 bp, but must still honor the user-requested
+        # period interval. It previously always searched 100..100,000 bp and
+        # relied on final filtering, wasting work and making preset diagnostics
+        # inconsistent with the CLI arguments.
+        tier3_min = max(100, self.min_period)
+        tier3_max = min(100_000, self.max_period)
+        self.tier3 = None
+        if "tier3" in self.enabled_tiers and tier3_min <= tier3_max:
+            self.tier3 = Tier3LongReadFinder(
+                self.bwt,
+                min_length=tier3_min,
+                max_length=tier3_max,
+                mode=tier3_mode,
+            )
 
         # Satellite gap-fill tuning (env-overridable). Defaults are the improved
         # operating point that recovers divergent-alpha-sat interior gaps which
@@ -656,7 +669,11 @@ class TandemRepeatFinder:
             if name in self.VALID_TIERS:
                 normalized.add(name)  # Add to set if it is a valid tier name
 
-        return normalized if normalized else set(self.VALID_TIERS)  # If no valid tiers found, return all tiers
+        if not normalized:
+            raise ValueError(
+                "No valid tiers selected; choose from tier1, tier2, tier3, or all"
+            )
+        return normalized
 
     def _register_repeat(self, repeat: TandemRepeat, store: List[TandemRepeat],
                          seen: Optional[Set[Tuple[int, int]]] = None) -> bool:

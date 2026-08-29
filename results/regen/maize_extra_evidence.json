@@ -1,0 +1,343 @@
+{
+  "command": "python3 scripts/scoring/score_maize_regen_evidence.py --bwt /data/gpfs/assoc/pgl/devel/exp1_human/regen/regen_maize.bed --trf-3a /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trf_exp3A_microsatellite.bed --ultra-3a /data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_maize_exp3A.bed --tantan-3a /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/tantan/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_tantan_exp3A_microsatellite.bed --trf-3b /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trf_exp3B_satellite.bed --ultra-3b /data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_maize_exp3B.bed --tantan-500 /data/gpfs/assoc/pgl/devel/exp1_human/wp0/fixcampaign/tantan/tantan_maize_w500.bed --trf-3c /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trf_exp3C_centc.bed --ultra-3c /data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_maize_exp3C.bed --tantan-200 /data/gpfs/assoc/pgl/devel/exp1_human/wp0/fixcampaign/tantan/tantan_maize_w200.bed --knob-gt results/ground_truth/mo17_knob180_arrays.bed --tr1-gt results/ground_truth/mo17_tr1_arrays.bed --centc-gt results/ground_truth/mo17_centc_arrays.bed --score-exp3 /data/gpfs/assoc/pgl/devel/exp1_human/filip_repro/score_exp3.py --output results/regen/maize_extra_evidence.json",
+  "conventions": {
+    "coordinates": "BED 0-based half-open",
+    "period": "integer column 5, else motif length",
+    "total_bp": "overlap/touch merged within chromosome",
+    "postmerge": "coordinate-only; join when gap <= threshold; motif ignored"
+  },
+  "inputs": {
+    "bwt": {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/regen/regen_maize.bed",
+      "sha256": "e9729337017639d10956a53edf655f4fe3217209b6b7aa2eef2d5108faf3a8df",
+      "bytes": 166077178
+    },
+    "trf_3a": {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trf_exp3A_microsatellite.bed",
+      "sha256": "3fc5533b5b4d3adc86e85b9100315d39c4cd4a05490526a085e36d93826a703a",
+      "bytes": 5921688
+    },
+    "ultra_3a": {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_maize_exp3A.bed",
+      "sha256": "5648fdce9b2bfdc7894c05127412977a1d1e4ff8332b34a362b0f4dda6d11bbd",
+      "bytes": 47575141
+    },
+    "tantan_3a": {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/tantan/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_tantan_exp3A_microsatellite.bed",
+      "sha256": "02e15df6bb9c2e9bc57f1414fade950fa6ec486790444708c6b4f10964aed300",
+      "bytes": 68279539
+    },
+    "trf_3b": {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trf_exp3B_satellite.bed",
+      "sha256": "e69427e35a0597fb4d4aeaaef1665eee9c56f46506791460b6e9ada15e3aa723",
+      "bytes": 200918916
+    },
+    "ultra_3b": {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_maize_exp3B.bed",
+      "sha256": "dc67ed7ec885946240f03c19ae78b1aae44aafcf24caa01bb3bf36b17e4f81f5",
+      "bytes": 114085554
+    },
+    "tantan_500": {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/fixcampaign/tantan/tantan_maize_w500.bed",
+      "sha256": "e5c522bd39f438bf5a279850412704dd4e9b893bcd3c26c516eba2cdc4d89187",
+      "bytes": 79696762
+    },
+    "trf_3c": {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trf_exp3C_centc.bed",
+      "sha256": "b26f6b76bf4d6a72591b81bec6b57f0857be882a014afdbf2a9b244717bbf930",
+      "bytes": 149837940
+    },
+    "ultra_3c": {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_maize_exp3C.bed",
+      "sha256": "df78eb36ec44bc0c2683d2e9e9c4e2d906b6a3fd5b9c0ae8afa2ae4d762340df",
+      "bytes": 112523993
+    },
+    "tantan_200": {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/fixcampaign/tantan/tantan_maize_w200.bed",
+      "sha256": "df5a903e81fc995ab7e3639b3e465f5a0cdb88fa456c98bb8a1539cdc0f0fa82",
+      "bytes": 74072536
+    },
+    "knob_gt": {
+      "path": "/data/gpfs/assoc/pgl/devel/bwt-algorithm/results/ground_truth/mo17_knob180_arrays.bed",
+      "sha256": "cf90563190f3d15c3d5c2fc45c391bacf788d098aa4c2bbd11d513b8644379c8",
+      "bytes": 924
+    },
+    "tr1_gt": {
+      "path": "/data/gpfs/assoc/pgl/devel/bwt-algorithm/results/ground_truth/mo17_tr1_arrays.bed",
+      "sha256": "7040de1f75b2967c1babb391299f40a5ff9011e4c537bed9998d239ef7d6e7c7",
+      "bytes": 587
+    },
+    "centc_gt": {
+      "path": "/data/gpfs/assoc/pgl/devel/bwt-algorithm/results/ground_truth/mo17_centc_arrays.bed",
+      "sha256": "07ed5c6fb167ea8cde08eec6a8884ba60d9cecc3edae3941a2b36b4b4e85bf61",
+      "bytes": 603
+    },
+    "score_exp3": {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/filip_repro/score_exp3.py",
+      "sha256": "e410dc94c12ea0d78b22eb34dd32330cff62f89ccb250662f5eb96061cb84033",
+      "bytes": 5699
+    }
+  },
+  "table3a": {
+    "bwt": {
+      "published_rule": {
+        "bp": 41313352,
+        "regions": 1508788,
+        "tag_substring": 38999,
+        "longest_substring_bp": 175598,
+        "tag_rotation": 34247,
+        "longest_rotation_bp": 235428
+      },
+      "band_1_6": {
+        "bp": 41313352,
+        "regions": 1508788,
+        "tag_substring": 38999,
+        "longest_substring_bp": 175598,
+        "tag_rotation": 34247,
+        "longest_rotation_bp": 235428
+      }
+    },
+    "trf_3a": {
+      "published_rule": {
+        "bp": 4793515,
+        "regions": 29559,
+        "tag_substring": 5263,
+        "longest_substring_bp": 562788,
+        "tag_rotation": 1379,
+        "longest_rotation_bp": 562788
+      },
+      "band_1_6": {
+        "bp": 4793515,
+        "regions": 29559,
+        "tag_substring": 5263,
+        "longest_substring_bp": 562788,
+        "tag_rotation": 1379,
+        "longest_rotation_bp": 562788
+      }
+    },
+    "ultra_3a": {
+      "published_rule": {
+        "bp": 46963400,
+        "regions": 1114556,
+        "tag_substring": 4554,
+        "longest_substring_bp": 29119,
+        "tag_rotation": 7031,
+        "longest_rotation_bp": 235404
+      },
+      "band_1_6": {
+        "bp": 46963400,
+        "regions": 1114556,
+        "tag_substring": 4554,
+        "longest_substring_bp": 29119,
+        "tag_rotation": 7031,
+        "longest_rotation_bp": 235404
+      }
+    },
+    "tantan_3a": {
+      "published_rule": {
+        "bp": 54933424,
+        "regions": 1303967,
+        "tag_substring": 181205,
+        "longest_substring_bp": 210094,
+        "tag_rotation": 11752,
+        "longest_rotation_bp": 235404
+      },
+      "band_1_6": {
+        "bp": 13701969,
+        "regions": 751581,
+        "tag_substring": 17842,
+        "longest_substring_bp": 210094,
+        "tag_rotation": 11752,
+        "longest_rotation_bp": 235404
+      }
+    }
+  },
+  "coordinate_postmerge": {
+    "knob180": {
+      "BWTandem": {
+        "0": {
+          "detected": 25,
+          "total_arrays": 25,
+          "calls_per_array": 286.6,
+          "fragmentation": 0.0,
+          "coverage_percent": 79.79,
+          "mean_offset_bp": 253
+        },
+        "100": {
+          "detected": 25,
+          "total_arrays": 25,
+          "calls_per_array": 219.8,
+          "fragmentation": 0.0,
+          "coverage_percent": 80.06,
+          "mean_offset_bp": 798
+        },
+        "500": {
+          "detected": 25,
+          "total_arrays": 25,
+          "calls_per_array": 122.4,
+          "fragmentation": 0.01,
+          "coverage_percent": 82.15,
+          "mean_offset_bp": 2328
+        },
+        "1000": {
+          "detected": 25,
+          "total_arrays": 25,
+          "calls_per_array": 80.0,
+          "fragmentation": 0.01,
+          "coverage_percent": 84.79,
+          "mean_offset_bp": 3135
+        },
+        "2000": {
+          "detected": 25,
+          "total_arrays": 25,
+          "calls_per_array": 37.8,
+          "fragmentation": 0.03,
+          "coverage_percent": 90.06,
+          "mean_offset_bp": 6215
+        },
+        "5000": {
+          "detected": 25,
+          "total_arrays": 25,
+          "calls_per_array": 4.3,
+          "fragmentation": 0.23,
+          "coverage_percent": 98.38,
+          "mean_offset_bp": 130412
+        },
+        "10000": {
+          "detected": 25,
+          "total_arrays": 25,
+          "calls_per_array": 1.0,
+          "fragmentation": 1.0,
+          "coverage_percent": 100.0,
+          "mean_offset_bp": 13812358
+        }
+      }
+    },
+    "TR-1": {
+      "BWTandem": {
+        "0": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 203.4,
+          "fragmentation": 0.0,
+          "coverage_percent": 50.34,
+          "mean_offset_bp": 4282
+        },
+        "100": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 158.0,
+          "fragmentation": 0.01,
+          "coverage_percent": 50.87,
+          "mean_offset_bp": 5153
+        },
+        "500": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 94.5,
+          "fragmentation": 0.01,
+          "coverage_percent": 55.86,
+          "mean_offset_bp": 8785
+        },
+        "1000": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 61.8,
+          "fragmentation": 0.02,
+          "coverage_percent": 62.53,
+          "mean_offset_bp": 11010
+        },
+        "2000": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 27.5,
+          "fragmentation": 0.04,
+          "coverage_percent": 77.24,
+          "mean_offset_bp": 19776
+        },
+        "5000": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 2.1,
+          "fragmentation": 0.49,
+          "coverage_percent": 98.22,
+          "mean_offset_bp": 179854
+        },
+        "10000": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 1.0,
+          "fragmentation": 1.0,
+          "coverage_percent": 100.0,
+          "mean_offset_bp": 17034533
+        }
+      }
+    },
+    "CentC": {
+      "BWTandem": {
+        "0": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 354.6,
+          "fragmentation": 0.0,
+          "coverage_percent": 58.55,
+          "mean_offset_bp": 171
+        },
+        "100": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 289.5,
+          "fragmentation": 0.0,
+          "coverage_percent": 58.92,
+          "mean_offset_bp": 185
+        },
+        "500": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 180.8,
+          "fragmentation": 0.01,
+          "coverage_percent": 63.25,
+          "mean_offset_bp": 352
+        },
+        "1000": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 98.2,
+          "fragmentation": 0.01,
+          "coverage_percent": 71.5,
+          "mean_offset_bp": 1001
+        },
+        "2000": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 35.9,
+          "fragmentation": 0.03,
+          "coverage_percent": 83.21,
+          "mean_offset_bp": 3362
+        },
+        "5000": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 7.1,
+          "fragmentation": 0.14,
+          "coverage_percent": 95.22,
+          "mean_offset_bp": 46575
+        },
+        "10000": {
+          "detected": 17,
+          "total_arrays": 17,
+          "calls_per_array": 1.0,
+          "fragmentation": 1.0,
+          "coverage_percent": 100.0,
+          "mean_offset_bp": 4059958
+        }
+      }
+    }
+  },
+  "period_100_200_merged_bp": {
+    "BWTandem": 47279628,
+    "TRF": 41211625,
+    "ULTRA": 46519711,
+    "tantan-w200": 34170063
+  }
+}

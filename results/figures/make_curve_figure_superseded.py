@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""WP1 deliverable — the recall/precision figure.
+"""SUPERSEDED earlier-build recall/precision figure, retained for audit only.
 
 Two panels, region-level and base-pair-level, both at the matched period range
 (<=100 bp) so every point sits on one axis. BWTandem is a connected curve through
@@ -9,7 +9,10 @@ one.
 Numbers are transcribed from logs/score_wp1_5982266.out and re-emitted as CSV
 alongside the figure so the figure and Table 1d cannot drift apart.
 
-Usage: make_curve_figure.py [--outdir DIR]
+This script is not a manuscript input and deliberately writes only filenames
+containing ``superseded``.  Figure 1 remains pending job 6129408.
+
+Usage: make_curve_figure_superseded.py [--outdir DIR]
 """
 import argparse
 import csv
@@ -92,11 +95,11 @@ def main():
     fig.tight_layout(rect=(0, 0, 1, 0.94))
 
     for ext in ("pdf", "png"):
-        p = os.path.join(a.outdir, f"figure_curve.{ext}")
+        p = os.path.join(a.outdir, f"figure_curve_superseded.{ext}")
         fig.savefig(p, dpi=300)
         print(f"wrote {p}")
 
-    csv_path = os.path.join(a.outdir, "figure_curve_data.csv")
+    csv_path = os.path.join(a.outdir, "figure_curve_data_superseded.csv")
     with open(csv_path, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["series", "label", "region_recall", "region_precision",

@@ -2,9 +2,12 @@
 
 `manifest.tsv` maps each table row in the manuscript to the interval file it was
 scored from, the scoring script and its hash, the scoring rule, and the
-repository commit. `figures/` holds Figure 1 and the values behind it.
-`ground_truth/` holds the curated coordinate sets every accuracy figure is scored
-against.
+repository commit. `figures/` holds no active Figure 1: its source CSV is a
+non-numeric pending placeholder awaiting job 6129408, and the earlier-build
+figure, its data and its renderer are retained under `superseded` names for
+audit only. `regen/` holds the provenance, scoring output and deposited
+evidence for the regenerated whole-genome runs. `ground_truth/` holds the
+curated coordinate sets every accuracy figure is scored against.
 
 ## ground_truth/
 
@@ -54,24 +57,39 @@ do reproduce.
 
 For scale on how approximate: two BWTandem executions of identical settings on
 the same genome at the same thread count differ by 29% in wall clock
-(9 h 21 m against 12 h 06 m, both 4,009,261 calls). Cost differences below that
-magnitude between any two rows here are not interpretable.
+(9 h 21 m against 12 h 06 m, both 4,009,261 calls, on the historical build).
+The regenerated human run at the campaign pin took 12 h 38 m for 4,014,108
+calls, inside that spread. Cost differences below this magnitude between any
+two rows here are not interpretable.
 
 ## The `repo_commit` column
 
-Every row reads `0e17d1a`, which was the repository HEAD when the runs were
-executed. The working tree at that moment carried uncommitted modifications under
-`src/`; those modifications are now **commit `294f8ac`**, and that is the commit to
-check out to obtain the code behind these results.
+The column now carries more than one value, and the distinction matters.
 
-Two behavioural differences separate `294f8ac` from the tree that actually ran.
+Rows for the **regenerated whole-genome runs** (the deposited Col-CEN, human and
+maize BEDs, and the scoring output under `regen/`) read **`0363d8b`**, the
+campaign pin. Those runs were executed by `run_with_provenance.sh` from a clean
+tree, and `regen/*.provenance.json` records the commit, the command, the SLURM
+accounting figures and a full SHA-256 for every output. That is the commit to
+check out to reproduce them.
+
+**Historical rows**, which the manuscript still cites where a regenerated
+replacement does not exist, read `0e17d1a` — the repository HEAD when those runs
+were executed — or **`294f8ac`**, which is where the uncommitted `src/`
+modifications present in that working tree now live. Rows superseded by the
+regeneration are labelled as such in `manifest.tsv` rather than deleted.
+
+The two behavioural differences below separate `294f8ac` from the tree that ran
+the historical rows; they do not apply to the `0363d8b` rows, whose outputs are
+byte-verified against their recorded hashes.
+
 First, it carries the fix that stops the satellite gap-filling pass from emitting
 motifs containing characters other than A, C, G and T; re-running the released code
 on the human genome therefore yields 198 fewer calls (4.57 Mb) than
 `remeas_human.bed` contains. Second, the released code renders the column recording
 each call's originating pass numerically, where the deposited outputs carry a text
 label on satellite calls — a byte-level formatting change that alters no coordinate,
-motif or statistic. Every other output should reproduce.
+motif or statistic. Every other historical output should reproduce.
 
 ## Known issue: a memory-layout-dependent flaky test
 

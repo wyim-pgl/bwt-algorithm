@@ -1,0 +1,104 @@
+{
+  "generated_utc": "2026-08-29T17:53:07.561063+00:00",
+  "script": "/data/gpfs/assoc/pgl/devel/exp1_human/regen/maize_rescore/rescore_tables_3bc.py",
+  "convention": {
+    "coordinates": "BED half-open",
+    "detection_fragmentation_offset": "raw calls; any >=1 bp overlap",
+    "coverage": "pooled bp; overlap/touch merge only; no positive gap",
+    "period": "integer column 5, else len(column 4 motif)",
+    "trash": "fixed windows retained including none_identified"
+  },
+  "inputs": [
+    {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/filip_repro/score_exp3.py",
+      "size": 5699,
+      "mtime": "2026-06-23T19:10:31.949296+00:00",
+      "sha256": "e410dc94c12ea0d78b22eb34dd32330cff62f89ccb250662f5eb96061cb84033"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/ground_truth/mo17_knob180_arrays.bed",
+      "size": 924,
+      "mtime": "2026-07-17T20:18:05.133776+00:00",
+      "sha256": "cf90563190f3d15c3d5c2fc45c391bacf788d098aa4c2bbd11d513b8644379c8"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/ground_truth/mo17_tr1_arrays.bed",
+      "size": 587,
+      "mtime": "2026-07-17T20:18:05.158437+00:00",
+      "sha256": "7040de1f75b2967c1babb391299f40a5ff9011e4c537bed9998d239ef7d6e7c7"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/ground_truth/mo17_centc_arrays.bed",
+      "size": 603,
+      "mtime": "2026-07-17T20:18:05.156529+00:00",
+      "sha256": "07ed5c6fb167ea8cde08eec6a8884ba60d9cecc3edae3941a2b36b4b4e85bf61"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/regen/regen_maize.bed",
+      "size": 166077178,
+      "mtime": "2026-08-29T06:13:46.667870+00:00",
+      "sha256": "e9729337017639d10956a53edf655f4fe3217209b6b7aa2eef2d5108faf3a8df"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/bwtandem/bwt_maize.bed",
+      "size": 158499025,
+      "mtime": "2026-07-22T10:16:23.618033+00:00",
+      "sha256": "7ea0a2d97613a7ba4487728a23666e435049ba495a246ae3d7538430819cfad5"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trf_exp3B_satellite.bed",
+      "size": 200918916,
+      "mtime": "2026-07-22T10:15:55.861627+00:00",
+      "sha256": "e69427e35a0597fb4d4aeaaef1665eee9c56f46506791460b6e9ada15e3aa723"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trf_exp3C_centc.bed",
+      "size": 149837940,
+      "mtime": "2026-07-22T10:15:58.036264+00:00",
+      "sha256": "b26f6b76bf4d6a72591b81bec6b57f0857be882a014afdbf2a9b244717bbf930"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_maize_exp3B.bed",
+      "size": 114085554,
+      "mtime": "2026-08-03T17:46:14.191214+00:00",
+      "sha256": "dc67ed7ec885946240f03c19ae78b1aae44aafcf24caa01bb3bf36b17e4f81f5"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_maize_exp3C.bed",
+      "size": 112523993,
+      "mtime": "2026-08-03T17:46:22.903457+00:00",
+      "sha256": "df78eb36ec44bc0c2683d2e9e9c4e2d906b6a3fd5b9c0ae8afa2ae4d762340df"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/fixcampaign/tantan/tantan_maize_w500.bed",
+      "size": 79696762,
+      "mtime": "2026-08-18T01:36:17.764303+00:00",
+      "sha256": "e5c522bd39f438bf5a279850412704dd4e9b893bcd3c26c516eba2cdc4d89187"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/devel/exp1_human/wp0/fixcampaign/tantan/tantan_maize_w200.bed",
+      "size": 74072536,
+      "mtime": "2026-08-17T23:37:18.466483+00:00",
+      "sha256": "df5a903e81fc995ab7e3639b3e465f5a0cdb88fa456c98bb8a1539cdc0f0fa82"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trash/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trash_denovo_exp3B_satellite.bed",
+      "size": 509733,
+      "mtime": "2026-07-22T10:16:43.073192+00:00",
+      "sha256": "7063df9bb342346b43df600431ff201de7bee45bcbee23c3c70af4cfd418fe28"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trash/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trash_templates_knob180_exp3B_satellite.bed",
+      "size": 508476,
+      "mtime": "2026-07-22T10:16:43.028504+00:00",
+      "sha256": "40c7fd8562bd261045fda100849852f26f26c6dd61a478b3874846655d865c9e"
+    },
+    {
+      "path": "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trash/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_trash_templates_CentC_exp3C_centc.bed",
+      "size": 507355,
+      "mtime": "2026-07-22T10:16:42.811159+00:00",
+      "sha256": "14efbb4456712851b0d9791ae0c6ceb63db302878911dda59a48fc53f49bf00b"
+    }
+  ],
+  "historical_validation": "PASS"
+}

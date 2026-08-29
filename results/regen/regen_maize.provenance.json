@@ -1,0 +1,19 @@
+{
+  "tag": "regen_maize_6124640",
+  "state": "CLEAN",
+  "exit_code": 0,
+  "commit": "0363d8bdc83cb8fb8e62c19d665479ce878e9f70",
+  "branch": "perf/exp1-human-sensitivity",
+  "command": "/data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem/bin/python -m src.main /data/gpfs/assoc/pgl/filip/bwt/zmays/zmays.fna --min-period 1 --max-period 2000 --threads 2 --format bed -o /data/gpfs/assoc/pgl/devel/exp1_human/regen/regen_maize -v",
+  "started_utc": "2026-08-28T14:23:14Z",
+  "finished_utc": "2026-08-29T06:13:50Z",
+  "elapsed_wall_s": 57034.5,
+  "max_rss_kb": 20937812,
+  "host": "cpu-51",
+  "cpu": "Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz",
+  "python": "3.11.14",
+  "numpy": "2.3.1",
+  "outputs": [
+    {"file": "regen_maize.bed", "sha256": "e9729337017639d10956a53edf655f4fe3217209b6b7aa2eef2d5108faf3a8df", "bytes": 166077178}
+  ]
+}

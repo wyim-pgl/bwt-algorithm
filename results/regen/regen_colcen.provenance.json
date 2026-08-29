@@ -1,0 +1,19 @@
+{
+  "tag": "regen_colcen_6110900",
+  "state": "CLEAN",
+  "exit_code": 0,
+  "commit": "0363d8bdc83cb8fb8e62c19d665479ce878e9f70",
+  "branch": "perf/exp1-human-sensitivity",
+  "command": "/data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem/bin/python -m src.main /data/gpfs/assoc/pgl/filip/bwt/colcen/colcen.fa --min-period 1 --max-period 2000 --threads 2 --format bed -o /data/gpfs/assoc/pgl/devel/exp1_human/regen/regen_colcen -v",
+  "started_utc": "2026-08-27T20:06:23Z",
+  "finished_utc": "2026-08-27T20:46:30Z",
+  "elapsed_wall_s": 2406.12,
+  "max_rss_kb": 1369968,
+  "host": "cpu-49",
+  "cpu": "Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz",
+  "python": "3.11.14",
+  "numpy": "2.3.1",
+  "outputs": [
+    {"file": "regen_colcen.bed", "sha256": "3a3076564bcbdad398c5a40e1a1d581c1d7cea3feb5d674a501809bf8cf27010", "bytes": 9167462}
+  ]
+}

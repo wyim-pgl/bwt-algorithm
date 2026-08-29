@@ -1,0 +1,87 @@
+
+====================================================================================================
+knob180  --  25 arrays, 29,655,996 bp
+====================================================================================================
+
+ [why the built-in merge does not fire]
+  BWTandem            13,163 calls in 25 arrays  distinct periods   664  distinct motif lengths   664  adjacent pairs the built-in merge would join   1.55%
+  TRF                 42,631 calls in 25 arrays  distinct periods   375  distinct motif lengths  4307  adjacent pairs the built-in merge would join   4.41%
+  ULTRA               21,937 calls in 25 arrays  distinct periods   249  distinct motif lengths   249  adjacent pairs the built-in merge would join  10.93%
+  tantan (500bp)      29,352 calls in 25 arrays  distinct periods   252  distinct motif lengths   252  adjacent pairs the built-in merge would join   7.18%
+
+ [stated post-merge, coordinates only]
+  tool                 gap     det  calls/array   frag     cov%        offset
+  BWTandem               0  25/25         286.6   0.00   79.79%           253
+  BWTandem             100  25/25         219.8   0.00   80.06%           798
+  BWTandem           1,000  25/25          80.0   0.01   84.79%         3,135
+  BWTandem          10,000  25/25           1.0   1.00  100.00%    13,812,358
+  TRF                    0  25/25         151.6   0.01   80.01%         1,258
+  TRF                  100  25/25          89.7   0.01   80.20%         1,263
+  TRF                1,000  25/25          44.9   0.02   81.53%         1,862
+  TRF               10,000  25/25           3.4   0.29   96.96%        54,376
+  ULTRA                  0  25/25         670.9   0.00   78.71%           206
+  ULTRA                100  25/25         224.7   0.00   79.31%           623
+  ULTRA              1,000  25/25          73.3   0.01   84.00%         2,316
+  ULTRA             10,000  25/25           1.0   0.96   99.96%     2,703,230
+  tantan (500bp)         0  25/25         726.2   0.00   71.92%           156
+  tantan (500bp)       100  25/25         450.3   0.00   72.93%           209
+  tantan (500bp)     1,000  25/25          71.1   0.01   81.34%         1,781
+  tantan (500bp)    10,000  25/25           1.6   0.61   99.38%       157,961
+
+====================================================================================================
+TR-1  --  17 arrays, 5,899,812 bp
+====================================================================================================
+
+ [why the built-in merge does not fire]
+  BWTandem             4,339 calls in 17 arrays  distinct periods   441  distinct motif lengths   441  adjacent pairs the built-in merge would join   1.87%
+  TRF                  5,307 calls in 17 arrays  distinct periods   234  distinct motif lengths  1239  adjacent pairs the built-in merge would join   5.35%
+  ULTRA                5,157 calls in 17 arrays  distinct periods   193  distinct motif lengths   193  adjacent pairs the built-in merge would join  12.16%
+  tantan (500bp)       3,161 calls in 17 arrays  distinct periods   139  distinct motif lengths   139  adjacent pairs the built-in merge would join   3.94%
+
+ [stated post-merge, coordinates only]
+  tool                 gap     det  calls/array   frag     cov%        offset
+  BWTandem               0  17/17         203.4   0.00   50.34%         4,282
+  BWTandem             100  17/17         158.0   0.01   50.87%         5,153
+  BWTandem           1,000  17/17          61.8   0.02   62.53%        11,010
+  BWTandem          10,000  17/17           1.0   1.00  100.00%    17,034,533
+  TRF                    0  17/17         129.3   0.01   45.77%           898
+  TRF                  100  17/17         108.2   0.01   46.03%         2,936
+  TRF                1,000  17/17          40.1   0.02   52.08%        11,796
+  TRF               10,000  17/17           2.9   0.35   92.00%       103,880
+  ULTRA                  0  17/17         263.5   0.00   36.36%           600
+  ULTRA                100  17/17         211.6   0.00   37.05%         1,234
+  ULTRA              1,000  17/17          66.6   0.02   54.21%        11,728
+  ULTRA             10,000  17/17           1.1   0.89   99.56%     4,420,223
+  tantan (500bp)         0  17/17         161.1   0.01   22.74%           658
+  tantan (500bp)       100  17/17         126.6   0.01   23.14%         1,019
+  tantan (500bp)     1,000  17/17          70.9   0.01   30.14%         9,706
+  tantan (500bp)    10,000  17/17           3.7   0.27   88.81%       875,921
+
+====================================================================================================
+CentC  --  17 arrays, 12,562,249 bp
+====================================================================================================
+
+ [why the built-in merge does not fire]
+  BWTandem             7,545 calls in 17 arrays  distinct periods   365  distinct motif lengths   365  adjacent pairs the built-in merge would join   0.98%
+  TRF                  3,326 calls in 17 arrays  distinct periods   239  distinct motif lengths  1166  adjacent pairs the built-in merge would join  14.84%
+  ULTRA                5,418 calls in 17 arrays  distinct periods   180  distinct motif lengths   180  adjacent pairs the built-in merge would join   2.67%
+  tantan (500bp)       8,664 calls in 17 arrays  distinct periods   177  distinct motif lengths   177  adjacent pairs the built-in merge would join   1.72%
+
+ [stated post-merge, coordinates only]
+  tool                 gap     det  calls/array   frag     cov%        offset
+  BWTandem               0  17/17         354.6   0.00   58.55%           171
+  BWTandem             100  17/17         289.5   0.00   58.92%           185
+  BWTandem           1,000  17/17          98.2   0.01   71.50%         1,001
+  BWTandem          10,000  17/17           1.0   1.00  100.00%     4,059,958
+  TRF                    0  17/17          77.6   0.01   59.73%            58
+  TRF                  100  17/17          73.1   0.01   59.75%            61
+  TRF                1,000  17/17          52.1   0.02   61.57%           269
+  TRF               10,000  17/17           6.1   0.16   90.11%        14,277
+  ULTRA                  0  17/17         251.5   0.00   57.81%            55
+  ULTRA                100  17/17         200.1   0.00   58.05%            73
+  ULTRA              1,000  17/17          71.4   0.01   66.60%           850
+  ULTRA             10,000  17/17           1.2   0.85   99.67%     1,095,310
+  tantan (500bp)         0  17/17         273.9   0.00   55.44%           125
+  tantan (500bp)       100  17/17         206.6   0.00   55.69%           130
+  tantan (500bp)     1,000  17/17          82.1   0.01   63.68%           591
+  tantan (500bp)    10,000  17/17           1.4   0.74   99.38%       240,594

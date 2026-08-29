@@ -18,7 +18,7 @@ Abstract
 
 **Motivation:** Tandem repeat periods run from single base pairs to kilobase satellite monomers, but detectors take a maximum-period parameter of unpredictable cost: an 83-fold widening raised ULTRA's maize runtime 151-fold while TRF's stayed flat. Users must bound in advance what a scan should discover.
 
-**Results:** BWTandem seeds candidates from FM-index queries over sampled k-mers, aligning only confirmed ones. Its cost is nearly flat in the reported period range, because the long-period search runs unconditionally rather than narrowed: widening it twentyfold on human cost 1.30–1.41 times the runtime across four pairs, for 2.9 GB more memory. This is a cost floor, not a saving on narrow searches. It searched 1–2,000 bp in 12.1 h against ULTRA's 29.8 at 1–100 bp and TRF's 33.7 at 500 bp (24.2, 59.6, 33.7 core-hours). On the range-matched adotto benchmark it recovers 79.9% of regions to ULTRA's 81.6% at lower precision; above period 100 it reaches 3.4% against capped TRF's 2.0%. Four operating points span 54.7%/62.2% recall/precision to 81.6%/48.4%. On Arabidopsis it recovers 99.7% of CEN180 monomers (truth set ≥80% consensus identity) in 31 minutes against ULTRA's 99.8% in 10.1 h, but a re-run tantan reaches 99.2% in 12 minutes at higher base pair precision; it leads maize CentC coverage by 0.35 points. Both are pipeline-plus-supplementary-pass results. The proposition: one wide-range pass at competitive but not leading accuracy, paid for in memory and fragmentation.
+**Results:** BWTandem seeds candidates from FM-index queries over sampled k-mers, aligning only confirmed ones. Its cost is nearly flat in the reported period range, because the long-period search runs unconditionally rather than narrowed: widening it twentyfold on human cost 1.30–1.41 times the runtime across four pairs, for 2.9 GB more memory. This is a cost floor, not a saving on narrow searches. It searched 1–2,000 bp in 12.1 h against ULTRA's 29.8 at 1–100 bp and TRF's 33.7 at 500 bp (24.2, 59.6, 33.7 core-hours). On the range-matched adotto benchmark it recovers 79.9% of regions to ULTRA's 81.6% at lower precision; above period 100 it reaches 3.4% against capped TRF's 2.0%. Four operating points span 54.7%/62.2% recall/precision to 81.6%/48.4%. On Arabidopsis it recovers 99.7% of CEN180 monomers (truth set ≥80% consensus identity) in 31 minutes against ULTRA's 99.8% in 10.1 h, but a re-run tantan reaches 99.2% in 12 minutes at higher base pair precision; it ties the leaders on maize CentC coverage, within 0.13 points of the best. Both are pipeline-plus-supplementary-pass results. The proposition: one wide-range pass at competitive but not leading accuracy, paid for in memory and fragmentation.
 
 **Availability and implementation:** Source code, scoring scripts and a per-figure provenance manifest: https://github.com/wyim-pgl/bwt-algorithm. Reproducing these numbers requires the Supplementary Methods S2 configurations; built-in defaults differ.
 
@@ -91,7 +91,7 @@ For Zea mays (Experiment 3), three aspects were evaluated. Experiment 3A measure
 
 BWTandem's configuration was selected empirically against this same benchmark: 44 candidate settings were scored on chromosomes 21 and 22 of the adotto catalog (48,344 of 1,784,804 regions, 2.7%), and the accepted values are the ones tabulated in Supplementary Methods S2. The competitors were run at their defaults, without an equivalent search. The reported human accuracy figures are therefore in-sample for BWTandem in the sense that its gates were fitted on a subset of the scoring catalog, and out-of-sample for the competitors. We have since measured that asymmetry rather than only declaring it, by rescoring every row on the 22 chromosomes that were not used to select the configuration. It is small. BWTandem's region recall moves from 80.54% to 80.48% and its region precision from 50.52% to 50.48%; ULTRA, tantan and TRF move by 0.01, 0.02 and 0.08 points, the ordering is unchanged, and BWTandem's deficit to ULTRA goes from 1.08 to 1.13 points. Two qualifications keep that from being stronger evidence than it is. The selection chromosomes are 2.7% of the catalog, so the full-catalog figure is arithmetically dominated by the held-out remainder and could not have moved far. And on the selection chromosomes themselves BWTandem scores 82.59%, 2.11 points above its held-out figure, where ULTRA gains 0.53 and tantan 0.51; that gap is consistent with an in-sample advantage, but TRF, which was never tuned, gains 3.01 points there, so chromosome composition rather than fitting can account for a difference of this size and we do not attribute it.
 
-Every figure in this paper is a single-run point estimate, and we report no confidence intervals or significance tests. Each tool is deterministic given its inputs (mreps excepted on assemblies containing ambiguity codes, which its human run hit; and our own multi-worker output order varies while call content does not), so the estimates carry no sampling error in the usual sense; what they lack is any estimate of how much a difference between two tools would move under a different benchmark, a different chromosome set, or a different curation of the ground truth. The differences we build arguments on are large, a twentyfold range difference in cost, a 49-point region-recall gap between BWTandem and TRF on the matched range (Table 1b), the presence or absence of any call above period 100. Several differences reported below are not: the three-way spread in Arabidopsis centromere coverage is 0.20 percentage points, the CentC coverage lead is 0.35, and the gap between BWTandem's most sensitive setting and ULTRA on region recall is 0.02. We describe those as ties rather than as rankings, and no claim in the Discussion rests on one. The provenance manifest names the scoring script and its hash for every table, so a reader wishing to resample the ground truth can rerun the same code.
+Every figure in this paper is a single-run point estimate, and we report no confidence intervals or significance tests. Each tool is deterministic given its inputs (mreps excepted on assemblies containing ambiguity codes, which its human run hit; and our own multi-worker output order varies while call content does not), so the estimates carry no sampling error in the usual sense; what they lack is any estimate of how much a difference between two tools would move under a different benchmark, a different chromosome set, or a different curation of the ground truth. The differences we build arguments on are large, a twentyfold range difference in cost, a 49-point region-recall gap between BWTandem and TRF on the matched range (Table 1b), the presence or absence of any call above period 100. Several differences reported below are not: the three-way spread in Arabidopsis centromere coverage is 0.20 percentage points, the CentC coverage spread across the top three tools is 0.18, and the gap between BWTandem's most sensitive setting and ULTRA on region recall is 0.02. We describe those as ties rather than as rankings, and no claim in the Discussion rests on one. The provenance manifest names the scoring script and its hash for every table, so a reader wishing to resample the ground truth can rerun the same code.
 3. Results
 3.1 Tandem Repeat Detection on Human GRCh38
 Seven runs were attempted on the 3.1 Gb human GRCh38 genome against the GIAB adotto benchmark; BWTandem and six competitors, NCRF excluded a priori on the memory grounds below; six produced output and five scorable output (Table 1a). TideHunter's run was abandoned for runtime, and NCRF was excluded on the basis of its 80.96 GB Arabidopsis footprint, no completed human run existing.
@@ -117,7 +117,7 @@ Seven runs were attempted on the 3.1 Gb human GRCh38 genome against the GIAB ado
 | TRF | 962,837 | 31.88 | 94.86 | 99.94 | 30.26 | 52.40 | 18,900 | 33.7 | 1.45 |
 | mreps ‡ | did not complete | — | — | — | — | — | — | 0.9 | 6.38 |
 | ULTRA | 3,216,710 | 81.62 | 53.66 | 78.44 | 38.14 | 61.33 | 518,405 | 29.8 | 1.68 |
-| BWTandem | 4,009,261 | 80.54 | 50.52 | 79.49 | 43.42 | 31.51 | 893,547 | 12.1 | 21.86 |
+| BWTandem | 4,014,108 | 80.53 | 50.50 | 79.45 | 43.34 | 42.74 | 893,480 | 12.6 | 28.08 |
 | BWTandem (built-in defaults) § | 655,095 | 22.78 | 79.18 | 87.89 | 22.87 | 43.05 | — | 6.1 | 17.78 |
 | tantan | 3,319,523 | 78.00 | 57.66 | 82.93 | 23.54 | 70.22 | 518,443 | 0.9 | 0.27 |
 | TRASH † | 5,134 | 1.16 | 95.25 | 99.86 | 10.24 | 24.96 | 0 | 107.6 | 14.59 |
@@ -136,7 +136,7 @@ Seven runs were attempted on the 3.1 Gb human GRCh38 genome against the GIAB ado
 
 | Tool | Regions | Region Recall (%) | Region Prec. (%) | BP Recall (%) | BP Prec. (%) |
 |---|--:|--:|--:|--:|--:|
-| BWTandem | 98,339 | 3.44 | 65.97 | 13.44 | 29.24 |
+| BWTandem | 102,926 | 3.43 | 64.60 | 13.39 | 29.25 |
 | TRF | 50,753 | 2.02 | 97.18 | 11.83 | 31.19 |
 | tantan (2,000 bp re-run) § | 37,700 | 0.61 | 47.29 | 4.82 | 18.65 |
 | TRASH | 1,427 | 0.25 | 90.75 | 5.23 | 16.42 |
@@ -187,7 +187,7 @@ Seven runs were attempted on the 3.1 Gb human GRCh38 genome against the GIAB ado
 | TRF | 27,538 | 84.39 | 191 | 82.79 | 97.55 | 131.9 | 1.26 |
 | mreps § | 27,762 | 58.48 | 25,021 | 98.33 | 78.45 | 0.12 | 0.17 |
 | ULTRA § | 150,122 | 84.44 | 766 | 58.08 | 99.80 | 10.12 | 4.20 |
-| BWTandem | 160,740 | 84.59 | 1,380 | 57.17 | 99.73 | 0.51 | 1.95 |
+| BWTandem | 160,883 | 84.54 | 1,533 | 57.08 | 99.72 | 0.67 | 2.16 |
 | tantan § | 147,654 | 81.50 | 5,749 | 76.88 | 99.24 | 0.20 | 0.09 |
 | NCRF | 74 | 85.17 | 0 | 95.82 | 99.63 | 0.80 | 80.96 |
 | TRASH (de novo) | 234 | 85.03 | 74 | 86.40 | 99.69 | 6.31 | 1.32 |
@@ -234,7 +234,7 @@ The reason the pipeline does not merge these itself is period-assignment drift, 
 |---|--:|--:|--:|--:|--:|--:|--:|
 | TRF | 25 | 17 | 0.00 | 651.96 | 884.85 | 5.5 | 1.20 |
 | ULTRA ¶ | 25 | 17 | 0.00 | 203.4 | 475.9 | 34.7 | 9.68 |
-| BWTandem | 25 | 17 | 0.00 | 274.5 | 924.5 | 15.4 | 22.41 |
+| BWTandem | 25 | 17 | 0.00 | 251.8 | 770.7 | 15.9 | 28.45 |
 | tantan § | 25 | 17 | 0.00 | 156.0 | 658.3 | 3.3 | 0.50 |
 | TRASH (de novo) | 25 | 17 | 0.05 | 9,845 | 10,561 | 58.8 | 12.78 |
 | TRASH (template) | 25 | 17 | 0.05 | 10,086 | 8,973 | 101.7 | 120.64 |
@@ -263,7 +263,7 @@ The reason the pipeline does not merge these itself is period-assignment drift, 
 | | tantan § | banded | 17/17 | 21.36 | 3,693 |
 
 		3.3.3 CentC Centromeric Arrays
-		Every tool in Table 3C detected all 17 CentC centromeric arrays. All five now cover them substantially: BWTandem gives the highest coverage, 59.03%, ahead of TRASH in template mode (58.68%), TRF (58.50%), ULTRA (57.73%) and the re-run tantan (56.51%), a spread of 2.5 points, and a lead of 0.35 points over the next tool that we do not read as a ranking. ULTRA and tantan place boundaries most tightly, 58 bp and 60 bp from curated coordinates, then TRF at 70 bp, with BWTandem at 196 bp and TRASH at 5.3 kb; on this class BWTandem's boundaries are the loosest of the four sub-kilobase tools by a factor of nearly three. Across the three maize classes BWTandem is therefore at or near the top on coverage in all three, and does so at a boundary offset under 1 kb throughout, less than half TRF's on knob180, though above TRF's on TR-1 and CentC, and above ULTRA's on all three classes.
+		Every tool in Table 3C detected all 17 CentC centromeric arrays. All five now cover them substantially: TRASH in template mode covers most, 58.68%, then BWTandem (58.55%), TRF (58.50%), ULTRA (57.73%) and the re-run tantan (56.51%), a spread of 2.2 points. The top three sit within 0.18 points of each other and we read them as a tie rather than a ranking; on the regenerated output BWTandem no longer leads this class. ULTRA and tantan place boundaries most tightly, 58 bp and 60 bp from curated coordinates, then TRF at 70 bp, with BWTandem at 170 bp and TRASH at 5.3 kb; on this class BWTandem's boundaries are the loosest of the four sub-kilobase tools by a factor of about two and a half. Across the three maize classes BWTandem is therefore within the leading group on coverage in all three without leading any of them outright, and does so at a boundary offset under 1 kb throughout, less than half TRF's on knob180 and below TRF's on TR-1, though above TRF's on CentC and above ULTRA's on all three classes.
 
 		 One caveat applies across these classes and is specific to BWTandem. Filtering calls by reported period, as an analysis targeting a known monomer length would, costs it 15.6, 33.0, and 17.8 percentage points of coverage on knob180, TR-1, and CentC, against at most 1.5 points for TRF and 2.8 for ULTRA across the same three classes, and 0.35 or less for TRASH on knob180 and CentC though 18.6 on TR-1 (Tables 3B-b and 3C-b). It covers the arrays but frequently reports a period outside the nominal monomer band, so selecting calls by expected monomer length discards correct detections; under the band the coverage ordering reverses on all three classes, TRF leading BWTandem by 14.7, 26.8 and 16.4 points. Users filtering on period should widen the window accordingly.
 
@@ -275,8 +275,8 @@ The reason the pipeline does not merge these itself is period-assignment drift, 
 
 | Tool | CentC (of 17) | Cen. Coverage (%) | Frag. Score | Mean Offset (bp) | Runtime (h) | Memory (GB) |
 |---|--:|--:|--:|--:|--:|--:|
-| BWTandem | 17 | 59.03 | 0.00 | 196.0 | 15.4 | 22.41 |
 | TRASH (template) ‖ | 17 | 58.68 | 0.05 | 5,319 | 97.8 | 42.83 |
+| BWTandem | 17 | 58.55 | 0.00 | 170.1 | 15.9 | 28.45 |
 | TRF | 17 | 58.50 | 0.01 | 69.6 | 5.5 | 1.20 |
 | ULTRA ¶ | 17 | 57.73 | 0.00 | 58.1 | 12.9 | 3.38 |
 | tantan § | 17 | 56.51 | 0.00 | 59.5 | 1.4 | 0.50 |
@@ -285,11 +285,11 @@ The reason the pipeline does not merge these itself is period-assignment drift, 
 
 | Tool | Rule | Detected | Coverage (%) | Offset (bp) | Loss under band (pp) |
 |---|---|--:|--:|--:|--:|
-| BWTandem | unfiltered | 17/17 | 59.03 | 196.0 | |
+| BWTandem | unfiltered | 17/17 | 58.55 | 170.1 | |
 | TRF | unfiltered | 17/17 | 58.50 | 69.6 | |
 | ULTRA | unfiltered | 17/17 | 57.73 | 58.1 | |
 | tantan § | unfiltered | 17/17 | 56.51 | 59.5 | |
-| BWTandem | banded | 17/17 | 41.23 | 3,035 | −17.80 |
+| BWTandem | banded | 17/17 | 40.71 | 3,036 | −17.84 |
 | TRF | banded | 17/17 | 57.63 | 1,779 | −0.87 |
 | ULTRA | banded | 17/17 | 55.84 | 1,795 | −1.89 |
 | tantan § | banded | 17/17 | 55.59 | 1,770 | −0.92 |

@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "Cython>=3.0", "numpy>=2.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bwtandem"
+version = "0.9.0"
+description = "BWT/FM-index based tandem repeat finder with a 3-tier detection pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [{name = "Won C. Yim", email = "woncyim@gmail.com"}]
+dependencies = [
+    "numpy>=2.0",
+    "pydivsufsort==0.0.20",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=9", "Cython>=3.0"]
+
+[project.scripts]
+bwtandem = "src.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

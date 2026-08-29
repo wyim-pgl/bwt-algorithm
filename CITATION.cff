@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use BWTandem, please cite it as below."
+title: "BWTandem: a BWT/FM-index based tandem repeat finder"
+type: software
+authors:
+  - family-names: "Yim"
+    given-names: "Won C."
+    email: "woncyim@gmail.com"
+repository-code: "https://github.com/wyim-pgl/bwt-algorithm"
+version: "0.9.0"
+date-released: "2026-08-27"
+license: MIT

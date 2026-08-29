@@ -26,3 +26,8 @@ resume.md.*
 
 # Manuscript working backups — one per revision pass, not project history
 manuscript.md.*-bak
+
+# Build residue from `pip install .` / `python -m build`
+*.egg-info/
+build/
+dist/

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel", "Cython>=3.0", "numpy>=2.0"]
+requires = ["setuptools>=77", "wheel", "Cython>=3.0", "numpy>=2.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,8 @@ version = "0.9.0"
 description = "BWT/FM-index based tandem repeat finder with a 3-tier detection pipeline"
 readme = "README.md"
 requires-python = ">=3.11"
-license = {file = "LICENSE"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{name = "Won C. Yim", email = "woncyim@gmail.com"}]
 dependencies = [
     "numpy>=2.0",
@@ -17,6 +18,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=9", "Cython>=3.0"]
+
+# Declared explicitly because auto-discovery reads the `src/` directory as a
+# src-layout and sets package_dir={"": "src"}: every module under src/ then
+# installs as a TOP-LEVEL module (main, models, coverage, ...), which both
+# breaks the `src.main` entry point and collides with real distributions such
+# as coverage. Naming the packages forces the flat layout the code imports as.
+[tool.setuptools]
+packages = ["src", "src.c_extensions"]
 
 [project.scripts]
 bwtandem = "src.main:main"

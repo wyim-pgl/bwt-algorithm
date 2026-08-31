@@ -85,7 +85,9 @@ class TandemRepeat:
         # Get actual sequence (or use consensus repeated)
         sequence = self.actual_sequence or (cons * int(self.copies))
 
-        return (f"{self.start} {self.end} {period} {self.copies:.1f} {consensus_size} "
+        # TRF .dat coordinates are 1-based inclusive. Internal intervals are
+        # 0-based half-open, so only the start requires conversion.
+        return (f"{self.start + 1} {self.end} {period} {self.copies:.1f} {consensus_size} "
                 f"{self.percent_matches:.0f} {self.percent_indels:.0f} {self.score} "
                 f"{comp['A']:.0f} {comp['C']:.0f} {comp['G']:.0f} {comp['T']:.0f} "
                 f"{self.entropy:.2f} {cons} {sequence}")

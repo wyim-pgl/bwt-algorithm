@@ -96,7 +96,10 @@ def main():
     # Parse all tool results
     tools = {}
 
-    bwt_path = os.path.join(results_dir, "bwt_Chr4.bed")
+    # Use the same v3 output cited by the README benchmark table.  The former
+    # path pointed to a 6,987-call legacy run, while the documented Venn counts
+    # were calculated from the 4,826-call v3 run.
+    bwt_path = os.path.join(results_dir, "bwtandem_Chr4_v3.bed")
     if os.path.exists(bwt_path):
         tools["bwtandem"] = parse_bed(bwt_path)
         print(f"bwtandem: {len(tools['bwtandem'])} repeats")

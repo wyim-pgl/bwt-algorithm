@@ -77,8 +77,20 @@ class TandemRepeatFinder:
                 show_progress=show_progress # Pass progress display flag
             )
 
-        # Only create Tier 3 instance if enabled, otherwise None
-        self.tier3 = Tier3LongReadFinder(self.bwt, mode=tier3_mode) if "tier3" in self.enabled_tiers else None
+        # Tier 3 owns periods >=100 bp, but must still honor the user-requested
+        # period interval.  Previously it always searched 100..100,000 bp and
+        # relied on final filtering, wasting work and making preset diagnostics
+        # inconsistent with the CLI arguments.
+        tier3_min = max(100, self.min_period)
+        tier3_max = min(100_000, self.max_period)
+        self.tier3 = None
+        if "tier3" in self.enabled_tiers and tier3_min <= tier3_max:
+            self.tier3 = Tier3LongReadFinder(
+                self.bwt,
+                min_length=tier3_min,
+                max_length=tier3_max,
+                mode=tier3_mode,
+            )
 
     def find_all(self) -> List[TandemRepeat]:
         """Execute the full 3-tier finding pipeline."""
@@ -445,6 +457,8 @@ class TandemRepeatFinder:
             near_satellite[max(0, sat_start - proximity):min(n, sat_end + proximity)] = True
 
         new_repeats = []
+        valid_base = np.zeros(256, dtype=bool)
+        valid_base[[65, 67, 71, 84]] = True  # A, C, G, T
         for block_start, block_end in uncovered_blocks:
             block_size = block_end - block_start
             if block_size > 100000 or block_size < 300:
@@ -472,12 +486,22 @@ class TandemRepeatFinder:
                 if w_size < 300:
                     continue
 
-                for p in range(100, min(301, w_size // 2)):
+                period_start = max(100, self.min_period)
+                period_stop = min(301, self.max_period + 1, w_size // 2)
+                for p in range(period_start, period_stop):
                     total = w_size - p
                     if total <= 0:
                         continue
-                    matches = int(np.sum(w_region[:total] == w_region[p:p + total]))
-                    identity = matches / total
+                    left = w_region[:total]
+                    right = w_region[p:p + total]
+                    valid = valid_base[left] & valid_base[right]
+                    valid_count = int(np.sum(valid))
+                    # Ambiguous/masked sequence must not create artificial
+                    # autocorrelation (e.g. long N runs matching themselves).
+                    if valid_count < 0.8 * total:
+                        continue
+                    matches = int(np.sum((left == right) & valid))
+                    identity = matches / valid_count
                     if identity > best_identity:
                         best_identity = identity
                         best_period = p
@@ -527,7 +551,11 @@ class TandemRepeatFinder:
             if name in self.VALID_TIERS:
                 normalized.add(name)  # Add to set if it is a valid tier name
 
-        return normalized if normalized else set(self.VALID_TIERS)  # If no valid tiers found, return all tiers
+        if not normalized:
+            raise ValueError(
+                "No valid tiers selected; choose from tier1, tier2, tier3, or all"
+            )
+        return normalized
 
     def _register_repeat(self, repeat: TandemRepeat, store: List[TandemRepeat],
                          seen: Optional[Set[Tuple[int, int]]] = None) -> bool:

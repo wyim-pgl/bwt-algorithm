@@ -16,7 +16,7 @@ Tandem repeats play important roles in genome instability, genetic disorders, an
 - **3-Tier pipeline**: Achieves both detection rate and speed through a 3-stage detection structure optimized for each repeat type
 - **Multiple output formats**: Supports BED, VCF, TRF `.dat`, and STRfinder `.csv`
 - **Adaptive parameters**: Automatically adjusts Tier 3 parameters based on sequence length, GC content, and coverage
-- **Optional acceleration**: Enables acceleration of core operations through Cython extensions and Numba JIT compilation
+- **Native acceleration**: Uses Cython extensions for the complete three-tier pipeline and Numba JIT compilation for additional speed
 
 ---
 
@@ -68,11 +68,11 @@ pip install numba Cython
 | `numpy` | Required | Array operations |
 | `pydivsufsort` | Required (recommended) | Fast suffix array construction; falls back to NumPy prefix-doubling if unavailable |
 | `numba` | Optional | JIT acceleration for rank queries and LCP computation |
-| `Cython` | Optional | Compiling `_accelerators.pyx` to accelerate critical paths |
+| `Cython` | Required for complete detection | Compiling `_accelerators.pyx`; several fallback paths are intentionally incomplete |
 
 ### Building Cython Extensions
 
-`_accelerators.pyx` provides performance-critical paths including Hamming distance computation, mismatch extension, LCP candidate detection, and DP alignment. Without compilation, pure-Python fallbacks are used, and some code paths return empty results.
+`_accelerators.pyx` provides detection-critical paths including Hamming distance computation, mismatch extension, LCP candidate detection, and DP alignment. Without compilation, partial pure-Python fallbacks are used and some code paths return empty results; such runs are not equivalent to the reported three-tier pipeline or benchmarks.
 
 ```bash
 # Run from the project root
@@ -213,15 +213,15 @@ Post-processing: Sort -> Merge adjacent -> Filter overlaps -> Filter by length
 Output (BED / VCF / TRF / STRfinder)
 ```
 
-### Tier 1: Short Perfect Repeats (1-9 bp)
+### Tier 1: Short Repeats (1-9 bp)
 
-**Coverage**: Motif length 1-9 bp, perfect (or near-perfect) repeats with 3 or more copies.
+**Coverage**: Motif length 1-9 bp, seeded by perfect runs and extended/refined with mismatch tolerance.
 
 **How it works**:
-- Sequence length < 10 Mbp: Enumerates all canonical motifs via FM-index backward search and finds tandem repeat positions.
-- Sequence length >= 10 Mbp: Switches to a sliding window scanner with adaptive step size.
+- Directly scans every sequence position for consecutive period-k runs (ctypes C implementation when available, NumPy/Python fallback otherwise).
+- Applies motif-length-dependent copy and minimum-array-length thresholds, then alignment-based refinement.
 
-This is the primary detection tier for STRs (Short Tandem Repeats, microsatellites). It performs O(1) short k-mer lookup using an 8-mer hash.
+This is the primary detection tier for STRs (Short Tandem Repeats, microsatellites).
 
 ### Tier 2: Medium/Imperfect Repeats (>=10 bp)
 
@@ -492,12 +492,12 @@ For imperfect repeats, the tool may report a consensus motif different from the 
 
 | Item | Sensitivity | Precision | F1 | Ground Truth Count |
 |------|------------|-----------|-----|-------------------|
-| **Overall** | 100.0% | 93.1% | 96.4% | 108 |
-| **Tier 1** | 100.0% | -- | -- | 54 |
+| **Overall** | 99.1% | 100.0% | 99.5% | 108 |
+| **Tier 1** | 98.1% | -- | -- | 54 |
 | **Tier 2** | 100.0% | -- | -- | 31 |
 | **Tier 3** | 100.0% | -- | -- | 23 |
 
-The stress test validates the robustness of the detector by inserting 2-5 repeats into 30 random 50KB sequences. It uses reproducible seeds (1000-1029).
+The stress test validates the robustness of the detector by inserting 2-5 repeats into 30 random 20KB sequences. It uses reproducible seeds (1000-1029). The table above is the deterministic result reproduced on 2026-08-26 (107 TP, 0 FP, 1 FN).
 
 > **Note**: Tier 2/3/Mixed/Adjacent tests require the Cython extension (`_accelerators.so`) to be built. If run without Cython, those tests are automatically skipped.
 
@@ -605,6 +605,10 @@ Comparison on 5 synthetic test sequences containing 44 planted repeats with know
 
 ### Arabidopsis Chr4 (18.5 Mbp)
 
+The counts below are from `results/bwtandem_Chr4_v3.bed` and timing from
+`results/bwt_chr4_v3.log`. They predate the ambiguous-base satellite fix in
+`src/finder.py`; rerun this benchmark before using the exact count in a manuscript.
+
 | Tool | Repeats Found | Runtime |
 |------|---------------|---------|
 | **bwtandem** | **4,826** | 3 min 32 sec |
@@ -621,6 +625,9 @@ Comparison on 5 synthetic test sequences containing 44 planted repeats with know
 
 ### Centromere Satellite DNA Detection (ColCEN Assembly)
 
+These values were generated before the ambiguous-base satellite fix in
+`src/finder.py`. The full ColCEN analysis must be rerun before manuscript use.
+
 Benchmark on the Arabidopsis Col-CEN genome assembly using CEN180 satellite repeat annotations (GFF3) as ground truth. CEN180 is a ~178 bp satellite repeat constituting centromeric regions, with 20-30% inter-copy divergence.
 
 **CEN180 Annotated Unit Coverage** (per-base coverage of individual annotated CEN180 units):
@@ -634,10 +641,9 @@ Benchmark on the Arabidopsis Col-CEN genome assembly using CEN180 satellite repe
 
 #### Key Findings
 
-- **bwtandem** is the only tool that effectively detects CEN180 satellite repeats, achieving **98.2%** per-base coverage of GFF3-annotated CEN180 units across all 5 chromosomes
-- **TRF** fails to complete on the ColCEN assembly — it hangs on centromeric sequences because its sliding-window DP alignment exhaustively tries all period/alignment combinations across highly repetitive regions, causing combinatorial explosion. bwtandem avoids this by using BWT/FM-index to target only positions where repeats actually exist, rather than scanning every window
-- Other tools fail because CEN180 has ~25% inter-copy divergence, exceeding their mismatch tolerance thresholds
-- The remaining ~1.8% uncovered CEN180 units are dispersed copies with autocorrelation at random level (~0.30), lacking detectable tandem repeat periodicity at the sequence level
+- Among the compared runs, **bwtandem** has the highest reported CEN180 coverage: **98.2%** of GFF3-annotated bases across all 5 chromosomes.
+- The repository's TRF logs show TRF 4.10.0-rc.2 remaining on sequence 1 until the scheduler cancelled the job; they do not establish the algorithmic cause of the non-completion.
+- The repository does not contain an analysis that establishes why mreps and ULTRA have lower coverage, or that characterizes every uncovered CEN180 unit; those interpretations require separate validation.
 - bwtandem's satellite DNA scanner uses autocorrelation-based period detection that tolerates high divergence
 - Note: CEN180 units occupy 46–71% of the centromere span (the rest is retrotransposons and other non-repetitive DNA), so centromere-wide coverage metrics can be misleading
 

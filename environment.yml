@@ -8,9 +8,12 @@ dependencies:
   - numpy
   - numba
   - cython
+  - pytest
+  - matplotlib
   - pip
   - trf
   - setuptools
   - mreps
   - pip:
       - pydivsufsort
+      - matplotlib-venn

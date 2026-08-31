@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BWT-based tandem repeat finder for genomic sequences. Detects tandem repeats (STRs and longer repeats) in FASTA files using a Burrows-Wheeler Transform / FM-index approach with a 3-tier detection pipeline. Written in Python with optional Cython/Numba acceleration.
+BWT-based tandem repeat finder for genomic sequences. Detects tandem repeats (STRs and longer repeats) in FASTA files using a Burrows-Wheeler Transform / FM-index approach with a 3-tier detection pipeline. Written in Python with required Cython acceleration for the complete pipeline and optional Numba acceleration.
 
 ## Running the Tool
 
@@ -22,7 +22,7 @@ python3 -m src.main input.fa -t 4 --mask soft -v  # 4 threads, skip soft-masked 
 
 ## Building Cython Extensions
 
-The Cython extension `_accelerators.pyx` provides critical performance functions. Without it, pure-Python fallbacks in `accelerators.py` are used (some return empty results, effectively disabling those code paths).
+The Cython extension `_accelerators.pyx` provides critical detection and performance functions. A few pure-Python fallbacks exist, but several return empty results; therefore the compiled extension is required for the complete three-tier pipeline and for reproducing the reported accuracy benchmarks.
 
 ```bash
 # Compile Cython extensions (requires numpy, Cython)
@@ -38,7 +38,8 @@ setup(script_args=['build_ext', '--inplace'], ext_modules=cythonize(ext_modules,
 ## Dependencies
 
 - **Required**: numpy, pydivsufsort (fast suffix array construction; falls back to NumPy prefix-doubling if unavailable)
-- **Optional performance**: numba (JIT for rank queries and LCP), Cython (compiled `_accelerators`)
+- **Required for the complete reported pipeline**: Cython (compiled `_accelerators`)
+- **Optional performance**: numba (JIT for rank queries and LCP)
 - **Container**: Singularity definition file at repo root builds a complete environment
 
 ## Architecture
@@ -47,7 +48,7 @@ setup(script_args=['build_ext', '--inplace'], ext_modules=cythonize(ext_modules,
 
 The coordinator builds a `BWTCore` FM-index once per chromosome, then runs enabled tiers sequentially. Each tier receives regions already found by previous tiers to avoid redundant work.
 
-- **Tier 1** (`tier1.py` — `Tier1STRFinder`): Short perfect repeats, motifs 1–9 bp. For sequences <10 Mbp uses FM-index backward search to enumerate all canonical motifs and locate tandem runs. For larger sequences falls back to a sliding-window scanner with adaptive step size. Requires ≥3 copies.
+- **Tier 1** (`tier1.py` — `Tier1STRFinder`): Short repeats, motifs 1–9 bp. Directly scans for consecutive period-k runs at every sequence position, then extends seeds with the configured mismatch tolerance and refines boundaries. The ctypes C scanner is used when available, with an equivalent NumPy/Python scan fallback. Final copy/array-length thresholds depend on motif length.
 
 - **Tier 2** (`tier2.py` — `Tier2LCPFinder`): Medium/imperfect repeats, motifs ≥10 bp. Two sub-phases:
   - **Long-unit strict**: Uses LCP array (Kasai's algorithm) to find adjacent suffix pairs with period ≥20 bp, then extends with mismatch tolerance.
@@ -63,7 +64,7 @@ The coordinator builds a `BWTCore` FM-index once per chromosome, then runs enabl
 
 - **`motif_utils.py` — `MotifUtils`**: Canonical motif rotation (strand-aware), primitive period detection (exact and approximate), DP alignment of repeat copies (`align_repeat_region` with banded Smith-Waterman), consensus building, TRF-compatible statistics, and the `refine_repeat()` entry point used by all tiers.
 
-- **`accelerators.py` / `_accelerators.pyx`**: Cython-accelerated hot paths (hamming distance, mismatch extension, unit repeat scanning, LCP candidate detection, periodic run finding, DP alignment). The Python module transparently falls back to pure-Python stubs (some no-ops) when the `.so` is absent.
+- **`accelerators.py` / `_accelerators.pyx`**: Cython-accelerated hot paths (hamming distance, mismatch extension, unit repeat scanning, LCP candidate detection, periodic run finding, DP alignment). The Python module has partial fallbacks, but some are no-ops; build the extension for complete detection.
 
 - **`models.py`**: Data classes — `TandemRepeat` (output record with BED/VCF/TRF/STRfinder formatters), `AlignmentResult`, `RepeatAlignmentSummary`, `RefinedRepeat`.
 

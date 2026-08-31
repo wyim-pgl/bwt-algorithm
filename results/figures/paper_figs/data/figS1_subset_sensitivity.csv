@@ -1,0 +1,10 @@
+panel,tool,regRecall,regPrec
+22 non-selection chr,BWTandem,78.84,50.08
+22 non-selection chr,ULTRA,81.61,53.57
+22 non-selection chr,tantan,77.98,57.57
+chr21+22,BWTandem,80.03,51.49
+chr21+22,ULTRA,82.14,56.65
+chr21+22,tantan,78.49,60.61
+all 24 chr,BWTandem,78.87,50.13
+all 24 chr,ULTRA,81.62,53.66
+all 24 chr,tantan,78.0,57.66

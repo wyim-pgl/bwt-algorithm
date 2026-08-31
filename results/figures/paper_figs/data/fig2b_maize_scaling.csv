@@ -1,0 +1,7 @@
+tool,max_period_bp,runtime_h
+ULTRA,6,0.23
+ULTRA,200,12.9
+ULTRA,500,34.7
+TRF,6,5.2
+TRF,200,5.5
+TRF,500,5.5

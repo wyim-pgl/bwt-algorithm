@@ -1,0 +1,13 @@
+tool,family,coverage_pct
+BWTandem,knob180,79.79
+BWTandem,TR-1,50.34
+BWTandem,CentC,58.55
+ULTRA,knob180,78.71
+ULTRA,TR-1,36.36
+ULTRA,CentC,57.73
+TRF,knob180,80.01
+TRF,TR-1,45.77
+TRF,CentC,58.5
+tantan,knob180,71.92
+tantan,TR-1,22.74
+tantan,CentC,56.51

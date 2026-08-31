@@ -1,0 +1,16 @@
+rule,tool,regRecall,regPrec
+one-base,BWTandem,78.87,50.13
+one-base,TRF,30.8,94.73
+one-base,ULTRA,81.62,53.66
+one-base,tantan,78.0,57.66
+one-base,TRASH,0.91,96.98
+reciprocal 0.25,BWTandem,67.31,32.36
+reciprocal 0.25,TRF,27.57,72.89
+reciprocal 0.25,ULTRA,72.67,41.41
+reciprocal 0.25,tantan,46.23,25.62
+reciprocal 0.25,TRASH,0.11,49.96
+reciprocal 0.50,BWTandem,17.61,8.06
+reciprocal 0.50,TRF,9.8,25.68
+reciprocal 0.50,ULTRA,31.05,17.24
+reciprocal 0.50,tantan,6.37,3.43
+reciprocal 0.50,TRASH,0.04,20.02

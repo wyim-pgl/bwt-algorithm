@@ -1,0 +1,13 @@
+tool,family,coverage_delta_pp
+BWTandem,knob180,-15.59
+BWTandem,TR-1,-33.01
+BWTandem,CentC,-17.84
+ULTRA,knob180,-1.2
+ULTRA,TR-1,-2.82
+ULTRA,CentC,-1.89
+TRF,knob180,-0.63
+TRF,TR-1,-1.54
+TRF,CentC,-0.87
+tantan,knob180,-0.51
+tantan,TR-1,-1.38
+tantan,CentC,-0.91

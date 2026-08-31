@@ -105,15 +105,32 @@ The container image is based on Ubuntu 22.04 with numpy, numba, pydivsufsort, an
 
 ## Quick Start
 
-```bash
-# Most basic execution (defaults: all Tiers, BED output)
-python3 -m src.main input.fa
+The repository ships small test sequences, so you can verify the install in
+seconds:
 
-# View results
-cat input.bed
+```bash
+# 35 bp toy sequence: five copies of TCATCGG (runs in <1 s)
+python3 -m src.main arabadopsis_chrs/test_seq1.fa --format bed -o /tmp/quick
+cat /tmp/quick.bed
+# repeatTCATCGG_5    0    35    TCATCGG    5.0    1    0.000    +
+
+# A real 367 kb sequence (Arabidopsis mitochondrial genome, ~2 s, 45 calls)
+python3 -m src.main arabadopsis_chrs/ChrM.fa --format bed -o /tmp/chrm -v
+wc -l /tmp/chrm.bed
+
+# Or the packaged smoke test
+bash examples/quickstart.sh
 ```
 
-The above command generates an `input.bed` file. The BED format includes columns for `chrom`, `start`, `end`, `motif`, `copies`, `tier`, `mismatch_rate`, and `strand`.
+On your own data:
+
+```bash
+# Defaults: all tiers, periods 1-2,000 bp, BED output next to the input
+python3 -m src.main input.fa
+```
+
+The BED columns are `chrom`, `start`, `end`, `motif`, `copies`, `tier`,
+`mismatch_rate`, `strand` (full format specs in [MANUAL.md](MANUAL.md)).
 
 ---
 
@@ -644,256 +661,54 @@ main.py
 
 ## Benchmarks
 
-> ### ⚠️ Benchmark validity notice (2026-08-03)
->
-> An audit of the cross-tool comparisons found defects that affect **every
-> cross-tool number in this section**. Single-tool BWTandem figures (runtime,
-> counts, coverage of its own calls) are unaffected.
->
-> 1. **The tools were not run over comparable period ranges.** BWTandem ran at
->    periods 1–2000; ULTRA ran at its default cap of **100** on human and
->    Col-CEN; TRF ran at 200 (Col-CEN) / 500 (human). Where a target repeat is
->    longer than a tool's cap, that tool cannot report it at all — so a "0" in
->    these tables may be a parameter consequence rather than a measurement.
->    This is what produces ULTRA's near-zero CEN180 numbers below (CEN180 is
->    178 bp; ULTRA was capped at 100).
-> 2. **Some scoring applied a stricter filter to BWTandem than to other tools**
->    (maize satellite tables), which understated BWTandem.
-> 3. A claim below that **TRF fails to complete on Col-CEN is wrong** — see that
->    section.
-> 4. **Two of the three tools reported as failing on CEN180 were never given a
->    period range that contains it** — ULTRA (cap 100) and mreps (cap 6). Only
->    tantan's result reflects the tool rather than its configuration.
->    **mreps is settled**: re-run at `-minperiod 150 -maxperiod 400` it reports
->    21,772 calls at exactly period 178, moving it from 5.8 % to 78.5 % CEN180
->    monomer recall. **ULTRA is partly settled** — its `-p 500` re-run is still
->    running, but past the Chr1 centromere it has gone from 0 to 191 calls in the
->    CEN180 period band, while still labelling most of that centromere with
->    periods ≤ 20 bp. The cap was a real blocker; removing it does not appear to
->    make ULTRA recover CEN180. See the footnote for the interim table.
->
-> A further caveat on the benchmark's **"CEN180 Count"** column (used in the
-> manuscript's Table 2, not in the table below): it counts calls, so it measures
-> **fragmentation**, not detection. In the Chr1 centromere BWTandem makes 333
-> calls in the CEN180 period band and reaches 99.7 % monomer recall, while mreps
-> makes 4,771 calls and reaches 78.5 % — one call per array versus one per few
-> monomers. Monomer recall or base-pair coverage is the metric to compare on.
->
-> A caveat that cuts the other way, found in the same audit: **BWTandem's
-> headline CEN180 monomer recall of 99.7 % is measured over all its calls,
-> including those it assigns a period outside the 150–200 bp monomer window.**
-> Counting only calls at a CEN180-like period gives **91.9 %**, below TRF's
-> 97.6 % — TRF scores 97.55 % under either definition. BWTandem covers the arrays
-> but assigns their period less consistently, and the same pattern shows up on
-> the maize satellites. This is a real limitation, not a scoring artifact.
->
-> Corrections known so far are flagged inline. Full analysis:
-> [`docs/2026-08-03-manuscript-revision-workplan.md`](docs/2026-08-03-manuscript-revision-workplan.md)
-> and the audit workspace `exp1_human/wp0/WP0_AUDIT_ALL_TABLES.md`.
-> Re-runs at matched period ranges are in progress; this section will be
-> replaced once they land.
+All manuscript benchmarks were regenerated from clean commit `0363d8b` with
+full provenance (SLURM job, elapsed time, sacct peak memory, SHA-256 of every
+output). **The authoritative numbers live in [`manuscript.md`](manuscript.md)
+and [`results/manifest.tsv`](results/manifest.tsv)** — every reported cell is
+linked there to its source BED, scoring script and hash. Deposited evidence:
+[`results/regen/`](results/regen/) (score reports, per-run provenance),
+[`results/beds/`](results/beds/) (the three whole-genome BWTandem BEDs),
+[`results/audit11/`](results/audit11/) (blinded specificity audit),
+[`results/figures/`](results/figures/) (operating-point figure and data).
 
-### De-novo sensitivity across three species (catch-all pass)
+Headline results (human GRCh38 vs the GIAB adotto catalog, Arabidopsis
+Col-CEN, maize Mo17; see the manuscript for every caveat):
 
-An opt-in **catch-all periodicity pass** (`CATCHALL_SCAN=1`) recovers the diverged
-short STRs the seed-based 3-tier pipeline structurally cannot find, closing the
-recall gap to ULTRA/tantan. Measured on the reproducible build `d52a4ff`
-(2026-07-11):
+| Claim | Measurement |
+|---|---|
+| One wide-range pass | periods 1–2,000 bp in 12.6 h / 25.3 core-hours on GRCh38 (ULTRA: 29.8 h / 59.6 core-hours capped at 100 bp; not range-matched) |
+| Near-flat range cost | widening the reportable maximum 100→2,000 bp costs 1.30–1.41× in paired runs |
+| Shared-range accuracy | non-leading: ULTRA ranks first in region recall (81.62%); BWTandem 79.88% at the whole-genome configuration, 81.60% at a permissive setting with lower precision |
+| Long-period stratum | 3.43% of catalog regions above period 100 (ULTRA: none by construction) |
+| Plant satellites | Col-CEN CEN180 monomer recall 99.72% in 40 min; maize unfiltered coverage in the leading group |
+| Specificity audit | 4 of 400 blinded BWTandem-only calls supported (single reader) — unmatched calls are predominantly over-calls |
+| Cost of the design | 28.08 GB peak memory on human (ULTRA: 1.68 GB) and fragmented satellite calls |
 
-| Genome | metric | catch-all OFF | catch-all ON (catchF) |
-|--------|--------|--:|--:|
-| Human GRCh38 (adotto v1.2.1) | region recall / adj precision | 57.6 % / — | **80.5 % / 79.5 %** [^adj] |
-| Maize Mo17 | 3A microsatellite bp | 11.1 M | **22.3 M** (+100 %) |
-| Arabidopsis Col-CEN | CEN180 monomer recall | 99.68 % | 99.69 % (leave OFF) |
+Reproducing any number requires the environment overrides in Supplementary
+Methods S2 of the manuscript — the benchmarked operating points differ from
+the built-in defaults.
 
-The catch-all is a short-STR / microsatellite mechanism (period ≤ 20 bp): turn it
-**on for STR runs, off for satellite / centromere runs** (where BWTandem already
-saturates — 25/25 knob180, 17/17 TR-1, 17/17 CentC in maize; 99.7 % CEN180). It is
-opt-in, so all existing runs are unchanged. Full tables, all tools, and exact
-commands: [`docs/2026-06-25-catch-all-benchmark-for-filip.md`](docs/2026-06-25-catch-all-benchmark-for-filip.md).
+---
 
-[^adj]: **Adjusted precision is biased upward.** It counts a prediction as a true
-positive if adotto *or* ULTRA *or* tantan supports it — but ULTRA was capped at
-period 100 and tantan emits nothing above period 100 either, while 35 % of
-BWTandem's human base pairs come from periods >100. Neither corroborator can
-confirm or deny that third of the output. The raw region precision (50.7 %) is
-unaffected. Recomputation over a matched range is pending.
+## Documentation
 
-### Synthetic Sequence Accuracy (44 ground truth repeats)
+- [MANUAL.md](MANUAL.md) — CLI reference, output format specifications,
+  environment-variable configuration, reproduction guide
+- [README Installation](#installation) and [SETUP_LINUX.md](SETUP_LINUX.md)
+- [CLAUDE.md](CLAUDE.md) — architecture notes and the complete sensitivity
+  env-var list (kept in sync with the code by `tests/test_env_var_docs.py`)
+- [manuscript.md](manuscript.md) — the paper, with Supplementary Methods S2
+  giving the exact configuration of every benchmarked run
 
-Comparison on 5 synthetic test sequences containing 44 planted repeats with known positions and motifs (periods 1 bp–1000 bp, including adjacent/edge cases):
+## Citation
 
-| Tool | Sensitivity | Precision | F1 |
-|------|-------------|-----------|-----|
-| **bwtandem** | **100.0%** | **100.0%** | **100.0%** |
-| TRF 4.10 | 97.7% | **100.0%** | 98.9% |
-| ULTRA 1.2.1 | 72.7% | 71.1% | 71.9% |
-| mreps 2.6 | 68.2% | 7.6% | 13.6% |
+If you use BWTandem, please cite the repository (see
+[CITATION.cff](CITATION.cff)) until the paper is published; the citation
+will be updated on acceptance.
 
-- **bwtandem**: Detected all 44 repeats with zero false positives, including all 11 adjacent/edge-case repeats
-- **TRF**: High precision but missed 1 adjacent repeat (97.7% sensitivity)
-- **ULTRA**: 100% on short repeats (Tier 1/2 range). Its 12.5% on the Tier 3 range is a
-  **configuration artifact, not a capability limit** — this test set contains periods up
-  to 1000 bp while ULTRA was left at its default `-p 100`, so the long planted repeats
-  were outside the range it was asked to search. Re-running it with a matching `-p`
-  would be the fair comparison
-- **mreps**: High over-detection (366 false positives across 5 sequences), low sensitivity on long repeats (25%)
+## License
 
-### Arabidopsis Chr4 (18.5 Mbp)
-
-| Tool | Repeats Found | Runtime |
-|------|---------------|---------|
-| **bwtandem** | **4,826** | 3 min 32 sec |
-| TRF | 4,549 | **34 sec** |
-| mreps | 84,502 | 48 sec |
-| ULTRA | 23,145 | 24 min 11 sec |
-
-#### Key Observations
-
-- **bwtandem** achieves the highest sensitivity and precision (100%/100% on synthetic data) and detects 6% more repeats than TRF on Chr4
-- **TRF** is the fastest tool (34 sec) with high precision
-- **mreps** reports 84K results (heavy over-detection, filtering required)
-- **ULTRA** is the slowest (24 min) with 4.8x more results than bwtandem
-
-### Centromere Satellite DNA Detection (ColCEN Assembly)
-
-Benchmark on the Arabidopsis Col-CEN genome assembly using CEN180 satellite repeat annotations (GFF3) as ground truth. CEN180 is a ~178 bp satellite repeat constituting centromeric regions, with 20-30% inter-copy divergence.
-
-**CEN180 Annotated Unit Coverage** (per-base coverage of individual annotated CEN180 units):
-
-| Tool | Chr1 | Chr2 | Chr3 | Chr4 | Chr5 | Overall |
-|------|------|------|------|------|------|---------|
-| **bwtandem** | **95.5%** | **99.7%** | **99.4%** | **98.0%** | **98.6%** | **98.2%** |
-| mreps | 33.6% | 34.0% | 29.9% | 32.1% | 24.4% | 30.9% [^mreps] |
-| ULTRA | ~~0.0%~~ | ~~0.2%~~ | ~~0.1%~~ | ~~0.2%~~ | ~~0.1%~~ | ~~0.1%~~ [^ultra] |
-| TRF | — | — | — | — | — | not run on this metric [^trf] |
-
-[^ultra]: **Invalid — do not cite.** ULTRA's `-p/--period` defaults to 100
-("Maximum detectable repeat period"), and the Col-CEN run passed no `-p`, so it
-was capped at 100 while CEN180 is a **178 bp** monomer. ULTRA could not emit a
-CEN180-length call under this configuration; the near-zero row measures the
-parameter, not the tool.
-    **Re-run status (in progress, interim).** A `-p 500` re-run is running. Once it
-had cleared the Chr1 centromere (14.38–17.87 Mb, 14,260 annotated CEN180
-monomers) the picture was mixed, and worth recording before the final numbers
-land:
-
-    | tool | calls in that centromere | of which period 150–200 |
-    |---|--:|--:|
-    | ULTRA `-p 500` | 1,561 (1,020 of them period ≤ 20) | **191** |
-    | mreps re-run 150–400 | 5,406 | **4,771** |
-    | BWTandem | 2,189 | 333 |
-
-    So the cap was a genuine blocker — 0 → 191 — but lifting it does **not** turn
-ULTRA into a CEN180 detector: it still describes the centromere mostly as short
-tandem repeats. The manuscript's conclusion that ULTRA does not recover CEN180
-looks likely to survive, but **for a different reason than stated** — period
-assignment, not an inability to tolerate divergence. Final numbers pending the
-full 5-chromosome run; these are Chr1 only and from an unfinished job.
-
-[^mreps]: **Invalid — do not cite. Same defect as the ULTRA row, now confirmed.**
-Two mreps Col-CEN runs exist. The one that could reach a 178 bp monomer
-(`-minperiod 150 -maxperiod 400`) **failed** — exit status 3, because the
-harness's per-sequence split produced only 3 of 7 files and mreps could not open
-`4.fa`–`7.fa`. The run that was actually scored used **`-maxperiod 6`**: its BED
-contains 342,377 calls with a maximum period of **6** and **zero** calls at
-period ≥ 150. mreps was asked for periods ≤ 6 and then scored on whether it found
-a 178 bp satellite. A corrected re-run (all 7 sequences, `-minperiod 150
--maxperiod 400`, 6 min 54 s) finds **21,772 calls at exactly period 178** plus
-1,701 at the 356 bp dimer — on the benchmark's own metrics that moves mreps from
-1.58 % to **58.5 %** centromere coverage and from 5.76 % to **78.5 %** CEN180
-monomer recall. (Those are the benchmark metrics, not the per-base unit coverage
-tabulated above, so they are not drop-in replacements for the 30.9 % cell — but
-they establish that the cell measures the period cap, not mreps.)
-
-[^trf]: TRF was not scored on this per-unit coverage metric. It **does** run to
-completion on this assembly — see the corrected note below.
-
-#### Key Findings
-
-- **bwtandem** achieves **98.2%** per-base coverage of GFF3-annotated CEN180 units across all 5 chromosomes, at a runtime of ~19 min
-- **CORRECTED (2026-08-03): TRF does *not* fail to complete on the ColCEN assembly.** An
-  earlier version of this README claimed it hangs from combinatorial explosion in its
-  sliding-window DP. A full benchmark run has since completed successfully:
-  `Exit status: 0`, **131 h 57 min** wall clock, 1.32 GB peak RSS, 27,626 regions
-  reported (`trf ... 2 7 7 80 10 50 200 -ngs -h`). On a separate CEN180 metric it
-  reached 97.6% monomer recall. So the real finding is a **~400x runtime gap on
-  satellite-dense sequence** (19 min vs 5.5 days), not a failure to terminate — which
-  is the stronger and more defensible result, since it is consistent with TRF's cost
-  tracking repeat density rather than genome size. The FM-index argument still holds:
-  BWTandem targets positions where repeats actually exist instead of scanning every
-  window.
-- **CORRECTED: "other tools fail because CEN180 has ~25% divergence exceeding their
-  mismatch tolerance" is not established.** For ULTRA the near-zero result is fully
-  explained by the period cap (100 < 178 bp) and says nothing about divergence
-  tolerance. Template-guided tools reach 99.6–99.7% monomer recall on this satellite,
-  so high divergence alone does not prevent detection. The divergence explanation
-  should not be reused without evidence per tool.
-- The remaining ~1.8% uncovered CEN180 units are dispersed copies with autocorrelation at random level (~0.30), lacking detectable tandem repeat periodicity at the sequence level
-- bwtandem's satellite DNA scanner uses autocorrelation-based period detection that tolerates high divergence
-- Note: CEN180 units occupy 46–71% of the centromere span (the rest is retrotransposons and other non-repetitive DNA), so centromere-wide coverage metrics can be misleading
-
-### Telomere Repeat Detection (ColCEN Assembly)
-
-bwtandem's Tier 1 (short tandem repeats, periods 1–9 bp) automatically detects telomeric repeats (AAACCCT, 7 bp period) at chromosome ends and interstitial telomeric sequences.
-
-**Telomere Detection Summary** (5 nuclear chromosomes):
-
-| Chr | Telomere Repeats | Period 7 | Period 8 | 5' End | 3' End |
-|-----|-----------------|----------|----------|--------|--------|
-| Chr1 | 421 | 421 (100%) | 0 | ✓ | ✓ |
-| Chr2 | 9 | 9 (100%) | 0 | — (rDNA) | ✓ |
-| Chr3 | 45 | 42 (93%) | 3 | ✓ | ✓ |
-| Chr4 | 112 | 108 (96%) | 2 | — (rDNA) | ✓ |
-| Chr5 | 48 | 45 (94%) | 3 | ✓ | ✓ |
-
-- All detected motifs are rotations of the canonical telomere repeat AAACCCT: CCTAAAC, AACCCTA, CCCTAAA, TTAGGGT, GGTTTAG, GGGTTTA, etc.
-- Chr1 has 421 telomeric repeats, mostly interstitial telomeric sequences (ITS) within the centromere region (17.1M–17.6M), reflecting retrotransposon-mediated telomere insertion into centromeric DNA
-- Chr2 and Chr4 start with rDNA (not telomeric sequence) in the ColCEN assembly
-- Mismatch rates in the BED output indicate SNPs relative to the consensus motif (e.g., 3.7% = ~9 SNPs per 251 bp region)
-
-### Cross-Species Validation: Oropetium thomaeum (245 Mb)
-
-To validate bwtandem beyond Arabidopsis, we ran it on the *Oropetium thomaeum* v1.0 genome assembly (Phytozome V12, 243 Mb, 625 contigs). The published analysis (VanBuren et al., 2015) used TRF with parameters `1 1 2 80 5 200 2000 -d -h` and identified 155 bp centromeric repeats (including 310 bp dimers and 465 bp trimers) and 18 telomeric sequences with the monomer AAACCCT.
-
-**bwtandem results** (8 threads, all tiers, 11 min 30 sec):
-
-| Feature | Published (TRF) | bwtandem | Match |
-|---------|----------------|----------|-------|
-| Total repeats | Not reported | **56,854** | — |
-| Telomere (AAACCCT, 7 bp) | 18 sequences | 362 repeats / **18 contigs** | Exact match |
-| Centromere (155 bp monomer) | Detected | **357 repeats** across 53 contigs | Detected |
-| Centromere (310 bp dimer) | Detected | **13 repeats** | Detected |
-| Centromere (465 bp trimer) | Detected | **3 repeats** | Detected |
-
-**Key findings**:
-
-- **Telomere**: bwtandem found AAACCCT telomeric repeats in exactly **18 contigs**, matching the published count. These are located at contig ends, consistent with telomeric positions.
-- **Centromere**: The 155 bp base centromeric repeat was detected across 53 contigs, with the largest arrays on contig 003 (up to 65.7 copies, ~10 kb arrays in the 6.0–6.3 Mb region), consistent with the paper's description of contig 003 as one of the three largest centromeric arrays (>400 kb).
-- **Higher-order repeats**: 310 bp dimers and 465 bp trimers were also detected, confirming bwtandem's ability to identify higher-order repeat organization.
-- **Runtime**: 11.5 minutes for a 243 Mb draft genome with 625 contigs — comparable to the Arabidopsis Col-CEN (132 Mb) benchmarks when accounting for genome size.
-
-This demonstrates that bwtandem generalizes beyond Arabidopsis to other plant genomes with different centromeric repeat families and assembly qualities.
-
-### Tool Overlap (Chr4 Venn Diagram)
-
-Region overlap analysis using 500bp genomic bins on Arabidopsis Chr4:
-
-![Venn Diagram Comparison](results/venn_comparison_chr4.png)
-
-| Comparison | Shared Bins | bwtandem-only | Other-only |
-|-----------|-------------|---------------|------------|
-| bwtandem vs TRF | 2,879 | 2,473 | 990 |
-| bwtandem vs ULTRA | 4,663 | 689 | 12,503 |
-| bwtandem vs mreps | 3,288 | 2,064 | 12,435 |
-| All 4 tools | 1,891 | — | — |
-
-bwtandem shares 74% of TRF's detected regions while finding 2,473 additional regions that TRF misses. ULTRA and mreps each detect many regions not found by other tools, likely due to different sensitivity/specificity trade-offs.
-
-> Note: the ULTRA and mreps columns here, and the Chr4 counts above, come from runs
-> whose period ranges were not matched to BWTandem's (see the validity notice at the
-> top of this section). The bwtandem-only counts are therefore upper bounds — some of
-> those regions are ones the other tools were never configured to look for.
+MIT — see [LICENSE](LICENSE).
 
 ---
 

@@ -1,0 +1,75 @@
+########## PROVENANCE ##########
+generated  : 2026-08-31T14:00:31-0700
+host       : cpu-51
+bedtools   : /data/gpfs/assoc/pgl/bin/bedtools2/bin/bedtools
+GT         : /data/gpfs/assoc/pgl/devel/exp1_human/data/adotto_primary.bed
+GT regions : 48344   GT bp: 8272112
+chroms     : chr21,chr22
+matched cap: period <= 100
+stratum    : period 101-2000
+period src : column 5, else len(motif)
+sources    :
+  BWTandem   /data/gpfs/assoc/pgl/devel/exp1_human/regen/regen_human.bed
+             211,949,715 bytes  mtime 2026-08-28 05:17:46
+  TRF        /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trf/GCA_000001405.15_GRCh38_genomic_output.bed
+             328,045,521 bytes  mtime 2026-07-22 03:16:04
+  ULTRA      /data/gpfs/assoc/pgl/devel/exp1_human/wp0/beds/ultra_human_GCA.bed
+             133,206,186 bytes  mtime 2026-08-03 10:46:38
+  tantan     /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/tantan/GCA_000001405.15_GRCh38_genomic_output.bed
+             137,897,003 bytes  mtime 2026-07-22 03:16:42
+  TRASH      /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/trash/GCA_000001405.15_GRCh38_genomic_trash.bed
+             630,487 bytes  mtime 2026-07-22 03:16:42
+
+########## BASELINE (full period range, as published) ##########
+tool            calls  regRecall%  regPrec%  bpRecall%  bpPrec%
+BWTandem       122605       82.57     51.88      48.85    37.30
+TRF             31494       34.81     95.47      38.05    40.47
+ULTRA           87897       82.14     56.65      38.30    65.08
+tantan          95413       78.49     60.61      23.34    72.88
+TRASH             287        2.28     96.52      16.89    21.62
+
+########## MATCHED RANGE (period <= 100, all tools) ##########
+tool            calls  regRecall%  regPrec%  bpRecall%  bpPrec%
+BWTandem       117862       80.03     51.49      29.18    56.31
+TRF             29274       33.30     95.35      23.65    85.44
+ULTRA           87897       82.14     56.65      38.30    65.08
+tantan          95413       78.49     60.61      23.34    72.88
+TRASH             195        1.74     98.97       7.75    48.66
+
+########## STRATUM period 101-2000 (only tools with calls there) ##########
+tool            calls  regRecall%  regPrec%  bpRecall%  bpPrec%
+BWTandem         4743        5.37     61.65      19.73    24.90
+TRF              2220        3.16     97.07      17.18    24.73
+TRASH              92        0.54     91.30       9.14    14.70
+
+########## ADJUSTED PRECISION — full range, corroborators ULTRA+tantan ##########
+tool            calls       inGT      outGT  supported   %ofOut  adjPrec%
+BWTandem       122605      63610      58995      32623    55.3%     78.49
+TRF             31494      30068       1426       1405    98.5%     99.93
+ULTRA           87897      49795      38102      21425    56.2%     81.03
+tantan          95413      57827      37586      23801    63.3%     85.55
+TRASH             287        277         10         10   100.0%    100.00
+
+########## ADJUSTED PRECISION — period <= 100, corroborators ULTRA+tantan ##########
+tool            calls       inGT      outGT  supported   %ofOut  adjPrec%
+BWTandem       117862      60686      57176      32194    56.3%     78.80
+TRF             29274      27913       1361       1358    99.8%     99.99
+ULTRA           87897      49795      38102      21425    56.2%     81.03
+tantan          95413      57827      37586      23801    63.3%     85.55
+TRASH             195        193          2          2   100.0%    100.00
+
+########## ADJUSTED PRECISION — full range, corroborators = all other tools ##########
+tool            calls       inGT      outGT  supported   %ofOut  adjPrec%
+BWTandem       122605      63610      58995      33548    56.9%     79.24
+TRF             31494      30068       1426       1425    99.9%    100.00
+ULTRA           87897      49795      38102      28554    74.9%     89.14
+tantan          95413      57827      37586      28181    75.0%     90.14
+TRASH             287        277         10         10   100.0%    100.00
+
+########## ADJUSTED PRECISION — period <= 100, corroborators = all other tools ##########
+tool            calls       inGT      outGT  supported   %ofOut  adjPrec%
+BWTandem       117862      60686      57176      32311    56.5%     78.90
+TRF             29274      27913       1361       1359    99.9%     99.99
+ULTRA           87897      49795      38102      28376    74.5%     88.93
+tantan          95413      57827      37586      27966    74.4%     89.92
+TRASH             195        193          2          2   100.0%    100.00

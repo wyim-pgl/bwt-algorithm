@@ -23,7 +23,7 @@ os.makedirs(DATA, exist_ok=True)
 def write(name, header, rows):
     path = os.path.join(DATA, name)
     with open(path, "w", newline="") as fh:
-        w = csv.writer(fh)
+        w = csv.writer(fh, lineterminator="\n")
         w.writerow(header)
         w.writerows(rows)
     print(f"wrote {name}: {len(rows)} rows")

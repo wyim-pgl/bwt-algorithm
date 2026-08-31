@@ -1,2 +1,9 @@
-status,job,commit,note
-pending,6129408,0363d8b,Native period-100 P/B/F/H values are withheld until all arms are scored
+series,label,region_recall,region_precision,bp_recall,bp_precision
+BWTandem,P,54.69,62.16,26.65,63.77
+BWTandem,B,71.89,53.28,31.02,58.10
+BWTandem,F,79.88,50.62,32.55,55.51
+BWTandem,H,81.60,48.44,33.40,53.86
+competitor,ULTRA,81.62,53.66,38.14,61.33
+competitor,tantan,78.00,57.66,23.54,70.22
+competitor,TRF,30.80,94.73,20.81,93.16
+competitor,TRASH,0.91,96.98,5.01,54.49

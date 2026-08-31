@@ -1,0 +1,24 @@
+tool  : BWT-F-p100  (/data/gpfs/assoc/pgl/devel/exp1_human/regen/maize_rescore/native_p100_0363/out/bwt_human_F_p100_0363.bed)
+calls : 3,993,151
+others: 4 tool BEDs
+
+unique to BWT-F-p100: 875,084 (21.9% of calls)
+shared with >=1 tool: 3,118,067
+
+  UNIQUE: n=875,084  bp=30,425,845
+    length  median 25  q25 20  q75 36  max 427
+    period  3-6:61.2%  21-100:21.9%  1-2:13.2%  7-20:3.7%
+    motif entropy  mean 1.241  <1.0 bit: 38.9%
+
+  SHARED: n=3,118,067  bp=110,942,722
+    length  median 24  q25 21  q75 34  max 9,087
+    period  3-6:51.7%  1-2:24.8%  7-20:17.4%  21-100:6.1%
+    motif entropy  mean 1.030  <1.0 bit: 46.4%
+
+  unique calls inside adotto: 76,251 / 875,084 (8.7%)
+
+  shared calls inside adotto: 1,945,232 / 3,118,067 (62.4%)
+
+Reading: if UNIQUE is much shorter, lower-entropy and largely outside the catalog
+relative to SHARED, the unique count reflects low-complexity over-calling rather than
+novel detection.

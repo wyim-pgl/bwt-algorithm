@@ -1,0 +1,19 @@
+{
+  "tag": "human_idsweep_0.68_p2000_0363_6143151_4",
+  "state": "CLEAN",
+  "exit_code": 0,
+  "commit": "0363d8bdc83cb8fb8e62c19d665479ce878e9f70",
+  "branch": "HEAD",
+  "command": "/data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem/bin/python -m src.main /data/gpfs/assoc/pgl/devel/exp1_human/data/hg38_primary.fa --min-period 1 --max-period 2000 --threads 4 --format bed -o /data/gpfs/assoc/pgl/devel/exp1_human/regen/maize_rescore/native_p100_0363/out/bwt_human_idsweep_0.68_p2000_0363 -v",
+  "started_utc": "2026-08-31T07:27:02Z",
+  "finished_utc": "2026-08-31T15:16:23Z",
+  "elapsed_wall_s": 28159.67,
+  "max_rss_kb": 18212268,
+  "host": "cpu-48",
+  "cpu": "Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz",
+  "python": "3.11.15",
+  "numpy": "2.4.6",
+  "outputs": [
+    {"file": "bwt_human_idsweep_0.68_p2000_0363.bed", "sha256": "19d22c5f420ddacddbe6982d73430812217dd0aaa9c85aac2f30b50428e9f0fe", "bytes": 222094827}
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "tag": "human_H_p100_0363_6143150_3",
+  "state": "CLEAN",
+  "exit_code": 0,
+  "commit": "0363d8bdc83cb8fb8e62c19d665479ce878e9f70",
+  "branch": "HEAD",
+  "command": "/data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem/bin/python -m src.main /data/gpfs/assoc/pgl/devel/exp1_human/data/hg38_primary.fa --min-period 1 --max-period 100 --threads 4 --format bed -o /data/gpfs/assoc/pgl/devel/exp1_human/regen/maize_rescore/native_p100_0363/out/bwt_human_H_p100_0363 -v",
+  "started_utc": "2026-08-30T23:23:30Z",
+  "finished_utc": "2026-08-31T03:28:13Z",
+  "elapsed_wall_s": 14681.69,
+  "max_rss_kb": 18053524,
+  "host": "cpu-50",
+  "cpu": "Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz",
+  "python": "3.11.15",
+  "numpy": "2.4.6",
+  "outputs": [
+    {"file": "bwt_human_H_p100_0363.bed", "sha256": "79024db902f5093e99a30cc3af34291f10d166754dc2ac6ce2be3ff41b6eb7cf", "bytes": 206135724}
+  ]
+}

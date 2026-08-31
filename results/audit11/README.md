@@ -8,7 +8,7 @@ seed 20260827, 100 calls per period stratum 1-6 / 7-20 / 21-100 / 101-2000 bp).
 - `reviewer_sheet.tsv`: the source-blinded sheet given to the reader
   (coordinates, proposed period, sequence with flanks; no stratum totals).
 - `verdicts_reviewer2.tsv`: the completed single-reader verdicts, 400/400
-  (one `SUUPORTED` typo normalised to SUPPORTED in aggregation, flagged there).
+  (one `SUUPORTED` typo normalised to SUPPORTED in aggregation; the reader confirmed the SUPPORTED intent on 2026-08-31).
   The protocol's second reader was not completed before submission;
   `verdicts_reviewer1.tsv` therefore does not exist here and the manuscript
   reports the audit as single-reader.

@@ -1,5 +1,5 @@
 #11 specificity audit — reviewer2 단독 예비 집계 (2026-08-31)
-입력: verdicts_reviewer2.tsv (400/400 기입; S176 "SUUPORTED"는 SUPPORTED로 정규화, 판독자 확인 대기)
+입력: verdicts_reviewer2.tsv (400/400 기입; S176 "SUUPORTED"는 SUPPORTED로 정규화 — 판독자가 SUPPORTED 의도임을 확인 (2026-08-31))
 층화: 샘플러 STRATA (1-6 / 7-20 / 21-100 / 101-2000 bp), seed 20260827
 판정 기준(샘플러 헤더): 제안된 period로 >=3 copies, 콜 내부 주기성이 양쪽 flank보다 강할 것
 

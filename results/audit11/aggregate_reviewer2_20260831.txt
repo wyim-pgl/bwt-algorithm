@@ -1,0 +1,15 @@
+#11 specificity audit — reviewer2 단독 예비 집계 (2026-08-31)
+입력: verdicts_reviewer2.tsv (400/400 기입; S176 "SUUPORTED"는 SUPPORTED로 정규화, 판독자 확인 대기)
+층화: 샘플러 STRATA (1-6 / 7-20 / 21-100 / 101-2000 bp), seed 20260827
+판정 기준(샘플러 헤더): 제안된 period로 >=3 copies, 콜 내부 주기성이 양쪽 flank보다 강할 것
+
+stratum      n  SUP  UNSUP  UNSURE   SUP%(UNSURE제외)  Wilson95%CI      보수적SUP%(UNSURE=UNSUP)
+1-6        100    3     59      38    4.8%             [1.7, 13.3]%     3.0%
+7-20       100    1     89      10    1.1%             [0.2,  6.0]%     1.0%
+21-100     100    0     99       1    0.0%             [0.0,  3.7]%     0.0%
+101-2000   100    0     99       1    0.0%             [0.0,  3.7]%     0.0%
+TOTAL      400    4    346      50    1.1%             [0.4,  2.9]%     1.0%
+
+SUPPORTED: S035(p6), S152(p2), S157(p5), S176(p20, 원기입 오타)
+비고: 단일 판독자(reviewer2) 예비 결과. 설계상 2인 판독 + 불일치 조정 — reviewer1 대기.
+UNSURE의 76%(38/50)가 최단 계층(1-6bp)에 집중 — 미세 플롯 가독성 한계와 정합.

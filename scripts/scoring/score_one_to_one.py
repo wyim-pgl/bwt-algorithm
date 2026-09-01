@@ -6,22 +6,35 @@ and accepts integer-multiple/±20% periods, which is fine for regression
 testing but inflates publication sensitivity. This scorer reports the strict
 counterpart alongside it:
 
-  * one-to-one assignment -- predictions and truths are matched greedily by
-    descending overlap; each record participates in at most one match;
+  * one-to-one assignment -- maximum-cardinality bipartite matching
+    (Hopcroft-Karp); each record participates in at most one match;
   * boundary error -- |start offset| and |end offset| per matched pair,
     reported as median/p90;
-  * period accuracy -- exact, integer-multiple, and ±20% agreement rates
-    reported separately instead of pooled;
+  * period-length agreement -- exact, integer-multiple, and ±20% rates
+    reported separately instead of pooled (length agreement, NOT motif
+    sequence identity);
   * copy-number error -- median relative error over matched pairs where both
     sides carry a copy count;
-  * stratification by truth period (1-6, 7-20, 21-100, 101-2000).
+  * stratification by TRUTH period band (1-6, 7-20, 21-100, 101-2000).
 
-Inputs are BED-like TSVs: truth needs chrom/start/end and, when available,
-motif (col 4) and copies (col 5); predictions are 8-column BWTandem BED.
+Inputs are BED-like TSVs (gzip accepted): truth needs chrom/start/end and,
+when available, motif (col 4) and copies (col 5). Column-5 semantics differ
+between tools -- BWTandem BEDs carry a copy count there, but the converted
+ULTRA/tantan/TRF baselines carry the PERIOD (see convert_to_bed.py) -- so
+--pred-col5 must say which; 'period' disables the copy-error metric rather
+than silently comparing a period against a copy count. --pred-motif-is-
+sequence marks BEDs whose column 4 is the full array sequence (TRF), which
+disables prediction-period metrics while truth-based strata still fill.
+--truth-chroms-only drops predictions on sequences absent from the truth
+(e.g. unplaced scaffolds a chr1-22XY catalog can never match), so precision
+denominators are comparable across tools run on different FASTA scopes.
 
-Usage: score_one_to_one.py TRUTH_BED PRED_BED [--min-overlap 0.5] [--json OUT]
+Usage: score_one_to_one.py TRUTH_BED PRED_BED [--min-overlap 0.5]
+       [--pred-col5 {copies,period}] [--pred-motif-is-sequence]
+       [--truth-chroms-only] [--json OUT]
 """
 import argparse
+import gzip
 import json
 import math
 import statistics
@@ -31,9 +44,10 @@ from collections import defaultdict
 STRATA = ((1, 6), (7, 20), (21, 100), (101, 2000))
 
 
-def load(path, need_cols=3):
+def load(path, need_cols=3, col5="copies", motif_is_sequence=False):
     rows = []
-    with open(path) as f:
+    opener = gzip.open if str(path).endswith(".gz") else open
+    with opener(path, "rt") as f:
         for i, line in enumerate(f, 1):
             p = line.rstrip("\n").split("\t")
             if len(p) < need_cols or line.startswith(("#", "track")):
@@ -44,9 +58,9 @@ def load(path, need_cols=3):
                 sys.exit(f"FATAL {path}:{i}: bad coordinates")
             if e <= s:
                 sys.exit(f"FATAL {path}:{i}: empty/inverted interval")
-            motif = p[3] if len(p) > 3 and p[3] else None
+            motif = p[3] if len(p) > 3 and p[3] and not motif_is_sequence else None
             copies = None
-            if len(p) > 4:
+            if len(p) > 4 and col5 == "copies":
                 try:
                     copies = float(p[4])
                 except ValueError:
@@ -183,17 +197,39 @@ def main():
     ap.add_argument("pred_bed")
     ap.add_argument("--min-overlap", type=float, default=0.5,
                     help="reciprocal overlap fraction required (default 0.5)")
+    ap.add_argument("--pred-col5", choices=("copies", "period"), default="copies",
+                    help="meaning of the prediction BED's 5th column; 'period' "
+                         "disables the copy-error metric (default: copies)")
+    ap.add_argument("--pred-motif-is-sequence", action="store_true",
+                    help="prediction column 4 is the full array sequence, not a "
+                         "motif (TRF-style); disables prediction-period metrics")
+    ap.add_argument("--truth-chroms-only", action="store_true",
+                    help="drop predictions on sequences absent from the truth "
+                         "before computing precision")
     ap.add_argument("--json", help="also write the full result as JSON")
     args = ap.parse_args()
     if not math.isfinite(args.min_overlap) or not 0 < args.min_overlap <= 1:
         ap.error("--min-overlap must be a finite value in (0, 1]")
 
     truth = load(args.truth_bed)
-    preds = load(args.pred_bed)
+    preds = load(args.pred_bed, col5=args.pred_col5,
+                 motif_is_sequence=args.pred_motif_is_sequence)
+    pred_records_loaded = len(preds)
+    dropped_off_truth_chroms = 0
+    if args.truth_chroms_only:
+        truth_chroms = {t["chrom"] for t in truth}
+        preds = [p for p in preds if p["chrom"] in truth_chroms]
+        dropped_off_truth_chroms = pred_records_loaded - len(preds)
+        if not preds:
+            sys.exit("FATAL: no predictions left on the truth's sequences")
     pairs, t_used, p_used = one_to_one(truth, preds, args.min_overlap)
 
     res = {
         "truth_records": len(truth), "pred_records": len(preds),
+        "pred_records_loaded": pred_records_loaded,
+        "dropped_off_truth_chroms": dropped_off_truth_chroms,
+        "pred_col5": args.pred_col5,
+        "pred_motif_is_sequence": args.pred_motif_is_sequence,
         "matched": len(pairs),
         "sensitivity_1to1_maxcard": pct(len(pairs), len(truth)),
         "precision_1to1_maxcard": pct(len(pairs), len(preds)),
@@ -253,6 +289,9 @@ def main():
     print("  note: overlap is not a secondary objective; among equal-cardinality "
           "matchings the pairing is arbitrary, so boundary/period/copy stats "
           "carry that indeterminacy")
+    if dropped_off_truth_chroms:
+        print(f"  note: {dropped_off_truth_chroms:,} of {pred_records_loaded:,} "
+              f"predictions dropped (sequences absent from the truth)")
     print(f"  truth {res['truth_records']:,}  preds {res['pred_records']:,}  "
           f"matched {res['matched']:,}")
     print(f"  sensitivity {res['sensitivity_1to1_maxcard']:.2f}%   "

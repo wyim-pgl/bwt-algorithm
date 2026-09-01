@@ -193,3 +193,60 @@ class TestCLI:
         preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100)])
         r = _run([truth, preds])
         assert r.returncode != 0
+
+    def test_gzip_input(self, tmp_path):
+        import gzip as _gzip
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "AT", 50)])
+        gz = tmp_path / "p.bed.gz"
+        with _gzip.open(gz, "wt") as f:
+            f.write("c\t0\t100\tAT\t50\n")
+        out = str(tmp_path / "r.json")
+        r = _run([truth, str(gz), "--json", out])
+        assert r.returncode == 0, r.stderr
+        assert json.load(open(out))["matched"] == 1
+
+    def test_pred_col5_period_disables_copy_metric(self, tmp_path):
+        # converted ULTRA/tantan/TRF BEDs carry the PERIOD in column 5;
+        # comparing it against a truth copy count would be a unit mismatch
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "AT", 50)])
+        preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100, "AT", 2)])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, preds, "--pred-col5", "period", "--json", out])
+        assert r.returncode == 0, r.stderr
+        res = json.load(open(out))
+        assert res["copies"]["scored_pairs"] == 0
+        assert res["pred_col5"] == "period"
+        # period metrics still score (col4 is a real motif)
+        assert res["period"]["scored_pairs"] == 1
+
+    def test_pred_motif_is_sequence_disables_period_metric(self, tmp_path):
+        # TRF-style BED: col4 is the whole array sequence, so a
+        # length-derived prediction period would be meaningless
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "AT", 50)])
+        preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100, "AT" * 50, 2)])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, preds, "--pred-col5", "period",
+                  "--pred-motif-is-sequence", "--json", out])
+        assert r.returncode == 0, r.stderr
+        res = json.load(open(out))
+        assert res["matched"] == 1
+        assert res["period"]["scored_pairs"] == 0
+        # truth-based strata still fill
+        assert res["strata"]["1-6"]["matched"] == 1
+
+    def test_truth_chroms_only_drops_scaffold_preds(self, tmp_path):
+        truth = _write_bed(tmp_path, "t.bed", [("chr1", 0, 100, "AT", 50)])
+        preds = _write_bed(tmp_path, "p.bed", [
+            ("chr1", 0, 100, "AT", 50),
+            ("scaffold_7", 0, 100, "AT", 50),
+        ])
+        out = str(tmp_path / "r.json")
+        # without the flag the scaffold call deflates precision
+        r = _run([truth, preds, "--json", out])
+        assert json.load(open(out))["precision_1to1_maxcard"] == pytest.approx(50.0)
+        r = _run([truth, preds, "--truth-chroms-only", "--json", out])
+        assert r.returncode == 0, r.stderr
+        res = json.load(open(out))
+        assert res["precision_1to1_maxcard"] == pytest.approx(100.0)
+        assert res["dropped_off_truth_chroms"] == 1
+        assert res["pred_records_loaded"] == 2

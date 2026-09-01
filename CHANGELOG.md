@@ -54,4 +54,6 @@ codebase at this version; there is no earlier tagged release to diff against.
 - Half-open interval binning at exact Venn bin boundaries in
   `scripts/venn_compare.py` (#23).
 - Wheel packaging: packages declared explicitly so the built wheel ships
-  `src` with the native extension instead of a `py3-none-any` wheel (#14).
+  the package with the native extension instead of a `py3-none-any` wheel,
+  and the `c_extensions/*.c` sources now travel in the wheel so the
+  runtime-compiled C libraries exist in installed environments too (#14).

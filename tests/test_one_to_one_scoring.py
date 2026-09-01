@@ -234,6 +234,32 @@ class TestCLI:
         # truth-based strata still fill
         assert res["strata"]["1-6"]["matched"] == 1
 
+    def test_deep_contested_chain_no_recursion_error(self):
+        """A half-shifted pileup forces one augmenting path spanning the
+        whole chain; the recursive DFS died at Python's ~1000-frame default
+        (reproduced at depth ~993). The iterative form must survive and
+        still find the maximum matching (N pairs for N truths)."""
+        n = 3000
+        truth = [rec("c", i * 100, i * 100 + 100) for i in range(n)]
+        # preds half-shifted, plus one extra at the front so augmenting
+        # paths must propagate down the chain
+        preds = [rec("c", i * 100 - 50, i * 100 + 50) for i in range(n + 1)]
+        pairs, t_used, _ = m.one_to_one(truth, preds, 0.3)
+        assert len(pairs) == n
+        assert t_used == set(range(n))
+
+    def test_within20_rule_matches_permissive_matcher(self, tmp_path):
+        # smaller-period-relative, like periods_compatible(): truth 10 vs
+        # pred 8 is 2/8 = 25% -> OUTSIDE, not within-20%
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "ACGTACGTAC", 10)])
+        preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100, "ACGTACGT", 12)])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, preds, "--json", out])
+        assert r.returncode == 0, r.stderr
+        res = json.load(open(out))
+        assert res["period"]["within_20pct_pct"] == pytest.approx(0.0)
+        assert res["period"]["outside_pct"] == pytest.approx(100.0)
+
     def test_truth_chroms_only_drops_scaffold_preds(self, tmp_path):
         truth = _write_bed(tmp_path, "t.bed", [("chr1", 0, 100, "AT", 50)])
         preds = _write_bed(tmp_path, "p.bed", [
@@ -250,3 +276,58 @@ class TestCLI:
         assert res["precision_1to1_maxcard"] == pytest.approx(100.0)
         assert res["dropped_off_truth_chroms"] == 1
         assert res["pred_records_loaded"] == 2
+
+
+DERIVE = os.path.join(os.path.dirname(__file__), "..",
+                      "scripts", "scoring", "derive_adotto_annotated_truth.py")
+
+
+class TestDeriveAnnotatedTruth:
+    def _catalog_line(self, chrom, r_start, r_end, anns):
+        return "\t".join([chrom, str(r_start), str(r_end)] +
+                         ["."] * 14 + [json.dumps(anns)]) + "\n"
+
+    def test_annotation_coords_and_primitive_reduction(self, tmp_path):
+        cat = tmp_path / "cat.bed"
+        cat.write_text(self._catalog_line("chr1", 9975, 10498, [
+            {"start": 10000, "end": 10467, "score": 1243,
+             "motif": "ATGATGATG", "copies": 3.7},   # 9-mer = ATG x3
+            {"start": 10481, "end": 10497, "score": 41,
+             "motif": "GCCC", "copies": 4.2},
+        ]))
+        r = subprocess.run([sys.executable, DERIVE, str(cat)],
+                           capture_output=True, text=True)
+        assert r.returncode == 0, r.stderr
+        fields = r.stdout.strip().split("\t")
+        # annotation coords, not the padded region's
+        assert fields[:3] == ["chr1", "10000", "10467"]
+        # primitive unit, copies rescaled by the reduction factor
+        assert fields[3] == "ATG"
+        assert float(fields[4]) == pytest.approx(11.1)
+        assert "primitive_reduced=1" in r.stderr
+
+    def test_restrict_to_region_set(self, tmp_path):
+        cat = tmp_path / "cat.bed"
+        cat.write_text(
+            self._catalog_line("chr1", 0, 100, [
+                {"start": 10, "end": 90, "score": 5, "motif": "AT", "copies": 40}])
+            + self._catalog_line("chr2", 0, 100, [
+                {"start": 10, "end": 90, "score": 5, "motif": "AT", "copies": 40}]))
+        regions = tmp_path / "primary.bed"
+        regions.write_text("chr1\t0\t100\n")
+        r = subprocess.run([sys.executable, DERIVE, str(cat),
+                            "--restrict-to", str(regions)],
+                           capture_output=True, text=True)
+        assert r.returncode == 0, r.stderr
+        lines = r.stdout.strip().splitlines()
+        assert len(lines) == 1 and lines[0].startswith("chr1\t")
+
+    def test_unexpected_annotation_shape_is_motifless_not_crash(self, tmp_path):
+        cat = tmp_path / "cat.bed"
+        cat.write_text(self._catalog_line("chr1", 0, 100, [None, "bare"]))
+        r = subprocess.run([sys.executable, DERIVE, str(cat)],
+                           capture_output=True, text=True)
+        assert r.returncode == 0, r.stderr
+        fields = r.stdout.rstrip("\n").split("\t")
+        assert fields[:3] == ["chr1", "0", "100"]  # region coords, no motif
+        assert fields[3] == ""

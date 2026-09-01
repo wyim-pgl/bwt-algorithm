@@ -28,6 +28,10 @@ jobs:
           setup(script_args=['build_ext','--inplace'], ext_modules=cythonize(ext, compiler_directives={'language_level':'3'}))
           "
           python bwtandem/c_extensions/build.py
+      - name: Deposited-evidence hashes verify
+        # a results/ file edited after hashing shipped once (e178707):
+        # every clone must be able to verify the deposit as advertised
+        run: sha256sum -c results/manifest.sha256 --quiet
       - name: Test (native)
         run: python -m pytest tests/ -q
       - name: Test (pure-Python fallback parity)

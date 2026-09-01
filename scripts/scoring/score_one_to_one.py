@@ -154,14 +154,35 @@ def one_to_one(truth, preds, min_frac):
                     q.append(pi)
         return dist, found
 
-    def dfs(i, dist):
-        for j in edges[i]:
-            pi = match_p.get(j)
-            if pi is None or (dist.get(pi) == dist[i] + 1 and dfs(pi, dist)):
-                match_t[i] = j
-                match_p[j] = i
-                return True
-        dist[i] = INF
+    def dfs(root, dist):
+        # Iterative: an augmenting path in a dense contested pileup can span
+        # thousands of layers, and the recursive form dies at Python's
+        # ~1000-frame default (reproduced on a 3000-interval half-shifted
+        # chain). Each stack frame is (vertex, iterator over its edges).
+        stack = [(root, iter(edges[root]))]
+        path = []  # (i, j) edges taken down the current branch
+        while stack:
+            i, it = stack[-1]
+            advanced = False
+            for j in it:
+                pi = match_p.get(j)
+                if pi is None:
+                    # augmenting path found: flip every edge on the path
+                    path.append((i, j))
+                    for pi_, pj_ in path:
+                        match_t[pi_] = pj_
+                        match_p[pj_] = pi_
+                    return True
+                if dist.get(pi) == dist[i] + 1:
+                    path.append((i, j))
+                    stack.append((pi, iter(edges[pi])))
+                    advanced = True
+                    break
+            if not advanced:
+                dist[i] = INF
+                stack.pop()
+                if path:
+                    path.pop()
         return False
 
     while True:
@@ -254,7 +275,10 @@ def main():
                 per_exact += 1
             elif pp % tp == 0 or tp % pp == 0:
                 per_mult += 1
-            elif abs(pp - tp) <= 0.2 * tp:
+            elif (max(tp, pp) - min(tp, pp)) / min(tp, pp) <= 0.2:
+                # smaller-period-relative, matching the permissive matcher's
+                # periods_compatible() so the strict and permissive rates
+                # decompose the same predicate
                 per_20 += 1
         if (t["copies"] is not None and t["copies"] > 0
                 and p["copies"] is not None):

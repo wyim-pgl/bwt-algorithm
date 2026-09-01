@@ -1,6 +1,6 @@
 import math
 import pytest
-from src.tier3 import compute_adaptive_params
+from bwtandem.tier3 import compute_adaptive_params
 
 
 class TestComputeAdaptiveParams:

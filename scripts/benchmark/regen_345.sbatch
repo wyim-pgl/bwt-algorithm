@@ -87,7 +87,7 @@ env | grep -E '^(TIER1_|TIER2_|CATCHALL_|SAT_|BWT_)' | sort
 echo "========================================"
 
 scripts/benchmark/run_with_provenance.sh --tag "regen_${GENOME}_${SLURM_JOB_ID:-manual}" --out "$OUT" -- \
-    "$PY" -m src.main "$FASTA" \
+    "$PY" -m bwtandem.main "$FASTA" \
     --min-period 1 --max-period 2000 --threads 2 --format bed -o "$OUT" -v
 RC=$?
 

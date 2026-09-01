@@ -21,8 +21,8 @@ With all three fixed the disagreement is zero. This test keeps it there.
 import numpy as np
 import pytest
 
-import src.motif_utils as mu
-from src.motif_utils import MotifUtils
+import bwtandem.motif_utils as mu
+from bwtandem.motif_utils import MotifUtils
 
 pytestmark = pytest.mark.skipif(
     mu._c_align_lib is None,

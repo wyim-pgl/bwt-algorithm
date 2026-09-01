@@ -9,7 +9,7 @@ python -c "
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy as np
-ext = [Extension('src._accelerators', ['src/_accelerators.pyx'], include_dirs=[np.get_include()])]
+ext = [Extension('bwtandem._accelerators', ['bwtandem/_accelerators.pyx'], include_dirs=[np.get_include()])]
 setup(script_args=['build_ext', '--inplace'], ext_modules=cythonize(ext, compiler_directives={'language_level': '3'}))
 "
 python -m pytest tests/ -q   # run from the repo root

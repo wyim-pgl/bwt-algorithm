@@ -38,7 +38,7 @@ micromamba run -n bwtandem python3 -c "
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy as np
-ext_modules = [Extension('src._accelerators', ['src/_accelerators.pyx'],
+ext_modules = [Extension('bwtandem._accelerators', ['bwtandem/_accelerators.pyx'],
                include_dirs=[np.get_include()], extra_compile_args=['-std=c99'])]
 setup(script_args=['build_ext', '--inplace'],
       ext_modules=cythonize(ext_modules, compiler_directives={'language_level': '3'}))
@@ -48,7 +48,7 @@ setup(script_args=['build_ext', '--inplace'],
 micromamba run -n bwtandem python3 -m pytest tests/ -v
 
 # 5. Run the tool
-micromamba run -n bwtandem python3 -m src.main input.fa --format bed -v
+micromamba run -n bwtandem python3 -m bwtandem.main input.fa --format bed -v
 ```
 
 ### Direct Python Dependency Installation
@@ -80,12 +80,12 @@ python3 -c "
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy as np
-ext_modules = [Extension('src._accelerators', ['src/_accelerators.pyx'], include_dirs=[np.get_include()])]
+ext_modules = [Extension('bwtandem._accelerators', ['bwtandem/_accelerators.pyx'], include_dirs=[np.get_include()])]
 setup(script_args=['build_ext', '--inplace'], ext_modules=cythonize(ext_modules, compiler_directives={'language_level': '3'}))
 "
 ```
 
-On successful build, a `src/_accelerators.*.so` file will be generated.
+On successful build, a `bwtandem/_accelerators.*.so` file will be generated.
 
 ### Singularity Container
 
@@ -96,7 +96,7 @@ You can build a container that includes all dependencies and Cython extensions.
 sudo singularity build bwtandem.sif Singularity
 
 # Run with the container
-singularity exec bwtandem.sif python3 -m src.main input.fa --format bed
+singularity exec bwtandem.sif python3 -m bwtandem.main input.fa --format bed
 ```
 
 The container image is based on Ubuntu 22.04 with numpy, numba, pydivsufsort, and Cython pre-installed.
@@ -110,12 +110,12 @@ seconds:
 
 ```bash
 # 35 bp toy sequence: five copies of TCATCGG (runs in <1 s)
-python3 -m src.main arabadopsis_chrs/test_seq1.fa --format bed -o /tmp/quick
+python3 -m bwtandem.main arabadopsis_chrs/test_seq1.fa --format bed -o /tmp/quick
 cat /tmp/quick.bed
 # repeatTCATCGG_5    0    35    TCATCGG    5.0    1    0.000    +
 
 # A real 367 kb sequence (Arabidopsis mitochondrial genome, ~2 s, 45 calls)
-python3 -m src.main arabadopsis_chrs/ChrM.fa --format bed -o /tmp/chrm -v
+python3 -m bwtandem.main arabadopsis_chrs/ChrM.fa --format bed -o /tmp/chrm -v
 wc -l /tmp/chrm.bed
 
 # Or the packaged smoke test
@@ -126,7 +126,7 @@ On your own data:
 
 ```bash
 # Defaults: all tiers, periods 1-2,000 bp, BED output next to the input
-python3 -m src.main input.fa
+python3 -m bwtandem.main input.fa
 ```
 
 The BED columns are `chrom`, `start`, `end`, `motif`, `copies`, `tier`,
@@ -137,7 +137,7 @@ The BED columns are `chrom`, `start`, `end`, `motif`, `copies`, `tier`,
 ## CLI Options in Detail
 
 ```
-python3 -m src.main <fasta_file> [options]
+python3 -m bwtandem.main <fasta_file> [options]
 ```
 
 | Option | Default | Description |
@@ -177,10 +177,10 @@ Processes multiple chromosomes simultaneously using multiple processes. Since ea
 
 ```bash
 # Parallel processing with 4 processes
-python3 -m src.main genome.fa -t 4 -v
+python3 -m bwtandem.main genome.fa -t 4 -v
 
 # Set to match the number of CPU cores (using nproc)
-python3 -m src.main genome.fa -t $(nproc) -v
+python3 -m bwtandem.main genome.fa -t $(nproc) -v
 ```
 
 **`--mask`**
@@ -197,10 +197,10 @@ Soft masking follows the convention where tools like RepeatMasker mark repetitiv
 
 ```bash
 # Analyze excluding soft-masked regions
-python3 -m src.main masked_genome.fa --mask soft -v
+python3 -m bwtandem.main masked_genome.fa --mask soft -v
 
 # Exclude both soft and hard masked regions
-python3 -m src.main masked_genome.fa --mask both -v
+python3 -m bwtandem.main masked_genome.fa --mask both -v
 ```
 
 ---
@@ -217,7 +217,7 @@ configuration. Point `BWT_INDEX_CACHE` at a directory and the index is loaded in
 of built, and written on the first miss:
 
 ```bash
-BWT_INDEX_CACHE=/scratch/idxcache python3 -m src.main genome.fa --min-period 1 --max-period 2000
+BWT_INDEX_CACHE=/scratch/idxcache python3 -m bwtandem.main genome.fa --min-period 1 --max-period 2000
 ```
 
 Unset (the default) means the previous behaviour, rebuilding every time.
@@ -239,7 +239,7 @@ recall/precision trade-off can be swept without editing code. **All defaults rep
 the baseline exactly** — unset means unchanged behaviour:
 
 ```bash
-TIER1_MIN_ARRAY_LEN=20 TIER1_MIN_SCORE=20 python3 -m src.main genome.fa
+TIER1_MIN_ARRAY_LEN=20 TIER1_MIN_SCORE=20 python3 -m bwtandem.main genome.fa
 ```
 
 The dominant levers for short-STR recall are `TIER1_MIN_ARRAY_LEN` and
@@ -417,7 +417,7 @@ The `--tier3-mode` option proportionally adjusts speed-related parameters throug
 
 ```bash
 # Run all Tiers, BED output (default)
-python3 -m src.main arabadopsis_chrs/chr1.fa -v
+python3 -m bwtandem.main arabadopsis_chrs/chr1.fa -v
 
 # Output: chr1.bed
 ```
@@ -426,20 +426,20 @@ python3 -m src.main arabadopsis_chrs/chr1.fa -v
 
 ```bash
 # Run Tier 1 only (STR/microsatellites only)
-python3 -m src.main input.fa --tiers tier1 --format bed -o str_only -v
+python3 -m bwtandem.main input.fa --tiers tier1 --format bed -o str_only -v
 
 # Run Tier 1 and Tier 2 only, VCF output
-python3 -m src.main input.fa --tiers tier1,tier2 --format vcf -o output -v
+python3 -m bwtandem.main input.fa --tiers tier1,tier2 --format vcf -o output -v
 
 # Limit period range (1-50 bp only)
-python3 -m src.main input.fa --tiers tier1,tier2 --min-period 1 --max-period 50 -o short_repeats
+python3 -m bwtandem.main input.fa --tiers tier1,tier2 --min-period 1 --max-period 50 -o short_repeats
 ```
 
 ### Example 3: Processing Large Genomes with Tier 3 Fast Mode
 
 ```bash
 # Fast search for long repeats only in large genomes
-python3 -m src.main large_genome.fa \
+python3 -m bwtandem.main large_genome.fa \
     --tiers tier3 \
     --tier3-mode fast \
     --min-period 100 \
@@ -449,7 +449,7 @@ python3 -m src.main large_genome.fa \
     -v
 
 # Detailed analysis of small sequences with sensitive mode
-python3 -m src.main small_region.fa \
+python3 -m bwtandem.main small_region.fa \
     --tier3-mode sensitive \
     --format trf \
     -o detailed_analysis
@@ -459,23 +459,23 @@ python3 -m src.main small_region.fa \
 
 ```bash
 # Parallel processing of entire genome with 4 processes
-python3 -m src.main genome.fa -t 4 --format bed -o genome_repeats -v
+python3 -m bwtandem.main genome.fa -t 4 --format bed -o genome_repeats -v
 
 # Analyze excluding interspersed repeats from RepeatMasker output (soft mask)
-python3 -m src.main masked_genome.fa --mask soft -t 8 -v
+python3 -m bwtandem.main masked_genome.fa --mask soft -t 8 -v
 
 # Analyze excluding only hard-masked regions (N regions)
-python3 -m src.main genome.fa --mask hard -v
+python3 -m bwtandem.main genome.fa --mask hard -v
 
 # Exclude both soft and hard masked regions
-python3 -m src.main masked_genome.fa --mask both -t $(nproc) -v
+python3 -m bwtandem.main masked_genome.fa --mask both -t $(nproc) -v
 ```
 
 ### Example 5: Performance Analysis with Profiling
 
 ```bash
 # Execution time profiling (outputs top 20 hotspots)
-python3 -m src.main input.fa --tiers tier1 --format trf --profile -v
+python3 -m bwtandem.main input.fa --tiers tier1 --format trf --profile -v
 
 # Profile results are also saved to input.profile.prof
 # Additional analysis possible with: python -m pstats input.profile.prof
@@ -508,7 +508,7 @@ pytest tests/test_ground_truth.py -v -s   # Regression tests (detailed output)
 | `test_anchor_scan.py` | 5 | Unit tests for `anchor_scan_boundaries()`: perfect repeats, flanking sequences, imperfect repeats, single copy | No |
 | `test_tier3_wiring.py` | 3 | Tier 3 mode parameter passing verification: initialization, defaults, seed scan wiring | No |
 | `test_ground_truth.py` | 11 | Regression tests with synthetic sequences: per-Tier sensitivity/precision verification | No |
-| `test_autocorr.py` | 12 | Shared autocorrelation primitives (`src/autocorr.py`) | No |
+| `test_autocorr.py` | 12 | Shared autocorrelation primitives (`bwtandem/autocorr.py`) | No |
 | `test_satellite_gapfill.py` | 2 | Divergent alpha-satellite interior gap-fill regression guard (self-generating) | No |
 | `test_accel_parity.py` | 31 | Compiled vs pure-Python accelerator path must emit byte-identical BED/VCF/TRF/STRfinder | Skips comparisons if absent |
 | `test_accel_differential.py` | 6 | Each pure-Python fallback vs its Cython original on randomised inputs | Skips if absent |
@@ -576,7 +576,7 @@ The `arabadopsis_chrs/` directory contains Arabidopsis chromosome FASTA files an
 
 ```bash
 # Quick functionality check with test sequences
-python3 -m src.main arabadopsis_chrs/test_seq1.fa -v
+python3 -m bwtandem.main arabadopsis_chrs/test_seq1.fa -v
 ```
 
 ### Utility Scripts
@@ -596,7 +596,7 @@ python3 scripts/trf_to_bed.py input.dat -o output.bed
 
 ```
 bwtandem/
-├── src/
+├── bwtandem/
 │   ├── main.py             # CLI entry point, FASTA parsing, output writing
 │   ├── finder.py           # TandemRepeatFinder: 3-Tier pipeline coordinator
 │   ├── bwt_core.py         # BWTCore: FM-index construction (suffix array, BWT, occurrence array)

@@ -13,7 +13,7 @@ FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures")
 
 # Tier 2/3 used to be skipped here when the Cython _accelerators extension was
 # absent, because the pure-Python stubs returned nothing and every case failed.
-# The fallbacks are faithful now (see src/accelerators.py), so both builds must
+# The fallbacks are faithful now (see bwtandem/accelerators.py), so both builds must
 # clear the same thresholds. tests/test_accel_parity.py pins them together.
 
 
@@ -196,7 +196,7 @@ def compute_metrics(tp: int, fp: int, fn: int) -> dict:
 def run_finder(fasta_path: str, enabled_tiers: set,
                min_period: int = 1, max_period: int = 100000) -> list:
     """Run TandemRepeatFinder on a FASTA file, return list of TandemRepeat."""
-    from src.finder import TandemRepeatFinder
+    from bwtandem.finder import TandemRepeatFinder
 
     all_repeats = []
     for name, seq in parse_fasta_simple(fasta_path):

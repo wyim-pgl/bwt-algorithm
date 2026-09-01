@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 First versioned release candidate. Everything below describes the state of the
 codebase at this version; there is no earlier tagged release to diff against.
 
+### Changed
+- The import package was renamed `src` → `bwtandem` (#14): the CLI is now
+  `python -m bwtandem.main` (the installed `bwtandem` entry point is
+  unchanged), tests import `from bwtandem...`, and the installed package no
+  longer squats on the generic name `src`. The Cython-generated
+  `_accelerators.c` is no longer tracked; every build regenerates it from the
+  `.pyx`.
+
 ### Added
 - 3-tier BWT/FM-index tandem repeat detection pipeline (`src/`): Tier 1
   (short STRs, motifs 1–9 bp, FM-index enumeration or sliding-window scan),

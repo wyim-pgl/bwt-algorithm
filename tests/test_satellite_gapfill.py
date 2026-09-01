@@ -20,8 +20,8 @@ import os
 import numpy as np
 import pytest
 
-from src.finder import TandemRepeatFinder
-from src.models import TandemRepeat
+from bwtandem.finder import TandemRepeatFinder
+from bwtandem.models import TandemRepeat
 
 RNG = np.random.RandomState(1234)
 BASES = np.frombuffer(b"ACGT", dtype=np.uint8)

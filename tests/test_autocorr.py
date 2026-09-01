@@ -1,4 +1,4 @@
-"""Unit tests for the shared autocorrelation primitives (src/autocorr.py).
+"""Unit tests for the shared autocorrelation primitives (bwtandem/autocorr.py).
 
 These helpers are extracted from three previously-duplicated inline blocks:
   - finder._fill_satellite_gaps  (scalar identity per window/period)
@@ -11,7 +11,7 @@ cumsum, same int8-view run detection).
 """
 import numpy as np
 
-from src.autocorr import (
+from bwtandem.autocorr import (
     DEFAULT_MIN_VALID_FRAC,
     autocorr_identity,
     valid_base_mask,

@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from src.accelerators import anchor_scan_boundaries
+from bwtandem.accelerators import anchor_scan_boundaries
 
 
 class TestAnchorScanBoundaries:

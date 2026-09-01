@@ -1,6 +1,6 @@
 """An ambiguous base must not be evidence of periodicity in the native paths.
 
-`src/autocorr.py` was corrected first, but the detector's hot paths compare
+`bwtandem/autocorr.py` was corrected first, but the detector's hot paths compare
 bases directly and counted `N == N` as agreement, so a seed could extend
 straight through an assembly gap or a masked block. Two of these are worse than
 raw equality:
@@ -20,9 +20,9 @@ parity tests compare two different definitions.
 import numpy as np
 import pytest
 
-from src import accelerators as A
+from bwtandem import accelerators as A
 
-_native = pytest.importorskip("src._accelerators")
+_native = pytest.importorskip("bwtandem._accelerators")
 
 
 def _arr(s):

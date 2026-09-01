@@ -19,16 +19,16 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=9", "Cython>=3.0"]
 
-# Declared explicitly because auto-discovery reads the `src/` directory as a
-# src-layout and sets package_dir={"": "src"}: every module under src/ then
-# installs as a TOP-LEVEL module (main, models, coverage, ...), which both
-# breaks the `src.main` entry point and collides with real distributions such
-# as coverage. Naming the packages forces the flat layout the code imports as.
+# Declared explicitly so the wheel ships exactly the bwtandem package and its
+# c_extensions subpackage. (Historical note: when the import package was still
+# named `src`, auto-discovery misread the tree as a src-layout and shipped every
+# module top-level, colliding with real distributions such as coverage; keeping
+# the explicit list makes the layout an assertion rather than an inference.)
 [tool.setuptools]
-packages = ["src", "src.c_extensions"]
+packages = ["bwtandem", "bwtandem.c_extensions"]
 
 [project.scripts]
-bwtandem = "src.main:main"
+bwtandem = "bwtandem.main:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

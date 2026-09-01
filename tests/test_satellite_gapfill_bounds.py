@@ -16,9 +16,9 @@ satellite pass, which unlike the catch-all is on by default.
 """
 import numpy as np
 
-from src.bwt_core import effective_length
-from src.finder import TandemRepeatFinder
-from src.models import TandemRepeat
+from bwtandem.bwt_core import effective_length
+from bwtandem.finder import TandemRepeatFinder
+from bwtandem.models import TandemRepeat
 
 RNG = np.random.RandomState(770509)
 BASES = np.frombuffer(b"ACGT", dtype=np.uint8)

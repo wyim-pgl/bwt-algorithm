@@ -14,7 +14,7 @@ Installation lives in the [README](README.md#installation).
 ## 1. Command line
 
 ```
-python3 -m src.main FASTA [options]
+python3 -m bwtandem.main FASTA [options]
 ```
 
 | Option | Default | Meaning |
@@ -115,7 +115,7 @@ export TIER1_COPYBASE=6 TIER1_COPYADD=2 TIER1_EXT_COPIES=2
 export TIER2_MISMATCH=0.30 TIER2_SHORT_REQ_COPIES=2
 export TIER1_SHORT_PERIOD_MAX=9 TIER1_SHORT_MIN_ARRAY_LEN=17 TIER1_SHORT_MIN_SCORE=17
 export CATCHALL_SCAN=1 CATCHALL_MIN_IDENTITY=0.72 CATCHALL_MIN_COPIES=3
-python3 -m src.main hg38_primary.fa --min-period 1 --max-period 2000 \
+python3 -m bwtandem.main hg38_primary.fa --min-period 1 --max-period 2000 \
     --threads 2 --format bed -o bwt_human -v
 ```
 

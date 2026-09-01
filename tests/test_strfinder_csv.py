@@ -14,7 +14,7 @@ import sys
 
 import pytest
 
-from src.models import TandemRepeat, STRFINDER_HEADER, STRFINDER_COLUMNS
+from bwtandem.models import TandemRepeat, STRFINDER_HEADER, STRFINDER_COLUMNS
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURES = os.path.join(REPO_ROOT, "tests", "fixtures")
@@ -73,7 +73,7 @@ def test_header_and_rows_agree_end_to_end(tmp_path):
     out_prefix = str(tmp_path / "mixed")
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
     proc = subprocess.run(
-        [sys.executable, "-m", "src.main",
+        [sys.executable, "-m", "bwtandem.main",
          os.path.join(FIXTURES, "synth_mixed.fa"), "--format", "strfinder",
          "-o", out_prefix],
         cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=900,

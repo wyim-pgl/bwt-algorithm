@@ -29,7 +29,7 @@ case "$ARM" in
   wide)   MAXP=100000 ;;
   *) echo "FATAL: bad ARM"; exit 1 ;;
 esac
-$PY -m src.main "$FASTA" --tiers tier3 --min-period 1 --max-period $MAXP \
+$PY -m bwtandem.main "$FASTA" --tiers tier3 --min-period 1 --max-period $MAXP \
     --threads 2 --format bed -o "$OUT" -v
 echo "BED lines: $(wc -l < "$OUT.bed")"
 if [[ "$ARM" == wide ]]; then

@@ -38,7 +38,7 @@ else:
     except Exception as exc:  # ImportError, or a numpy/Cython ABI mismatch
         _native = None
         _message = (
-            f"Compiled extension src/_accelerators could not be imported ({exc}); "
+            f"Compiled extension bwtandem/_accelerators could not be imported ({exc}); "
             "falling back to pure Python. Results are identical but detection will "
             "be much slower. See CLAUDE.md 'Building Cython Extensions'."
         )

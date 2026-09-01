@@ -33,7 +33,7 @@ from collections import defaultdict
 import numpy as np
 
 sys.path.insert(0, "/data/gpfs/assoc/pgl/devel/bwt-algorithm")
-from src.autocorr import autocorr_identity  # noqa: E402
+from bwtandem.autocorr import autocorr_identity  # noqa: E402
 
 GT = "/data/gpfs/assoc/pgl/filip/bwtandem_results/ground_truth"
 BWT = "/data/gpfs/assoc/pgl/filip/bwtandem_results/beds/bwtandem/bwt_maize.bed"

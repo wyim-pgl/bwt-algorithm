@@ -12,8 +12,8 @@ import textwrap
 
 import pytest
 
-from src.finder import TandemRepeatFinder
-from src.models import TandemRepeat
+from bwtandem.finder import TandemRepeatFinder
+from bwtandem.models import TandemRepeat
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -139,7 +139,7 @@ def _run_cli(tmp_path, *args):
     fasta = tmp_path / "in.fa"
     fasta.write_text(">c\n" + "ACGT" * 100 + "\n")
     return subprocess.run(
-        [sys.executable, "-m", "src.main", str(fasta),
+        [sys.executable, "-m", "bwtandem.main", str(fasta),
          "-o", str(tmp_path / "out"), *args],
         capture_output=True, text=True, cwd=REPO_ROOT,
     )
@@ -194,9 +194,9 @@ def test_multiprocess_failure_writes_no_partial_output(tmp_path):
     driver.write_text(textwrap.dedent(f"""
         import sys
         sys.path.insert(0, {str(REPO_ROOT)!r})
-        sys.argv = ["src.main", {str(fasta)!r}, "-t", "2",
+        sys.argv = ["bwtandem.main", {str(fasta)!r}, "-t", "2",
                     "-o", {str(tmp_path / 'out')!r}]
-        import src.main as M
+        import bwtandem.main as M
         _real = M._process_chromosome
         def boom(chrom, *a, **k):
             if chrom == "b":

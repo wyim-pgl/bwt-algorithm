@@ -1,6 +1,6 @@
 """The compiled and pure-Python accelerator paths must agree, byte for byte.
 
-`src/accelerators.py` binds `extend_with_mismatches`, `find_periodic_runs` and
+`bwtandem/accelerators.py` binds `extend_with_mismatches`, `find_periodic_runs` and
 friends to the Cython extension when it is importable and to Python fallbacks
 otherwise. Those fallbacks used to be degenerate stubs — `return None` and
 `return []` — so a build without the extension detected zero Tier-2 and zero
@@ -27,20 +27,20 @@ FIXTURE_NAMES = ["tier1", "tier2", "tier3", "mixed", "adjacent"]
 FORMAT_EXTENSIONS = {"bed": ".bed", "trf": ".dat", "vcf": ".vcf", "strfinder": ".csv"}
 
 try:
-    from src import _accelerators as _native  # noqa: F401
+    from bwtandem import _accelerators as _native  # noqa: F401
     NATIVE_BUILT = True
 except Exception:
     NATIVE_BUILT = False
 
 needs_native = pytest.mark.skipif(
     not NATIVE_BUILT,
-    reason="compiled src/_accelerators is absent, so there is only one path to compare; "
+    reason="compiled bwtandem/_accelerators is absent, so there is only one path to compare; "
            "build it (see CLAUDE.md) to run the parity check",
 )
 
 
 def run_pipeline(fasta: str, out_prefix: str, fmt: str, disable_native: bool) -> str:
-    """Run src.main in a subprocess and return the contents of its output file."""
+    """Run bwtandem.main in a subprocess and return the contents of its output file."""
     env = dict(os.environ)
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     if disable_native:
@@ -49,10 +49,10 @@ def run_pipeline(fasta: str, out_prefix: str, fmt: str, disable_native: bool) ->
         env.pop("BWT_DISABLE_NATIVE", None)
 
     proc = subprocess.run(
-        [sys.executable, "-m", "src.main", fasta, "--format", fmt, "-o", out_prefix],
+        [sys.executable, "-m", "bwtandem.main", fasta, "--format", fmt, "-o", out_prefix],
         cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=900,
     )
-    assert proc.returncode == 0, f"src.main failed: {proc.stderr}"
+    assert proc.returncode == 0, f"bwtandem.main failed: {proc.stderr}"
 
     with open(out_prefix + FORMAT_EXTENSIONS[fmt]) as fh:
         return fh.read()
@@ -95,7 +95,7 @@ def test_rolling_extender_refuses_to_run_without_the_extension():
     proc = subprocess.run(
         [sys.executable, "-c",
          "import numpy as np;"
-         "from src.accelerators import extend_with_mismatches as e;"
+         "from bwtandem.accelerators import extend_with_mismatches as e;"
          "e(np.zeros(10, dtype=np.uint8), 0, 2, 10, 0.1)"],
         cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
     )
@@ -110,7 +110,7 @@ def test_rolling_flag_parses_like_the_pyx(monkeypatch, raw, rolling):
     A looser parse here would mean `TIER1_EXT_ROLLING=00` picks the default
     extender when the extension is built and blows up when it is not.
     """
-    from src import accelerators as acc
+    from bwtandem import accelerators as acc
 
     monkeypatch.setenv("TIER1_EXT_ROLLING", raw)
     assert acc._rolling_extender_requested() is rolling
@@ -118,7 +118,7 @@ def test_rolling_flag_parses_like_the_pyx(monkeypatch, raw, rolling):
 
 @pytest.mark.parametrize("raw", ["", "false", "yes"])
 def test_rolling_flag_rejects_non_integers_like_the_pyx(monkeypatch, raw):
-    from src import accelerators as acc
+    from bwtandem import accelerators as acc
 
     monkeypatch.setenv("TIER1_EXT_ROLLING", raw)
     with pytest.raises(ValueError):
@@ -134,9 +134,9 @@ def test_import_survives_warnings_as_errors_without_the_extension():
     # which hides the compiled extension without touching the file on disk.
     stub = (
         "import sys\n"
-        "sys.modules['src._accelerators'] = None\n"
+        "sys.modules['bwtandem._accelerators'] = None\n"
         "import warnings; warnings.simplefilter('error')\n"
-        "import src.accelerators as a\n"
+        "import bwtandem.accelerators as a\n"
         "assert a.NATIVE_AVAILABLE is False\n"
         "print('ok')\n"
     )
@@ -156,7 +156,7 @@ def test_all_public_accelerators_are_bound_in_both_modes():
         env["PYTHONDONTWRITEBYTECODE"] = "1"
         proc = subprocess.run(
             [sys.executable, "-c",
-             f"import src.accelerators as a; [getattr(a, n) for n in {consumed!r}]"],
+             f"import bwtandem.accelerators as a; [getattr(a, n) for n in {consumed!r}]"],
             cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
         )
         assert proc.returncode == 0, f"BWT_DISABLE_NATIVE={disable}: {proc.stderr}"

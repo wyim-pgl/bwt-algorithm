@@ -46,7 +46,7 @@ def _run(approx: bool):
     else:
         env.pop("TIER2_APPROX_SEED", None)
     subprocess.run(
-        [PY, "-m", "src.main", fa, "--min-period", "10", "--max-period", "20",
+        [PY, "-m", "bwtandem.main", fa, "--min-period", "10", "--max-period", "20",
          "--tiers", "tier2", "--format", "bed", "-o", os.path.join(d, "t")],
         cwd=REPO, env=env, check=True, capture_output=True,
     )

@@ -14,7 +14,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.bwt_core import BWTCore  # noqa: E402
+from bwtandem.bwt_core import BWTCore  # noqa: E402
 
 
 def _seq(n=20000, seed=11):

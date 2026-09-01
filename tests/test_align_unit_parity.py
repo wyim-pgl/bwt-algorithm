@@ -16,13 +16,13 @@ clusters, each followed by a random tail so the window is longer than the motif.
 import numpy as np
 import pytest
 
-import src.accelerators as acc
-import src.motif_utils as mu
-from src.motif_utils import MotifUtils
+import bwtandem.accelerators as acc
+import bwtandem.motif_utils as mu
+from bwtandem.motif_utils import MotifUtils
 
 pytestmark = pytest.mark.skipif(
     not acc.NATIVE_AVAILABLE,
-    reason="compiled src/_accelerators is absent; only one implementation to compare",
+    reason="compiled bwtandem/_accelerators is absent; only one implementation to compare",
 )
 
 BASES = "ACGT"

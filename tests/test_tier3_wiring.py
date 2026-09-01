@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
 import numpy as np
-from src.tier3 import Tier3LongReadFinder
+from bwtandem.tier3 import Tier3LongReadFinder
 
 
 class TestTier3ModeWiring:
@@ -29,7 +29,7 @@ class TestTier3ModeWiring:
         finder = Tier3LongReadFinder(bwt)
         assert finder.mode == "balanced"
 
-    @patch("src.tier3.bwt_kmer_seed_scan")
+    @patch("bwtandem.tier3.bwt_kmer_seed_scan")
     def test_adaptive_params_passed_to_seed_scan(self, mock_scan):
         mock_scan.return_value = []
         bwt = self._make_mock_bwt(5_000_000)

@@ -1,7 +1,7 @@
 # tests/test_maxrecall_extender.py
 """Regression test for the rolling-consensus mismatch extender (Task C2).
 
-The original `extend_with_mismatches` (in src/_accelerators.pyx) compares every
+The original `extend_with_mismatches` (in bwtandem/_accelerators.pyx) compares every
 copy to a FIXED first/seed copy and breaks on CUMULATIVE mismatch. On a diverged
 STR array this truncates the call early: as drift accumulates, the cumulative
 budget is exhausted long before the true array boundary, so the reported span
@@ -38,7 +38,7 @@ import random
 import tempfile
 import shutil
 
-# Project root must be on sys.path so src/ is importable.
+# Project root must be on sys.path so bwtandem/ is importable.
 # tests/ must be on sys.path so fixtures/ is importable.
 _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _tests_dir = os.path.dirname(os.path.abspath(__file__))
@@ -75,13 +75,13 @@ def run_finder(fasta_path: str, enabled_tiers: set,
                min_period: int = 1, max_period: int = 100000) -> list:
     """Run TandemRepeatFinder; returns list of TandemRepeat objects.
 
-    Re-imports src.* so that the module-level env constants in the compiled
+    Re-imports bwtandem.* so that the module-level env constants in the compiled
     extender (TIER1_EXT_ROLLING / TIER1_EXT_BAD_RUN, read once at import) pick up
     whatever the caller has set in os.environ for this invocation.
     """
-    for m in [k for k in sys.modules if k == "src" or k.startswith("src.")]:
+    for m in [k for k in sys.modules if k == "bwtandem" or k.startswith("bwtandem.")]:
         del sys.modules[m]
-    from src.finder import TandemRepeatFinder
+    from bwtandem.finder import TandemRepeatFinder
     all_repeats = []
     for name, seq in _parse_fasta_simple(fasta_path):
         seq = seq.upper()

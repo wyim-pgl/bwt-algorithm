@@ -8,8 +8,8 @@ centromeric output; the same value also goes out as VCF `TIER=`.
 import numpy as np
 import pytest
 
-from src.finder import TandemRepeatFinder
-from src.models import TandemRepeat, TIER_SATELLITE, TIER_CATCHALL
+from bwtandem.finder import TandemRepeatFinder
+from bwtandem.models import TandemRepeat, TIER_SATELLITE, TIER_CATCHALL
 
 RNG = np.random.RandomState(20260805)
 BASES = np.frombuffer(b"ACGT", dtype=np.uint8)

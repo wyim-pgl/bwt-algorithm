@@ -22,15 +22,15 @@ Skipped when the compiled extension is absent, since there is nothing to compare
 import numpy as np
 import pytest
 
-from src import accelerators as acc
+from bwtandem import accelerators as acc
 
 pytestmark = pytest.mark.skipif(
     not acc.NATIVE_AVAILABLE,
-    reason="compiled src/_accelerators is absent; nothing to differentially test against",
+    reason="compiled bwtandem/_accelerators is absent; nothing to differentially test against",
 )
 
 if acc.NATIVE_AVAILABLE:
-    from src import _accelerators as native
+    from bwtandem import _accelerators as native
 
 ACGT = np.array([65, 67, 71, 84], dtype=np.uint8)  # A, C, G, T
 

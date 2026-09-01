@@ -19,7 +19,7 @@ import os
 import re
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(REPO, "src")
+SRC = os.path.join(REPO, "bwtandem")
 CLAUDE_MD = os.path.join(REPO, "CLAUDE.md")
 
 # Prefixes that denote a user-facing tuning knob. Anything outside these (PATH,
@@ -31,7 +31,7 @@ _DOC = re.compile(r"\b((?:TIER[123]|CATCHALL|SAT_FILL|SAT_ANCHOR|BWT)_[A-Z0-9_]+
 
 
 def _knobs_read_by_code():
-    """Env var names read anywhere under src/, restricted to the tuning prefixes."""
+    """Env var names read anywhere under bwtandem/, restricted to the tuning prefixes."""
     found = set()
     for root, _dirs, files in os.walk(SRC):
         for fn in files:
@@ -64,7 +64,7 @@ def test_no_knob_the_code_reads_is_undocumented():
     """A knob nobody can find is a knob whose effect on a result cannot be reported."""
     undocumented = sorted(_knobs_read_by_code() - _knobs_documented())
     assert not undocumented, (
-        "src/ reads environment variables that CLAUDE.md does not document: "
+        "bwtandem/ reads environment variables that CLAUDE.md does not document: "
         + ", ".join(undocumented)
         + ". Add them to the 'Tuning detection sensitivity (env vars)' section with "
         "their defaults."
@@ -75,9 +75,9 @@ def test_the_scan_finds_a_plausible_number_of_knobs():
     """Guard against the regexes silently matching nothing and passing vacuously."""
     read = _knobs_read_by_code()
     assert len(read) >= 30, (
-        f"only {len(read)} tuning knobs found in src/ — the scan regex has probably "
+        f"only {len(read)} tuning knobs found in bwtandem/ — the scan regex has probably "
         "stopped matching, which would make the two tests above pass for the wrong "
         "reason"
     )
-    assert "TIER1_FMSCAN" in read, "TIER1_FMSCAN should be read by src/tier1.py"
-    assert "BWT_INDEX_CACHE" in read, "BWT_INDEX_CACHE should be read by src/finder.py"
+    assert "TIER1_FMSCAN" in read, "TIER1_FMSCAN should be read by bwtandem/tier1.py"
+    assert "BWT_INDEX_CACHE" in read, "BWT_INDEX_CACHE should be read by bwtandem/finder.py"

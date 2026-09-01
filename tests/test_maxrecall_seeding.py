@@ -43,7 +43,7 @@ import random
 import tempfile
 import shutil
 
-# Project root must be on sys.path so src/ is importable.
+# Project root must be on sys.path so bwtandem/ is importable.
 # tests/ must be on sys.path so fixtures/ is importable.
 _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _tests_dir = os.path.dirname(os.path.abspath(__file__))
@@ -79,7 +79,7 @@ def _parse_fasta_simple(path: str) -> list:
 def run_finder(fasta_path: str, enabled_tiers: set,
                min_period: int = 1, max_period: int = 100000) -> list:
     """Run TandemRepeatFinder; returns list of TandemRepeat objects."""
-    from src.finder import TandemRepeatFinder
+    from bwtandem.finder import TandemRepeatFinder
     all_repeats = []
     for name, seq in _parse_fasta_simple(fasta_path):
         seq = seq.upper()

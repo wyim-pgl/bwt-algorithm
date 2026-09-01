@@ -24,17 +24,17 @@ jobs:
           from setuptools import setup, Extension
           from Cython.Build import cythonize
           import numpy as np
-          ext=[Extension('src._accelerators',['src/_accelerators.pyx'],include_dirs=[np.get_include()])]
+          ext=[Extension('bwtandem._accelerators',['bwtandem/_accelerators.pyx'],include_dirs=[np.get_include()])]
           setup(script_args=['build_ext','--inplace'], ext_modules=cythonize(ext, compiler_directives={'language_level':'3'}))
           "
-          python src/c_extensions/build.py
+          python bwtandem/c_extensions/build.py
       - name: Test (native)
         run: python -m pytest tests/ -q
       - name: Test (pure-Python fallback parity)
         run: BWT_DISABLE_NATIVE=1 python -m pytest tests/test_accel_parity.py tests/test_ambiguous_native_paths.py -q
       - name: CLI smoke
         run: |
-          python -m src.main arabadopsis_chrs/test_seq1.fa --tiers tier1 --format bed -o /tmp/smoke -v
+          python -m bwtandem.main arabadopsis_chrs/test_seq1.fa --tiers tier1 --format bed -o /tmp/smoke -v
           test -s /tmp/smoke.bed
 
   install:
@@ -60,7 +60,7 @@ jobs:
           cd /tmp
           bwtandem --help
           python -c "
-          import src._accelerators as a
+          import bwtandem._accelerators as a
           assert a.__file__.endswith(('.so', '.pyd')), a.__file__
           assert 'site-packages' in a.__file__, a.__file__
           "

@@ -10,12 +10,12 @@ BWT-based tandem repeat finder for genomic sequences. Detects tandem repeats (ST
 
 ```bash
 # Basic usage
-python3 -m src.main <fasta_file> [options]
+python3 -m bwtandem.main <fasta_file> [options]
 
 # Common options
-python3 -m src.main input.fa --min-period 1 --max-period 2000 --tiers tier1,tier2,tier3 --format bed -o output_prefix -v
-python3 -m src.main input.fa --tiers tier1 --format trf --profile  # profile tier execution
-python3 -m src.main input.fa -t 4 --mask soft -v  # 4 threads, skip soft-masked regions
+python3 -m bwtandem.main input.fa --min-period 1 --max-period 2000 --tiers tier1,tier2,tier3 --format bed -o output_prefix -v
+python3 -m bwtandem.main input.fa --tiers tier1 --format trf --profile  # profile tier execution
+python3 -m bwtandem.main input.fa -t 4 --mask soft -v  # 4 threads, skip soft-masked regions
 
 # Output formats: bed (default), vcf, trf (.dat), strfinder (.csv)
 ```
@@ -33,13 +33,13 @@ python3 -c "
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy as np
-ext_modules = [Extension('src._accelerators', ['src/_accelerators.pyx'], include_dirs=[np.get_include()])]
+ext_modules = [Extension('bwtandem._accelerators', ['bwtandem/_accelerators.pyx'], include_dirs=[np.get_include()])]
 setup(script_args=['build_ext', '--inplace'], ext_modules=cythonize(ext_modules, compiler_directives={'language_level': '3'}))
 "
 ```
 
 Rebuild scope: only edits to `_accelerators.pyx` require running the command
-above by hand. The four `src/c_extensions/*.c` libraries rebuild themselves on
+above by hand. The four `bwtandem/c_extensions/*.c` libraries rebuild themselves on
 import when their source is newer than their `.so` (`build.py` checks mtimes), so
 editing `align_accel.c` and friends needs no manual step. Edits to the
 pure-Python tier files (`tier1.py`, `tier2.py`, `tier3.py`, `finder.py`,
@@ -47,7 +47,7 @@ pure-Python tier files (`tier1.py`, `tier2.py`, `tier3.py`, `finder.py`,
 
 ## Testing
 
-`pytest`-based suite under `tests/`. Tests import `from src...`, so **run from
+`pytest`-based suite under `tests/`. Tests import `from bwtandem...`, so **run from
 the repo root** (no `conftest.py`/`pytest.ini` — discovery is root-relative).
 
 ```bash
@@ -112,13 +112,13 @@ python3 -m pytest tests/test_ground_truth.py::TestTier1GroundTruth::test_sensiti
   `libtier1_scan`, `libtier2_accel` and `libbwt_accel` still load unconditionally and are
   therefore still outside it.
 - ⚠️ **There is no `gcc` on the login-node PATH.** `build.py` shells out to bare `gcc`, so
-  editing any `src/c_extensions/*.c` without `/data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem/bin`
+  editing any `bwtandem/c_extensions/*.c` without `/data/gpfs/assoc/pgl/bin/conda/conda_envs/bwtandem/bin`
   on PATH makes the compile raise, the loader return None, and the C path vanish silently.
 - `tests/test_align_unit_parity.py` closes the last accelerator gap: `align_unit_to_window`
   was the only one of the five consumed symbols with no C-vs-Python value comparison, and
   its Python twin is a separate hand-written banded DP — the same code shape as the
   `align_accel.c` loop that disagreed on 31% of regions until 2026-07-09.
-- `tests/test_env_var_docs.py` pins this file's env-var list to what `src/` actually
+- `tests/test_env_var_docs.py` pins this file's env-var list to what `bwtandem/` actually
   reads, in both directions. It was added after a catch-all seed cap was found
   documented here but implemented nowhere, and `TIER1_FMSCAN` implemented but left
   undocumented while every benchmark run set it. If it fails, fix the docs or the
@@ -141,7 +141,7 @@ configuration. Point `BWT_INDEX_CACHE` at a directory and `finder.py` will load 
 matching index instead of building one, writing it on the first miss:
 
 ```bash
-BWT_INDEX_CACHE=/scratch/idxcache python3 -m src.main genome.fa ...
+BWT_INDEX_CACHE=/scratch/idxcache python3 -m bwtandem.main genome.fa ...
 ```
 
 Unset (the default) disables it and the pipeline behaves exactly as before.
@@ -165,7 +165,7 @@ The tier detection thresholds are hardcoded constants exposed as environment-
 variable overrides so the sensitivity/precision trade-off can be swept without
 editing code. **All defaults reproduce the original behaviour exactly** — unset
 means baseline. Set them on the command line, e.g.
-`TIER1_MIN_ARRAY_LEN=20 TIER1_MIN_SCORE=20 python3 -m src.main ...`.
+`TIER1_MIN_ARRAY_LEN=20 TIER1_MIN_SCORE=20 python3 -m bwtandem.main ...`.
 
 - **Tier 1** (`tier1.py`, short STRs): `TIER1_MIN_COPIES`, `TIER1_MIN_ARRAY_LEN`
   (min reported span, default 26), `TIER1_MIN_SCORE` (length×purity gate,
@@ -244,7 +244,7 @@ means baseline. Set them on the command line, e.g.
   this exists to answer "what does the index buy the seeding step" (review item REV-2) and is
   not a tuning knob. The table is built once per (index, k) and cached on the `BWTCore`
   object, costing roughly 12 bytes per base of the sequence. Read once at import time, so it
-  must be set in the environment before `src` is imported. It does **not** touch Tier 1's
+  must be set in the environment before `bwtandem` is imported. It does **not** touch Tier 1's
   FM-index enumeration (`TIER1_FMSCAN`), which is a separate mechanism, so a run with this set
   is not an index-free pipeline.
 

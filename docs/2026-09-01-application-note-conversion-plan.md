@@ -1,5 +1,12 @@
 # Application Note conversion plan (2026-09-01)
 
+> ⚠️ **Superseded as the default direction (same day)**: the venue analysis
+> (docs/2026-09-01-venue-and-positioning-analysis.md) recommends a FULL
+> paper at GigaScience or Bioinformatics — the contribution's center of
+> mass is the provable benchmark, which ~2,600 App Note words cannot hold
+> once longdust/AniAnn's enter the comparison. This plan is retained as a
+> fallback design only.
+
 Decision context: shared-range accuracy is honestly non-leading (ULTRA
 first by ~1pp), so the publishable claim is **capability** — one pass over
 periods 1 bp–2,000 bp at a 1.30–1.41× cost for a 20× wider range, with the

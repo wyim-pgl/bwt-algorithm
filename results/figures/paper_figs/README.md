@@ -1,9 +1,10 @@
 # Paper figures workspace (seaborn)
 
-Working directory for the manuscript's display items. The panel specs, data
-provenance, per-figure claims, caption drafts, and the list of figures that
-must NOT be made are in `FIGURE_PLAN.md` (adversarial-review output,
-2026-08-31).
+Working directory for the manuscript's display items. **Implementing the
+plots is handed off — start from `HANDOFF_FILIP.md`** (English: per-figure
+titles, panel specs, data-file mapping, caption drafts, ground rules). The
+full adversarial design document behind it is `FIGURE_PLAN.md` (Korean,
+2026-08-31), including the list of figures that must NOT be made.
 
 ## Layout
 

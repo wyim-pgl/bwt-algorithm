@@ -1,0 +1,53 @@
+{
+ "truth_records": 1784804,
+ "pred_records": 5134,
+ "pred_records_loaded": 5332,
+ "dropped_off_truth_chroms": 198,
+ "pred_col5": "period",
+ "pred_motif_is_sequence": false,
+ "matched": 892,
+ "sensitivity_1to1_maxcard": 0.049977476518430035,
+ "precision_1to1_maxcard": 17.374366965329177,
+ "min_overlap": 0.5,
+ "strata": {
+  "1-6": {
+   "truth": 1048225,
+   "matched": 59,
+   "sensitivity_pct": 0.01
+  },
+  "101-2000": {
+   "truth": 45161,
+   "matched": 387,
+   "sensitivity_pct": 0.86
+  },
+  "21-100": {
+   "truth": 157835,
+   "matched": 326,
+   "sensitivity_pct": 0.21
+  },
+  "7-20": {
+   "truth": 533583,
+   "matched": 120,
+   "sensitivity_pct": 0.02
+  }
+ },
+ "boundary": {
+  "start_offset_median": 494.0,
+  "start_offset_p90": 2616.5,
+  "end_offset_median": 551.5,
+  "end_offset_p90": 2848.8,
+  "exact_start_pct": 0.22,
+  "exact_end_pct": 0.11
+ },
+ "period": {
+  "scored_pairs": 892,
+  "exact_pct": 33.41,
+  "integer_multiple_pct": 9.98,
+  "within_20pct_pct": 22.09,
+  "outside_pct": 34.53
+ },
+ "copies": {
+  "scored_pairs": 0,
+  "rel_error_median_pct": null
+ }
+}

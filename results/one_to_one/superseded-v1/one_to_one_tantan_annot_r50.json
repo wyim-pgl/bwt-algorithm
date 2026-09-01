@@ -1,0 +1,49 @@
+{
+ "truth_records": 1784804,
+ "pred_records": 3469229,
+ "matched": 113649,
+ "sensitivity_1to1_maxcard": 6.367589942649165,
+ "precision_1to1_maxcard": 3.275915196143005,
+ "min_overlap": 0.5,
+ "strata": {
+  "1-6": {
+   "truth": 1041083,
+   "matched": 46612,
+   "sensitivity_pct": 4.48
+  },
+  "101-2000": {
+   "truth": 45186,
+   "matched": 577,
+   "sensitivity_pct": 1.28
+  },
+  "21-100": {
+   "truth": 158010,
+   "matched": 40696,
+   "sensitivity_pct": 25.76
+  },
+  "7-20": {
+   "truth": 540525,
+   "matched": 25764,
+   "sensitivity_pct": 4.77
+  }
+ },
+ "boundary": {
+  "start_offset_median": 25,
+  "start_offset_p90": 31.0,
+  "end_offset_median": 24,
+  "end_offset_p90": 30.0,
+  "exact_start_pct": 7.73,
+  "exact_end_pct": 1.04
+ },
+ "period": {
+  "scored_pairs": 113649,
+  "exact_pct": 63.56,
+  "integer_multiple_pct": 14.42,
+  "within_20pct_pct": 8.13,
+  "outside_pct": 13.89
+ },
+ "copies": {
+  "scored_pairs": 113649,
+  "rel_error_median_pct": 94.29
+ }
+}

@@ -1,10 +1,6 @@
 {
  "truth_records": 1784804,
  "pred_records": 4014108,
- "pred_records_loaded": 4014108,
- "dropped_off_truth_chroms": 0,
- "pred_col5": "copies",
- "pred_motif_is_sequence": false,
  "matched": 348464,
  "sensitivity_1to1_maxcard": 19.523936521881396,
  "precision_1to1_maxcard": 8.680982175865722,

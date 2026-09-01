@@ -1,49 +1,53 @@
 {
  "truth_records": 1784804,
- "pred_records": 3347216,
- "matched": 554179,
- "sensitivity_1to1_maxcard": 31.04985197254152,
- "precision_1to1_maxcard": 16.556415839312432,
+ "pred_records": 3216710,
+ "pred_records_loaded": 3347216,
+ "dropped_off_truth_chroms": 130506,
+ "pred_col5": "period",
+ "pred_motif_is_sequence": false,
+ "matched": 1122910,
+ "sensitivity_1to1_maxcard": 62.915031566491336,
+ "precision_1to1_maxcard": 34.908648899030375,
  "min_overlap": 0.5,
  "strata": {
   "1-6": {
-   "truth": 1041083,
-   "matched": 264242,
-   "sensitivity_pct": 25.38
+   "truth": 1048225,
+   "matched": 605567,
+   "sensitivity_pct": 57.77
   },
   "101-2000": {
-   "truth": 45186,
-   "matched": 3575,
-   "sensitivity_pct": 7.91
+   "truth": 45161,
+   "matched": 3777,
+   "sensitivity_pct": 8.36
   },
   "21-100": {
-   "truth": 158010,
-   "matched": 102457,
-   "sensitivity_pct": 64.84
+   "truth": 157835,
+   "matched": 127693,
+   "sensitivity_pct": 80.9
   },
   "7-20": {
-   "truth": 540525,
-   "matched": 183905,
-   "sensitivity_pct": 34.02
+   "truth": 533583,
+   "matched": 385873,
+   "sensitivity_pct": 72.32
   }
  },
  "boundary": {
-  "start_offset_median": 20,
-  "start_offset_p90": 29.0,
-  "end_offset_median": 20,
-  "end_offset_p90": 29.0,
-  "exact_start_pct": 3.77,
-  "exact_end_pct": 1.27
+  "start_offset_median": 1.0,
+  "start_offset_p90": 13.0,
+  "end_offset_median": 1.0,
+  "end_offset_p90": 14.0,
+  "exact_start_pct": 46.27,
+  "exact_end_pct": 6.25
  },
  "period": {
-  "scored_pairs": 554179,
-  "exact_pct": 49.85,
-  "integer_multiple_pct": 22.02,
-  "within_20pct_pct": 7.71,
-  "outside_pct": 20.42
+  "scored_pairs": 1122910,
+  "exact_pct": 59.61,
+  "integer_multiple_pct": 18.38,
+  "within_20pct_pct": 4.62,
+  "outside_pct": 17.38
  },
  "copies": {
-  "scored_pairs": 554179,
-  "rel_error_median_pct": 78.76
+  "scored_pairs": 0,
+  "rel_error_median_pct": null
  }
 }

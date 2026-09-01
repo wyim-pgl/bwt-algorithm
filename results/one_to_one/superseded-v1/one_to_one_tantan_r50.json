@@ -1,13 +1,9 @@
 {
  "truth_records": 1784804,
- "pred_records": 3319523,
- "pred_records_loaded": 3469229,
- "dropped_off_truth_chroms": 149706,
- "pred_col5": "period",
- "pred_motif_is_sequence": false,
+ "pred_records": 3469229,
  "matched": 113649,
  "sensitivity_1to1_maxcard": 6.367589942649165,
- "precision_1to1_maxcard": 3.4236545431376735,
+ "precision_1to1_maxcard": 3.275915196143005,
  "min_overlap": 0.5,
  "strata": {
   "other": {

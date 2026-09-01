@@ -1,0 +1,38 @@
+{
+ "truth_records": 1784804,
+ "pred_records": 5134,
+ "pred_records_loaded": 5332,
+ "dropped_off_truth_chroms": 198,
+ "pred_col5": "period",
+ "pred_motif_is_sequence": false,
+ "matched": 1241,
+ "sensitivity_1to1_maxcard": 0.06953144434907138,
+ "precision_1to1_maxcard": 24.172185430463575,
+ "min_overlap": 0.5,
+ "strata": {
+  "other": {
+   "truth": 1784804,
+   "matched": 1241,
+   "sensitivity_pct": 0.07
+  }
+ },
+ "boundary": {
+  "start_offset_median": 420,
+  "start_offset_p90": 1947.6,
+  "end_offset_median": 432,
+  "end_offset_p90": 1871.8,
+  "exact_start_pct": 0.0,
+  "exact_end_pct": 0.08
+ },
+ "period": {
+  "scored_pairs": 0,
+  "exact_pct": 0.0,
+  "integer_multiple_pct": 0.0,
+  "within_20pct_pct": 0.0,
+  "outside_pct": 0.0
+ },
+ "copies": {
+  "scored_pairs": 0,
+  "rel_error_median_pct": null
+ }
+}

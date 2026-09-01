@@ -44,6 +44,25 @@ from collections import defaultdict
 STRATA = ((1, 6), (7, 20), (21, 100), (101, 2000))
 
 
+def parse_strata(spec):
+    """'1-6,7-20,101-500' -> ((1,6),(7,20),(101,500)); validated."""
+    bands = []
+    for part in spec.split(","):
+        try:
+            lo, hi = part.strip().split("-")
+            lo, hi = int(lo), int(hi)
+        except ValueError:
+            sys.exit(f"FATAL: bad stratum '{part}' (expected LO-HI)")
+        if lo <= 0 or hi < lo:
+            sys.exit(f"FATAL: bad stratum '{part}' (need 0 < LO <= HI)")
+        if bands and lo <= bands[-1][1]:
+            sys.exit(f"FATAL: strata must be ascending and non-overlapping ('{part}')")
+        bands.append((lo, hi))
+    if not bands:
+        sys.exit("FATAL: --strata is empty")
+    return tuple(bands)
+
+
 def load(path, need_cols=3, col5="copies", motif_is_sequence=False):
     rows = []
     opener = gzip.open if str(path).endswith(".gz") else open
@@ -201,8 +220,8 @@ def period_of(rec):
     return len(rec["motif"]) if rec["motif"] else None
 
 
-def stratum(p):
-    for lo, hi in STRATA:
+def stratum(p, strata=STRATA):
+    for lo, hi in strata:
         if p is not None and lo <= p <= hi:
             return f"{lo}-{hi}"
     return "other"
@@ -227,6 +246,9 @@ def main():
     ap.add_argument("--pred-motif-is-sequence", action="store_true",
                     help="prediction column 4 is the full array sequence, not a "
                          "motif (TRF-style); disables prediction-period metrics")
+    ap.add_argument("--strata", default="1-6,7-20,21-100,101-2000",
+                    help="comma list of ascending truth period bands LO-HI "
+                         "(default: 1-6,7-20,21-100,101-2000)")
     ap.add_argument("--truth-chroms-only", action="store_true",
                     help="drop predictions on sequences absent from the truth "
                          "before computing precision")
@@ -234,6 +256,7 @@ def main():
     args = ap.parse_args()
     if not math.isfinite(args.min_overlap) or not 0 < args.min_overlap <= 1:
         ap.error("--min-overlap must be a finite value in (0, 1]")
+    strata_bands = parse_strata(args.strata)
 
     truth = load(args.truth_bed, col5=args.truth_col5)
     preds = load(args.pred_bed, col5=args.pred_col5,
@@ -258,6 +281,7 @@ def main():
         "sensitivity_1to1_maxcard": pct(len(pairs), len(truth)),
         "precision_1to1_maxcard": pct(len(pairs), len(preds)),
         "min_overlap": args.min_overlap,
+        "strata_spec": args.strata,
         "strata": {},
     }
 
@@ -265,10 +289,10 @@ def main():
     per_exact = per_mult = per_20 = per_scored = 0
     strat_counts = defaultdict(lambda: {"truth": 0, "matched": 0})
     for t in truth:
-        strat_counts[stratum(period_of(t))]["truth"] += 1
+        strat_counts[stratum(period_of(t), strata_bands)]["truth"] += 1
     for i, j, ov in pairs:
         t, p = truth[i], preds[j]
-        strat_counts[stratum(period_of(t))]["matched"] += 1
+        strat_counts[stratum(period_of(t), strata_bands)]["matched"] += 1
         start_off.append(abs(t["start"] - p["start"]))
         end_off.append(abs(t["end"] - p["end"]))
         tp, pp = period_of(t), period_of(p)

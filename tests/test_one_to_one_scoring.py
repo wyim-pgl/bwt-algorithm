@@ -354,3 +354,36 @@ class TestEdgeSemantics:
         r = _run([truth, preds, "--truth-col5", "period", "--json", out])
         assert r.returncode == 0, r.stderr
         assert json.load(open(out))["copies"]["scored_pairs"] == 0
+
+
+class TestStrataOption:
+    def test_custom_strata_split_band(self, tmp_path):
+        truth = _write_bed(tmp_path, "t.bed", [
+            ("c", 0, 1000, "A" * 200, 5),      # period 200 -> 101-500
+            ("c", 2000, 4000, "A" * 800, 2.5),  # period 800 -> 501-2000
+        ])
+        preds = _write_bed(tmp_path, "p.bed", [
+            ("c", 0, 1000, "A" * 200, 5),
+            ("c", 2000, 4000, "A" * 800, 2.5),
+        ])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, preds, "--strata", "1-6,7-20,21-100,101-500,501-2000",
+                  "--json", out])
+        assert r.returncode == 0, r.stderr
+        res = json.load(open(out))
+        assert res["strata_spec"] == "1-6,7-20,21-100,101-500,501-2000"
+        assert res["strata"]["101-500"]["matched"] == 1
+        assert res["strata"]["501-2000"]["matched"] == 1
+
+    @pytest.mark.parametrize("bad", ["", "6-1", "1-6,3-9", "0-5", "abc"])
+    def test_bad_strata_rejected(self, tmp_path, bad):
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100)])
+        r = _run([truth, truth, "--strata", bad])
+        assert r.returncode != 0
+
+    def test_default_strata_unchanged(self, tmp_path):
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "AT", 50)])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, truth, "--json", out])
+        assert r.returncode == 0, r.stderr
+        assert json.load(open(out))["strata_spec"] == "1-6,7-20,21-100,101-2000"

@@ -221,6 +221,9 @@ def main():
     ap.add_argument("--pred-col5", choices=("copies", "period"), default="copies",
                     help="meaning of the prediction BED's 5th column; 'period' "
                          "disables the copy-error metric (default: copies)")
+    ap.add_argument("--truth-col5", choices=("copies", "period"), default="copies",
+                    help="meaning of the truth BED's 5th column (symmetric with "
+                         "--pred-col5; 'period' disables the copy-error metric)")
     ap.add_argument("--pred-motif-is-sequence", action="store_true",
                     help="prediction column 4 is the full array sequence, not a "
                          "motif (TRF-style); disables prediction-period metrics")
@@ -232,7 +235,7 @@ def main():
     if not math.isfinite(args.min_overlap) or not 0 < args.min_overlap <= 1:
         ap.error("--min-overlap must be a finite value in (0, 1]")
 
-    truth = load(args.truth_bed)
+    truth = load(args.truth_bed, col5=args.truth_col5)
     preds = load(args.pred_bed, col5=args.pred_col5,
                  motif_is_sequence=args.pred_motif_is_sequence)
     pred_records_loaded = len(preds)

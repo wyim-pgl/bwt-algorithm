@@ -331,3 +331,26 @@ class TestDeriveAnnotatedTruth:
         fields = r.stdout.rstrip("\n").split("\t")
         assert fields[:3] == ["chr1", "0", "100"]  # region coords, no motif
         assert fields[3] == ""
+
+
+class TestEdgeSemantics:
+    def test_duplicate_intervals_each_match_once(self):
+        truth = [rec("c", 0, 100), rec("c", 0, 100)]
+        preds = [rec("c", 0, 100), rec("c", 0, 100)]
+        pairs, t_used, p_used = m.one_to_one(truth, preds, 0.5)
+        assert len(pairs) == 2 and t_used == {0, 1} and p_used == {0, 1}
+
+    def test_exact_threshold_boundary_is_eligible(self):
+        # overlap exactly min_frac of both records must pass (>= semantics)
+        truth = [rec("c", 0, 100)]
+        preds = [rec("c", 50, 150)]  # overlap 50 = exactly 0.5 of both
+        edges = m._eligible_edges(truth, preds, 0.5)
+        assert edges[0][0] == 50
+
+    def test_truth_col5_period_disables_copy_metric(self, tmp_path):
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "AT", 2)])
+        preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100, "AT", 50)])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, preds, "--truth-col5", "period", "--json", out])
+        assert r.returncode == 0, r.stderr
+        assert json.load(open(out))["copies"]["scored_pairs"] == 0

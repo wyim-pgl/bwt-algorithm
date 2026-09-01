@@ -54,11 +54,19 @@ def best_annotation(cell):
         return None
     if not isinstance(anns, list):
         return None
+    def key(a):
+        # deterministic tie-break: score, then longer span, then leftmost
+        try:
+            span = int(a.get("end", 0)) - int(a.get("start", 0))
+            return (float(a.get("score", 0)), span, -int(a.get("start", 0)))
+        except (TypeError, ValueError):
+            return (float("-inf"), 0, 0)
+
     best = None
     for a in anns:
         if not isinstance(a, dict) or not a.get("motif"):
             continue
-        if best is None or a.get("score", 0) > best.get("score", 0):
+        if best is None or key(a) > key(best):
             best = a
     return best
 
@@ -105,7 +113,7 @@ def main():
                 copies = float(best.get("copies", 0)) or ""
             except (KeyError, TypeError, ValueError):
                 sys.exit(f"FATAL {args.catalog_bed}:{i}: malformed annotation")
-            motif, factor = primitive(str(best["motif"]).upper())
+            motif, factor = primitive(str(best["motif"]).strip().upper())
             if factor > 1:
                 n_reduced += 1
                 if copies != "":

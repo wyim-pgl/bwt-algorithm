@@ -63,6 +63,13 @@ jobs:
           import bwtandem._accelerators as a
           assert a.__file__.endswith(('.so', '.pyd')), a.__file__
           assert 'site-packages' in a.__file__, a.__file__
+          # the ctypes C sources must ship in the wheel: build.py compiles
+          # them at first import, and without them the fast C paths silently
+          # fall back to Python (that exact defect shipped once)
+          import glob, os
+          import bwtandem.c_extensions.build as b
+          cs = glob.glob(os.path.join(os.path.dirname(b.__file__), '*.c'))
+          assert len(cs) == 4, cs
           "
           bwtandem "$FIXTURE" --tiers tier1 --format bed -o /tmp/inst_smoke
           test -s /tmp/inst_smoke.bed

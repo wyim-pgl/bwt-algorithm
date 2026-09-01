@@ -32,7 +32,7 @@ test suite after the accelerator build above. What lives where:
 
 | Class | Destination | Examples |
 |---|---|---|
-| Source, tests, docs | Git | `src/`, `tests/`, `docs/`, `scripts/` |
+| Source, tests, docs | Git | `bwtandem/`, `tests/`, `docs/`, `scripts/` |
 | Benchmark provenance | Git, under `results/` | `results/manifest.tsv` (+ `manifest.sha256`) maps every reported table row to the interval file, scoring script, hash, and commit that produced it |
 | Deposited evidence | Git, under `results/` | the three whole-genome BWTandem BEDs (`results/beds/`), curated ground-truth coordinate sets (`results/ground_truth/`), audit sheets (`results/audit11/`) |
 | Superseded / quarantined claims | Git, under `archive/` | `archive/2026-08-05-unreproducible/` documents which historical cost figures were re-measured and why — read it before reusing any cost number |

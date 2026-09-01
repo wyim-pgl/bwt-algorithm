@@ -27,6 +27,12 @@ dev = ["pytest>=9", "Cython>=3.0"]
 [tool.setuptools]
 packages = ["bwtandem", "bwtandem.c_extensions"]
 
+# The four ctypes libraries are compiled AT RUNTIME by c_extensions/build.py
+# (dlopen'd by path, not imported), so their C sources must travel in the
+# wheel or the installed package silently loses the fast C paths.
+[tool.setuptools.package-data]
+"bwtandem.c_extensions" = ["*.c"]
+
 [project.scripts]
 bwtandem = "bwtandem.main:main"
 

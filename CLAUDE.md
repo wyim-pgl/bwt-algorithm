@@ -304,7 +304,7 @@ harness + ledger under `exp1_human/loop/` (`resume.md` = state).
 
 - **Required**: numpy, pydivsufsort (fast suffix array construction; falls back to NumPy prefix-doubling if unavailable)
 - **Optional performance**: numba (JIT for rank queries and LCP), Cython (compiled `_accelerators`)
-- **Container**: Singularity definition file at repo root builds a complete environment
+- **Container**: `Dockerfile` at the repo root installs the pinned core environment and the package (`ENTRYPOINT` is `bwtandem`); it converts to a Singularity/Apptainer image
 - **Environment**: `environment.yml` defines the `bwt` conda env (python, numpy/numba/cython, pytest,
   plus the competitor tools used for benchmarking: trf, tantan, tidehunter, ncrf, mreps). `pydivsufsort`
   is pip-only and needs `--no-build-isolation` (see README "Installation"). Note the env in `environment.yml`

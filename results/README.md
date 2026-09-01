@@ -2,12 +2,14 @@
 
 `manifest.tsv` maps each table row in the manuscript to the interval file it was
 scored from, the scoring script and its hash, the scoring rule, and the
-repository commit. `figures/` holds no active Figure 1: its source CSV is a
-non-numeric pending placeholder awaiting job 6129408, and the earlier-build
-figure, its data and its renderer are retained under `superseded` names for
-audit only. `regen/` holds the provenance, scoring output and deposited
-evidence for the regenerated whole-genome runs. `ground_truth/` holds the
-curated coordinate sets every accuracy figure is scored against.
+repository commit. `figures/` holds the active Figure 1 (`figure_curve.*`,
+rendered from the regenerated identity sweep); the earlier-build figure, its
+data and its renderer are retained under `superseded` names for audit only.
+`regen/` holds the provenance, scoring output and deposited evidence for the
+regenerated whole-genome runs. `one_to_one/` holds the strict one-to-one,
+boundary-aware scoring results (Supplementary Table S4; see its README for
+the metric definitions). `ground_truth/` holds the curated coordinate sets
+every accuracy figure is scored against.
 
 ## ground_truth/
 

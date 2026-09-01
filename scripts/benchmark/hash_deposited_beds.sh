@@ -9,8 +9,11 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 OUT=results/manifest.sha256
 : > "$OUT"
-find results/beds results/ground_truth -type f 2>/dev/null | sort | while read -r f; do
+# Everything under results/ is deposited evidence (CONTRIBUTING.md policy),
+# plus the evidence scripts deposited beside the scoring wrappers.
+{ find results -type f ! -name manifest.sha256 ! -path '*__pycache__*' ! -name '*.pyc' 2>/dev/null
+  ls scripts/scoring/score_maize_regen_evidence.py 2>/dev/null
+} | sort | while read -r f; do
     sha256sum "$f" >> "$OUT"
 done
-sha256sum results/manifest.tsv >> "$OUT"
 echo "$(wc -l < "$OUT") full-file hashes -> $OUT"

@@ -36,9 +36,10 @@ metric. The JSONs here are the strict counterpart, produced by
   5**; the converted ULTRA/tantan/TRF/TRASH baselines carry the *period*
   there (`convert_to_bed.py`), so the metric is reported for BWTandem alone
   (`--pred-col5 period` disables it rather than mis-scoring it).
-- **Strata** — sensitivity by **truth-side period band** (1–6, 7–20,
-  21–100, 101–2,000 bp of the truth annotation's primitive period). This is
-  a different quantity from Table 1c's prediction-side period strata.
+- **Strata** — sensitivity by **truth-side period band** of the truth
+  annotation's primitive period (1–6, 7–20, 21–100, and the long band,
+  which the split-band run showed contains only 101–500 bp). This is a
+  different quantity from Table 1c's prediction-side period strata.
 
 ## The two truth sets
 
@@ -102,7 +103,7 @@ precision is what the 1:1 assignment adds):
 
 Annotation truth:
 
-| Tool | Matched | Sens. (%) | Prec. (%) | Δstart med (bp) | Period exact (%) | Copy med rel err (%) | 1–6 | 7–20 | 21–100 | 101–2000 |
+| Tool | Matched | Sens. (%) | Prec. (%) | Δstart med (bp) | Period exact (%) | Copy med rel err (%) | 1–6 | 7–20 | 21–100 | 101–500 |
 |---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | ULTRA | 1,122,910 | 62.92 | 34.91 | 1 | 59.61 | — | 57.77 | 72.32 | 80.90 | 8.36 |
 | BWTandem | 1,050,831 | 58.88 | 26.18 | 2 | 58.66 | 34.15 | 59.21 | 58.24 | 62.38 | 46.39 |
@@ -116,13 +117,19 @@ BWTandem is second on sensitivity in both arms and **has the lowest
 region-arm precision of the five tools** — the same per-region call
 granularity (several calls per catalog region) disclosed as fragmentation
 in the manuscript's limitations, charged per extra call by the 1:1
-assignment. In the 101–2,000 bp truth band **TRF leads at 62.40%** with
-BWTandem second at 46.39%; ULTRA (8.36%) and tantan (1.67%) emit no call
-above period 100, so the calls matching those truths are their shorter-
-period calls. Each tool's matched-pair statistics are computed over its
-*own* matched set, which differ in size and composition (e.g. the 21–100 bp
-band is 11.4% of ULTRA's matched pairs but 6.8% of tantan's); the
-period-exact ordering (tantan 73.54 > ULTRA 59.61 ≈ BWTandem 58.66) should
-be read with that selection effect, and tantan's smaller matched set, in
-mind. Copy error is measurable only for BWTandem (34.15% median relative
-error against the rescaled annotation copy count).
+assignment. A split-band verification run (`*_annot_r50_bands.json`, job
+6146343, metric-identical to the deposited arm) found **zero truth
+annotations with primitive period above 500 bp** — the long band is really
+101–500 bp and is labelled so. **TRF leads it at 62.40%** with BWTandem
+second at 46.39%, entirely within TRF's 500 bp cap and at TRF's measured
+cost (33.7 h; its 2,000 bp attempt did not finish in 6.6 days); the
+>500 bp regime is not adjudicable against this catalog — the repository's
+evidence above 500 bp is the satellite experiments. ULTRA (8.36%) and
+tantan (1.67%) emit no call above period 100, so the calls matching those
+truths are their shorter-period calls. Each tool's matched-pair statistics
+are computed over its *own* matched set, which differ in size and
+composition (e.g. the 21–100 bp band is 11.4% of ULTRA's matched pairs but
+6.8% of tantan's); the period-exact ordering (tantan 73.54 > ULTRA 59.61 ≈
+BWTandem 58.66) should be read with that selection effect, and tantan's
+smaller matched set, in mind. Copy error is measurable only for BWTandem
+(34.15% median relative error against the rescaled annotation copy count).

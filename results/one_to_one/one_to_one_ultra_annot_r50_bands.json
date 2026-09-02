@@ -1,0 +1,54 @@
+{
+ "truth_records": 1784804,
+ "pred_records": 3216710,
+ "pred_records_loaded": 3347216,
+ "dropped_off_truth_chroms": 130506,
+ "pred_col5": "period",
+ "pred_motif_is_sequence": false,
+ "matched": 1122910,
+ "sensitivity_1to1_maxcard": 62.915031566491336,
+ "precision_1to1_maxcard": 34.908648899030375,
+ "min_overlap": 0.5,
+ "strata_spec": "1-6,7-20,21-100,101-500,501-2000",
+ "strata": {
+  "1-6": {
+   "truth": 1048225,
+   "matched": 605567,
+   "sensitivity_pct": 57.77
+  },
+  "101-500": {
+   "truth": 45161,
+   "matched": 3777,
+   "sensitivity_pct": 8.36
+  },
+  "21-100": {
+   "truth": 157835,
+   "matched": 127693,
+   "sensitivity_pct": 80.9
+  },
+  "7-20": {
+   "truth": 533583,
+   "matched": 385873,
+   "sensitivity_pct": 72.32
+  }
+ },
+ "boundary": {
+  "start_offset_median": 1.0,
+  "start_offset_p90": 13.0,
+  "end_offset_median": 1.0,
+  "end_offset_p90": 14.0,
+  "exact_start_pct": 46.27,
+  "exact_end_pct": 6.25
+ },
+ "period": {
+  "scored_pairs": 1122910,
+  "exact_pct": 59.61,
+  "integer_multiple_pct": 18.38,
+  "within_20pct_pct": 4.62,
+  "outside_pct": 17.38
+ },
+ "copies": {
+  "scored_pairs": 0,
+  "rel_error_median_pct": null
+ }
+}

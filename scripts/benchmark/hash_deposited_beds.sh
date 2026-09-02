@@ -38,7 +38,7 @@ done
 { find results -type f ! -name manifest.sha256 ! -name external_evidence.sha256 \
       ! -path '*__pycache__*' ! -name '*.pyc'
   printf '%s\n' "${EVIDENCE_SCRIPTS[@]}"
-} | sort | while read -r f; do
+} | LC_ALL=C sort | while read -r f; do
     sha256sum "$f" >> "$OUT"
 done
 
@@ -51,7 +51,7 @@ while IFS= read -r f; do
         echo "WARN: external evidence path unreachable, not hashed: $f" >&2
         missing=$((missing + 1))
     fi
-done < <(awk -F'\t' 'NR>1 && $3 ~ /^\// {print $3}' results/manifest.tsv | sort -u)
+done < <(awk -F'\t' 'NR>1 && $3 ~ /^\// {print $3}' results/manifest.tsv | LC_ALL=C sort -u)
 
 sha256sum -c "$OUT" --quiet
 echo "$(wc -l < "$OUT") in-repo hashes -> $OUT (verified)"

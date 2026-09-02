@@ -56,8 +56,12 @@ records — motif sequence, period, copy count, purity — across 1 bp–2 kb**;
 longdust yields intervals without repeat units (their words), AniAnn's
 yields boundaries/periodicity/class without per-copy structure (output
 spec), and the measured no-competitor band narrows from ">500 bp" to
-**500–2,000 bp** (above 2 kb is AniAnn's/longdust territory and we have
-no accuracy evidence there). The near-flat range cost stays as a
+**500–2,000 bp** — and a same-day follow-up (job 6146343) found the adotto
+catalog holds **zero truth annotations above primitive period 500 bp**, so
+that band is not adjudicable against adotto at all; the >500 bp evidence
+base is the satellite experiments (Col-CEN, maize, CHM13 HOR arrays), and
+above 2 kb is AniAnn's/longdust territory with no accuracy evidence of
+ours. The near-flat range cost stays as a
 supporting scalability point — the field review (Liu & Li 2026,
 *Brief. Bioinform.* 27(1):bbag031) names scalability, not long-period
 coverage, among open problems.

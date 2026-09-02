@@ -37,3 +37,24 @@ def test_manifest_hashes_verify():
             "deposited-evidence hashes stale — rerun "
             "scripts/benchmark/hash_deposited_beds.sh LAST and commit it. "
             f"mismatched: {bad[:5]} missing: {missing[:5]}")
+
+
+def test_manifest_paths_are_tracked_by_git():
+    """Every hashed path must be committed, not merely present in the working
+    tree. A `.gitignore` rule (`*.settings`, 2026-09-02) silently dropped an
+    evidence file from `git add`; the hash test above still passed locally
+    because the file existed on disk, and CI's `sha256sum -c` failed on the
+    fresh clone. Skipped outside a git checkout (release tarballs)."""
+    import subprocess
+    try:
+        out = subprocess.run(["git", "-C", REPO, "ls-files", "-z"],
+                             capture_output=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        pytest.skip("not a git checkout")
+    tracked = set(out.decode().split("\0"))
+    with open(MANIFEST) as fh:
+        hashed = [line.strip().partition("  ")[2] for line in fh if line.strip()]
+    untracked = [p for p in hashed if p not in tracked]
+    assert not untracked, (
+        "hashed evidence not tracked by git (ignored by .gitignore? use "
+        f"`git add -f`): {untracked[:5]}")

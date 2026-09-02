@@ -72,6 +72,10 @@ evidence repo cannot afford a single suppressed cell.
 
 - Venue analysis (running): format limits per venue, precedent papers,
   reviewer-pool risk.
-- ULTRA `-p 2000` (job 6145581): the last cell of the range-cost story.
+- ~~ULTRA `-p 2000` (job 6145581): the last cell of the range-cost story.~~
+  Resolved 2026-09-02: terminated incomplete after 1 d 22 h with ~4% of the
+  assembly processed (chr1 to 124.8 Mb); recorded as manifest row
+  `ULTRA-p2000-attempt`, Methods 2.2, Results 3.1 and
+  `results/range_cost_attempts/`.
 - Title decision (5 candidates pending) — should name the capability, not
   a superiority claim.

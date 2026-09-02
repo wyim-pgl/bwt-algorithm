@@ -129,6 +129,9 @@ rows = [
 write("fig2b_maize_scaling.csv", ["tool", "max_period_bp", "runtime_h"], rows)
 
 # ---- Fig 2C: human whole-genome cost (not range-matched) ------------------
+# No matched-ceiling competitor point exists: the TRF and ULTRA 2,000 bp
+# attempts (manifest range-cost rows TRF-p2000-attempt / ULTRA-p2000-attempt)
+# were terminated incomplete at 6.6 d and 1 d 22 h — footnote only, no row.
 # Table 1a / abstract: BWTandem 12.6 h x 2 thr = 25.3 core-h, 28.08 GB sacct;
 # ULTRA 29.8 h x 2 = 59.6 core-h, 1.68 GB; TRF 33.7 h x 1, 1.45 GB (GNU time).
 # 2026 additions (results/comparators2026/README.md, GNU time; chromosome-only

@@ -173,7 +173,7 @@ Col-CEN, maize Mo17; see the manuscript for every caveat):
 | Claim | Measurement |
 |---|---|
 | One wide-range pass | periods 1–2,000 bp in 12.6 h / 25.3 core-hours on GRCh38 (ULTRA: 29.8 h / 59.6 core-hours capped at 100 bp; not range-matched) |
-| Near-flat range cost | widening the reportable maximum 100→2,000 bp costs 1.30–1.41× in paired runs |
+| Near-flat range cost | widening the reportable maximum 100→2,000 bp costs 1.30–1.41× in paired runs; the competitors' caps could not be lifted to 2,000 bp on human (TRF and ULTRA attempts terminated incomplete at 6.6 d and 1 d 22 h) |
 | Shared-range accuracy | non-leading: ULTRA ranks first in region recall (81.62%); BWTandem 79.88% at the whole-genome configuration, 81.60% at a permissive setting with lower precision |
 | Long-period stratum | 3.43% of catalog regions above period 100 (ULTRA: none by construction) |
 | Plant satellites | Col-CEN CEN180 monomer recall 99.72% in 40 min; maize unfiltered coverage in the leading group |

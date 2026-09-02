@@ -78,7 +78,11 @@ overlap rule.*
   only — footnote it). Data
   `data/fig2c_human_cost.csv`. Label each point with its period cap
   (2,000 / 100 / 500 bp). Footnote: runs are not range-matched and the
-  competitor FASTA scope was ~5% larger.
+  competitor FASTA scope was ~5% larger. Second footnote line: neither
+  competitor could be run at BWTandem's 2,000 bp ceiling — the TRF and ULTRA
+  2,000 bp attempts were terminated incomplete at 6.6 d and 1 d 22 h
+  (manifest rows `TRF-p2000-attempt`, `ULTRA-p2000-attempt`). Do not plot
+  them as points; the footnote is enough.
 - **Caption draft:** "(A) Paired BWTandem runs on GRCh38: raising the
   requested/reportable maximum period from 100 to 2,000 bp costs
   1.30–1.41× in wall clock across three replicate pairs. (B) Observed
@@ -87,7 +91,9 @@ overlap rule.*
   is implied. (C) Measured cost of the human whole-genome runs
   (core-hours; sacct peak memory for BWTandem, GNU-time for competitors),
   each point labelled with its period cap — the runs are not
-  range-matched. BWTandem's 28.08 GB peak is the cost of the design."
+  range-matched, and matched-ceiling competitor runs do not exist: the TRF
+  and ULTRA attempts at 2,000 bp were terminated incomplete after 6.6 days
+  and 1 d 22 h. BWTandem's 28.08 GB peak is the cost of the design."
 
 ## Figure 3 — Sensitivity levers and the audit of unsupported unique calls
 **Title:** *Recall-favouring settings buy recall with precision, and the

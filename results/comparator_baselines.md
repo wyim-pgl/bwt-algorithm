@@ -16,7 +16,7 @@ Sources: `results/manifest.tsv` (rows named), `manuscript.md` §2.2/§4.
 | Tool | Period range | Provenance | Note |
 |---|---|---|---|
 | TRF | max 500 (no min-period parameter) | published | 2,000 bp rerun infeasible: cancelled at 6.6 d incomplete |
-| ULTRA | 1–100 (default) | published | default `-p 100`; 20x below BWTandem's max |
+| ULTRA | 1–100 (default) | published | default `-p 100`; 20x below BWTandem's max; 2,000 bp rerun infeasible: cancelled at 1 d 22 h with ~4% of the assembly done (manifest `ULTRA-p2000-attempt`) |
 | tantan | window 100 (default `-w`) | published | structurally zero in the 101–2,000 bp stratum |
 | tantan | 1–2,000 (re-run) | job 6085144 | range-corrected arm; prefer for Table 1c |
 | mreps | unbounded | published | |

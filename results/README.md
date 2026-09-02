@@ -9,7 +9,9 @@ data and its renderer are retained under `superseded` names for audit only.
 regenerated whole-genome runs. `one_to_one/` holds the strict one-to-one,
 boundary-aware scoring results (Supplementary Table S4; see its README for
 the metric definitions). `ground_truth/` holds the curated coordinate sets
-every accuracy figure is scored against.
+every accuracy figure is scored against. `range_cost_attempts/` holds the
+evidence for the two competitor runs attempted at BWTandem's 2,000 bp ceiling
+on human (TRF, ULTRA), neither of which completed.
 
 ## ground_truth/
 
@@ -108,7 +110,7 @@ the full evidence table.
 |---|---|
 | `1a`, `1b`, `1c`, `1d`, `1e` | human GRCh38 against adotto v1.2.1 |
 | `sweep` | the single-parameter catch-all identity sweep, full range |
-| `range-cost` | the 4-thread 1–2,000 bp arm; paired with row `1b` BWTandem for the range-cost claim. Cost-only, not scored |
+| `range-cost` | the 4-thread 1–2,000 bp arm; paired with row `1b` BWTandem for the range-cost claim. Cost-only, not scored. Also the two competitor matched-ceiling attempts (`TRF-p2000-attempt`, `ULTRA-p2000-attempt`), both terminated incomplete; see `range_cost_attempts/` |
 | `2` | Arabidopsis Col-CEN v1.2 |
 | `ablation` | Col-CEN satellite gap-fill ablation, three arms from one job |
 | `3A`, `3B`, `3C`, `3B-b/3C-b` | Zea mays Mo17 |

@@ -7,6 +7,11 @@
 > 정정 전 원문을 그대로 담고 있다. 어느 쪽이든 그 도판은 여전히 금지다
 > (체리피킹이라는 본질은 불변이고, longdust 0검출로 오히려 다른 방식으로도
 > 틀린 도판이 된다).
+>
+> **2026-09-02 부록 2**: ULTRA `-p 2000` human 시도(job 6145581)가 1일 22시간에
+> chr1 124.8 Mb(어셈블리의 ~4%)까지만 처리하고 중단됨 — TRF 6.6일 선례와 같은
+> 결말. Fig 2C에는 점을 추가하지 않고 각주 한 줄만(`HANDOFF_FILIP.md` 2C 반영).
+> manifest `ULTRA-p2000-attempt`, 증거 `results/range_cost_attempts/ultra_p2000/`.
 
 ## 1. Original Paper 트랙 우선순위 도판 목록
 

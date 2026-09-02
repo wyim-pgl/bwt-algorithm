@@ -41,6 +41,14 @@ array period) as the period column and no motif. Scoring job **6146742** (repo `
 (`scripts/scoring/score_2026_tools.py`), so the new rows come from exactly
 the code that produced the published rows.
 
+The deposited `score_2026_human.txt` is the log of the clean re-run, job
+**6147179** (repo `89ada02`, 0 dirty, 2026-09-02): every cell is identical to
+job 6146742's, whose own log ended in a `KeyError` in the frozen scorer's
+corroborator section — a block after the ones used here, reached because the
+wrapper had not passed `--adj ''`. The re-run also removed the
+`scripts/scoring/work/` scratch that the crashed run had left behind (and that
+`2b2beea` had committed by mistake).
+
 ## Headline results (full outputs in the three .txt files here)
 
 - **Human (adotto, full range, one-base rule)**: longdust 41.16% region

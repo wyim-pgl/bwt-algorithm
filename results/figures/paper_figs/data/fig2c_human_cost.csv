@@ -2,3 +2,5 @@ tool,max_period_bp,wall_h,core_hours,memory_gb
 BWTandem,2000,12.6,25.3,28.08
 ULTRA,100,29.8,59.6,1.68
 TRF,500,33.7,33.7,1.45
+longdust,LC intervals,0.47,0.47,0.47
+AniAnn's,window >=1000,2.32,4.64,0.53

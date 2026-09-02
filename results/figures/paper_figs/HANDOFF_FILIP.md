@@ -36,9 +36,14 @@ overlap rule.*
   adotto. Data `data/fig1ab_pr_points.csv` (`region_recall`,
   `region_precision`). Connect BWTandem P→B→F→H with a line
   (`figstyle.BWT_POINT_ORDER`), competitors as labelled points. Axes 0–100,
-  do not zoom.
+  do not zoom. Rows with `series=competitor2026` are the 2026 additions
+  (longdust ×2 arms, AniAnn's) — plot as points with the new
+  `figstyle.TOOL_COLORS` entries; AniAnn's sits at 0.10% recall on the
+  axis — keep it and footnote its ≥1 kb window (do not drop the point).
 - **1B** Same, base-pair metrics (`bp_recall`, `bp_precision`).
-- **1C** Matched-range region recall vs overlap rule. Data
+- **1C** Matched-range region recall vs overlap rule. (2026 tools are
+  absent here by design — the reciprocal analysis predates them and
+  longdust has no periods to restrict; say so in the caption.) Data
   `data/fig1c_overlap_rules.csv`; x categorical: one-base → reciprocal
   0.25 → reciprocal 0.50. Emphasise ULTRA/BWTandem/tantan; draw TRF/TRASH
   faded. Annotate that the BWTandem series is "regenerated full-range
@@ -67,7 +72,10 @@ overlap rule.*
   `data/fig2b_maize_scaling.csv`. Two connected series; annotate "observed
   scaling on maize runs, not a cross-tool mechanism comparison".
 - **2C** Two small horizontal dot plots: core-hours and peak memory (GB)
-  for the human runs, BWTandem/ULTRA/TRF only. Data
+  for the human runs — now five tools: BWTandem/ULTRA/TRF plus the 2026
+  rows (longdust "LC intervals", AniAnn's "window ≥1 kb" as their cap
+  labels; their FASTA was chromosome-only, comparable to the BWTandem row
+  only — footnote it). Data
   `data/fig2c_human_cost.csv`. Label each point with its period cap
   (2,000 / 100 / 500 bp). Footnote: runs are not range-matched and the
   competitor FASTA scope was ~5% larger.
@@ -106,15 +114,22 @@ assignment under banding.*
 3 panels.
 
 - **4A** Col-CEN: centromere coverage and CEN180 monomer recall as two
-  aligned dot plots. Data `data/fig4a_colcen.csv`.
+  aligned dot plots. Data `data/fig4a_colcen.csv`. The `mode` column now
+  includes "array-level (2026)" (AniAnn's — the coverage leader, 86.97%)
+  and "interval-only (2026)" (longdust) — use distinct markers per mode.
 - **4B** Maize unfiltered coverage per family (knob180, TR-1, CentC),
-  grouped dot plot. Data `data/fig4b_maize_coverage.csv`.
+  grouped dot plot. Data `data/fig4b_maize_coverage.csv`. Now six tools:
+  AniAnn's leads all three families; longdust is 0.00 in all three (its LC
+  model does not consider these satellites low-complexity) — plot the
+  zeros, do not omit them.
 - **4C** Coverage change when the period band is applied, slope plot
   unfiltered→banded per family and tool. Data
   `data/fig4c_band_filter_delta.csv` (deltas in pp; before-values are 4B).
-  Use the file's values, not manuscript roundings, throughout.
+  Use the file's values, not manuscript roundings, throughout. The 2026
+  tools have no banded arm (longdust: no periods; AniAnn's: array-level
+  periodicity) and are absent from this panel — caption it.
 - **Caption draft:** "(A) Arabidopsis Col-CEN centromere coverage and
-  CEN180 monomer recall. (B) Unfiltered coverage of the curated maize
+  CEN180 monomer recall, including the 2026 additions (Section 2.2.4). (B) Unfiltered coverage of the curated maize
   satellite arrays. (C) Coverage lost when a period band is imposed:
   BWTandem loses 15.6–33.0 pp where competitors lose ≤2.8 pp, because its
   satellite period assignments are less stable — the trade-off named in

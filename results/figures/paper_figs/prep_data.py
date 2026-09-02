@@ -75,6 +75,25 @@ def baseline(path):
     return out
 
 
+# ---- Fig 1A/1B: PR points = figure_curve_data.csv + the 2026 additions ----
+# 2026 rows are parsed from the deposited frozen-scorer output, never typed.
+C2026 = os.path.join(REPO, "results", "comparators2026")
+h26 = baseline(os.path.join(C2026, "score_2026_human.txt"))
+rows = []
+with open(os.path.join(REPO, "results", "figures", "figure_curve_data.csv")) as fh:
+    for r in csv.DictReader(fh):
+        rows.append([r["series"], r["label"], r["region_recall"],
+                     r["region_precision"], r["bp_recall"], r["bp_precision"]])
+for name, label in (("longdust", "longdust"),
+                    ("longdust-k8w20000", "longdust -k8w20000"),
+                    ("AniAnns", "AniAnn's")):
+    v = h26[name]
+    rows.append(["competitor2026", label, v["regRecall"], v["regPrec"],
+                 v["bpRecall"], v["bpPrec"]])
+write("fig1ab_pr_points.csv",
+      ["series", "label", "region_recall", "region_precision",
+       "bp_recall", "bp_precision"], rows)
+
 # ---- Fig 1C: matched-range region recall under three overlap rules --------
 # NOTE (FIGURE_PLAN.md): the BWTandem series here is the regenerated
 # full-range output post-hoc filtered to <=100 bp, NOT the native H run.
@@ -112,10 +131,15 @@ write("fig2b_maize_scaling.csv", ["tool", "max_period_bp", "runtime_h"], rows)
 # ---- Fig 2C: human whole-genome cost (not range-matched) ------------------
 # Table 1a / abstract: BWTandem 12.6 h x 2 thr = 25.3 core-h, 28.08 GB sacct;
 # ULTRA 29.8 h x 2 = 59.6 core-h, 1.68 GB; TRF 33.7 h x 1, 1.45 GB (GNU time).
+# 2026 additions (results/comparators2026/README.md, GNU time; chromosome-only
+# FASTA, so comparable to the BWTandem row only): longdust reports no periods
+# ("LC intervals"), AniAnn's window is >=1,000 bp.
 rows = [
     ["BWTandem", 2000, 12.6, 25.3, 28.08],
     ["ULTRA", 100, 29.8, 59.6, 1.68],
     ["TRF", 500, 33.7, 33.7, 1.45],
+    ["longdust", "LC intervals", 0.47, 0.47, 0.47],
+    ["AniAnn's", "window >=1000", 2.32, 4.64, 0.53],
 ]
 write("fig2c_human_cost.csv",
       ["tool", "max_period_bp", "wall_h", "core_hours", "memory_gb"], rows)
@@ -144,7 +168,9 @@ rows = [
     ["ULTRA", 84.44, 99.80, "de novo"],
     ["TRF", 84.39, 97.55, "de novo"],
     ["tantan", 81.50, 99.24, "de novo"],
-]
+    ["AniAnn's", 86.97, 99.24, "array-level (2026)"],
+    ["longdust", 84.76, 99.86, "interval-only (2026)"],
+]  # 2026 rows: results/comparators2026/score_2026_colcen.txt
 write("fig4a_colcen.csv",
       ["tool", "cen_coverage_pct", "cen180_monomer_recall_pct", "mode"], rows)
 
@@ -156,7 +182,9 @@ fallback_cov = [
     ["ULTRA", "knob180", 78.71], ["ULTRA", "TR-1", 36.36], ["ULTRA", "CentC", 57.73],
     ["TRF", "knob180", 80.01], ["TRF", "TR-1", 45.77], ["TRF", "CentC", 58.50],
     ["tantan", "knob180", 71.92], ["tantan", "TR-1", 22.74], ["tantan", "CentC", 56.51],
-]
+    ["AniAnn's", "knob180", 87.61], ["AniAnn's", "TR-1", 67.98], ["AniAnn's", "CentC", 81.42],
+    ["longdust", "knob180", 0.00], ["longdust", "TR-1", 0.00], ["longdust", "CentC", 0.00],
+]  # 2026 rows: results/comparators2026/score_2026_maize.txt (gap-0 postmerge)
 write("fig4b_maize_coverage.csv", ["tool", "family", "coverage_pct"], fallback_cov)
 fallback_delta = [
     ["BWTandem", "knob180", -15.59], ["BWTandem", "TR-1", -33.01], ["BWTandem", "CentC", -17.84],

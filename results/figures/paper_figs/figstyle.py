@@ -15,6 +15,8 @@ TOOL_COLORS = {
     "tantan": "#2f855a",
     "TRF": "#6b46c1",
     "TRASH": "#718096",
+    "longdust": "#b7791f",
+    "AniAnn's": "#d53f8c",
 }
 BWT_POINT_ORDER = ["P", "B", "F", "H"]
 

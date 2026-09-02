@@ -1,0 +1,12 @@
+GT: 5 centromeres, 66,683 CEN180 monomers
+
+tool                           regions    cov%  n150-200  bpPrec% | recall(pub)  rec150-200  rec150-400   published (cov/count/bpPrec/recall)
+BWTandem                       160,740  84.59%     1,380   57.17% |      99.73%      91.92%      95.21%   84.59 / 1380 / 57.17 / 99.73
+TRF                             27,538  84.39%       191   82.79% |      97.55%      97.55%      97.55%   84.39 /  191 / 82.79 / 97.55
+tantan                         138,691   1.04%         0    0.23% |       0.35%       0.00%       0.00%    1.04 /    0 /  0.23 /  0.35
+mreps (published, maxp 6)      341,554   1.58%         0    0.56% |       5.76%       0.00%       0.00%    1.58 /    0 /  0.56 /  5.76
+mreps (RE-RUN 150-400)       (missing)
+ULTRA (published, -p 100)    (missing)
+longdust                        46,975  84.76%         0   81.79% |      99.86%       0.00%       0.00%     -- ablation --
+longdust-k8w20000               30,602  85.02%         0   81.31% |      99.85%       0.00%       0.00%     -- ablation --
+AniAnns                             60  86.97%        19   83.41% |      99.24%      99.15%      99.15%     -- ablation --

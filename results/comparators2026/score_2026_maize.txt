@@ -1,0 +1,72 @@
+
+====================================================================================================
+knob180  --  25 arrays, 29,655,996 bp
+====================================================================================================
+
+ [why the built-in merge does not fire]
+  longdust         no calls inside any knob180 array
+  longdust-k8w20000 no calls inside any knob180 array
+  AniAnns                123 calls in 22 arrays  distinct periods     7  distinct motif lengths     1  adjacent pairs the built-in merge would join 100.00%
+
+ [stated post-merge, coordinates only]
+  tool                 gap     det  calls/array   frag     cov%        offset
+  longdust               0   0/25           0.0   0.00    0.00%             0
+  longdust             100   0/25           0.0   0.00    0.00%             0
+  longdust           1,000   0/25           0.0   0.00    0.00%             0
+  longdust          10,000   0/25           0.0   0.00    0.00%             0
+  longdust-k8w20000       0   0/25           0.0   0.00    0.00%             0
+  longdust-k8w20000     100   0/25           0.0   0.00    0.00%             0
+  longdust-k8w20000   1,000   0/25           0.0   0.00    0.00%             0
+  longdust-k8w20000  10,000   0/25           0.0   0.00    0.00%             0
+  AniAnns                0  22/25           5.5   0.18   87.61%        22,581
+  AniAnns              100  22/25           5.2   0.19   87.61%        22,581
+  AniAnns            1,000  22/25           5.1   0.19   87.61%        30,005
+  AniAnns           10,000  22/25           4.5   0.22   87.95%        31,149
+
+====================================================================================================
+TR-1  --  17 arrays, 5,899,812 bp
+====================================================================================================
+
+ [why the built-in merge does not fire]
+  longdust         no calls inside any TR-1 array
+  longdust-k8w20000 no calls inside any TR-1 array
+  AniAnns                 65 calls in 14 arrays  distinct periods     7  distinct motif lengths     1  adjacent pairs the built-in merge would join 100.00%
+
+ [stated post-merge, coordinates only]
+  tool                 gap     det  calls/array   frag     cov%        offset
+  longdust               0   0/17           0.0   0.00    0.00%             0
+  longdust             100   0/17           0.0   0.00    0.00%             0
+  longdust           1,000   0/17           0.0   0.00    0.00%             0
+  longdust          10,000   0/17           0.0   0.00    0.00%             0
+  longdust-k8w20000       0   0/17           0.0   0.00    0.00%             0
+  longdust-k8w20000     100   0/17           0.0   0.00    0.00%             0
+  longdust-k8w20000   1,000   0/17           0.0   0.00    0.00%             0
+  longdust-k8w20000  10,000   0/17           0.0   0.00    0.00%             0
+  AniAnns                0  14/17           4.6   0.22   67.98%        83,740
+  AniAnns              100  14/17           4.6   0.22   67.98%        83,740
+  AniAnns            1,000  14/17           4.6   0.22   67.98%        89,692
+  AniAnns           10,000  14/17           4.2   0.24   68.81%       119,490
+
+====================================================================================================
+CentC  --  17 arrays, 12,562,249 bp
+====================================================================================================
+
+ [why the built-in merge does not fire]
+  longdust         no calls inside any CentC array
+  longdust-k8w20000 no calls inside any CentC array
+  AniAnns                 82 calls in 17 arrays  distinct periods     5  distinct motif lengths     1  adjacent pairs the built-in merge would join 100.00%
+
+ [stated post-merge, coordinates only]
+  tool                 gap     det  calls/array   frag     cov%        offset
+  longdust               0   0/17           0.0   0.00    0.00%             0
+  longdust             100   0/17           0.0   0.00    0.00%             0
+  longdust           1,000   0/17           0.0   0.00    0.00%             0
+  longdust          10,000   0/17           0.0   0.00    0.00%             0
+  longdust-k8w20000       0   0/17           0.0   0.00    0.00%             0
+  longdust-k8w20000     100   0/17           0.0   0.00    0.00%             0
+  longdust-k8w20000   1,000   0/17           0.0   0.00    0.00%             0
+  longdust-k8w20000  10,000   0/17           0.0   0.00    0.00%             0
+  AniAnns                0  17/17           4.7   0.21   81.42%        14,917
+  AniAnns              100  17/17           4.6   0.22   81.42%        14,917
+  AniAnns            1,000  17/17           4.6   0.22   81.42%        14,917
+  AniAnns           10,000  17/17           3.9   0.26   82.23%        14,917

@@ -8,7 +8,7 @@ integer period, falling back to len(column 4).
   repeat units — the converted BED stays 3-column ON PURPOSE so every
   period-conditional metric is structurally empty for it rather than faked.
 - **AniAnn's** writes one 9-column BED per sequence (header line, score
-  column = array periodicity/monomer length). Converted:
+  column = inferred monomer length, i.e. the array period). Converted:
   `chrom  start  end  .  <period>  AniAnns` — coordinates and period carry
   over; there is no motif sequence to carry (per-copy structure is not part
   of its output).

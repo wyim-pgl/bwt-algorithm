@@ -55,7 +55,10 @@ def main():
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         mod.GT, mod.SOURCES, mod.EXTRA = gt, tools, []
-        sys.argv = [sys.argv[0]]
+        # sources-only runs cannot compute the catalog-or-cross-tool
+        # corroboration (it needs the ULTRA/tantan baselines in SOURCES);
+        # skip that section instead of crashing after the blocks we use
+        sys.argv = [sys.argv[0], "--adj", ""]
         mod.main()
     else:
         gt_root = os.environ.get(

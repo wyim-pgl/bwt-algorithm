@@ -33,8 +33,8 @@ jobs 6146420/6146421) — symlink the FASTA beside a pre-built index.
 period-column contract — longdust's converted BED is deliberately 3-column
 (its paper: "longdust is unable to report the repeat units in case of
 tandem repeats"), so every period-conditional metric is structurally empty
-rather than fabricated; AniAnn's carries its array-level periodicity as
-the period column and no motif. Scoring job **6146742** (repo `7b2113d`,
+rather than fabricated; AniAnn's carries its inferred monomer length (the
+array period) as the period column and no motif. Scoring job **6146742** (repo `7b2113d`,
 0 dirty; converted-BED hashes in the job log) loaded the FROZEN scorers
 (`score_table1.py`, `score_colcen.py` via its LABEL:PATH interface,
 `score_maize_postmerge.py`) and overrode only their source lists

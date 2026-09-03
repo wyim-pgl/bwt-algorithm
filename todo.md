@@ -108,6 +108,10 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [x] **C-6. 투고처 — Bioinformatics Application Note** ✅ (2026-09-03, 저자 결정)
 - [x] **C-7. 제목 — 현행 유지** ✅ (2026-09-03) `BWTandem: FM-index seeding for wide-period-range tandem repeat detection in assembled genomes` — 저자가 지정한 문구가 원고 현행과 동일. **#27(FM-index 인과 프레이밍 지적)은 저자 유지 결정으로 종결**
 - [ ] **C-8. Abstract 재구성 — 전체 이슈 정리 후로 연기** (저자 결정 2026-09-03)
+---
+
+## D. 재실행·재측정이 필요한 것
+
 - [ ] **§6.20** `sacct -j ... --format=JobID,Elapsed,MaxRSS,State -P` 원문을 체크섬과 함께 예치.
       불가하면 예치된 `wait4` 값(17.37 / 19.97 / 1.31 GiB)을 그 이름으로 쓰도록 원고 수정
 - [ ] **§6.27** Col-CEN 밴드 recall 을 재생성 BED 로 재채점 — 원고의 91.31/94.68 은 예치 출처가 없다
@@ -129,21 +133,26 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 
 - [ ] **#14** [HIGH] license, citation, package metadata, release versioning, CI
 - [ ] **#26** [MEDIUM] 2026-tool 벤치마크를 남은 서술에 반영
-- [ ] **#27** [HIGH] 제목·Abstract 의 FM-index 인과 프레이밍 → C-7
+- [x] **#27** 제목의 FM-index 인과 프레이밍 — **저자 유지 결정으로 종결** ✅ (2026-09-03, C-7)
 - [ ] **#28** [HIGH] Abstract: caveat 이 우리 수치에만 붙고 경쟁 도구엔 안 붙음 → C-8
 - [ ] **#29** [MEDIUM] range-cost "sublinearity" 주장 → C-1 과 연동
 - [ ] **#30** [HIGH] 경쟁 도구 GNU-time 로그 예치 → D
 - [ ] **#31** [HIGH] deposit-hash 워크플로 (재해시 순서) → A-2 에서 실증됨
 - [ ] **#32** [MEDIUM] 증거 트리의 동등성 주장에 검사 첨부
-- [~] **#33** [MEDIUM] 2차 의견 리뷰 — Kimi 완료, Codex 라운드 1 완료, R2·R3 진행 중
+- [~] **#33** 2차 의견 리뷰 — Kimi 3라운드·Codex 4라운드 **전부 완료**. 남은 것은 미검증분 처리(B절)
 
 ---
 
 ## F. 기타
 
-- [ ] `quarantine.md` §6.7–6.21, §3.8–3.9 추가분 커밋 (현재 워킹트리에만 있음)
-- [ ] origin 푸시 (로컬이 1 커밋 앞섬)
-- [ ] 위키의 "미커밋" ⚠️ 정리(`0357cbd` 로 해소) **및 `ruleout.md` → `quarantine.md` 개명 반영**
+> ⚠️ **SLURM 제출 함정 (2026-09-03)**: 이 환경은 `SBATCH_PARTITION`·`SBATCH_ACCOUNT`·**`SBATCH_TIMELIMIT`**
+> 를 export 해 두고 있어 `--time` 이 무시된다(24h 요청이 13-23:00:00 이 됐다). `resume` 의 회피법
+> `SBATCH_X= sbatch` 는 `SBATCH_TIMELIMIT` 에서는 *빈 시간 스펙* 오류를 낸다. **`env -u` 로 지울 것**:
+> `env -u SBATCH_PARTITION -u SBATCH_ACCOUNT -u SBATCH_TIMELIMIT sbatch --partition=cpu-s2-core-0 --account=cpu-s2-pgl-0 ...`
+> s1 은 자기 6일짜리 annotation 잡으로 늘 막혀 있다 — 이걸로 시작 예정이 9/5 에서 즉시로 바뀌었다.
+
+- [ ] **origin 푸시** — 로컬이 17 커밋 앞섬
+- [x] 위키의 "미커밋" ⚠️ 정리 + 개명 반영 ✅ (2026-09-03, wiki `50e863d`)
 - [!] **flaky `TestAdjacentGroundTruth::test_sensitivity`** ⛔ 클러스터 ASLR 이 꺼져 있어
       실패 레이아웃에 도달 불가. 관리자에게 노드 1대 ASLR 재활성화 요청 필요 (`quarantine.md` §9.1)
 - [ ] Filip 그림 6개 — 우리 손 밖. 브리프 `results/figures/paper_figs/HANDOFF_FILIP.md`

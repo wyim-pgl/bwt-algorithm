@@ -21,11 +21,27 @@ they are not like-for-like speed ratios.
 - `run_ultra_human_p2000.sbatch`: the submitted script. It matches the published
   human ULTRA invocation (`ultra -t 2 -o OUT.tsv FASTA`, ULTRA 1.2.1, the same
   GCA_000001405.15 FASTA) except for `-p 2000`. **One difference beyond the
-  period:** this run used a local installation of the binary
-  (`~/micromamba/bin/ultra`, recorded with its mtime in the log header), whereas
-  the published competitor runs were executed inside a Singularity sandbox
-  (manuscript Section 2.2). The two are version- and input-matched, not
-  environment-matched.
+  period, verified rather than assumed:** this run used a local installation of
+  the binary, whereas the published run ran inside the Singularity sandbox. The
+  two are version- and input-matched, not environment-matched.
+
+  The published run's GNU-time log survives at
+  `/data/gpfs/assoc/pgl/filip/bwtandem_results/benchmarking_results/ultra/logs/GCA_000001405.15_GRCh38_genomic_run.log`
+  and records `singularity exec ./bwtbench.sif ultra -t 2 -o …
+  GCA_000001405.15_GRCh38_genomic.fna` with an elapsed time of **29:46:49**,
+  which is the 29.8 h the manuscript quotes. (A second human ULTRA log, for the
+  RefSeq-flavoured `GCF_000001405.26`, records 27:24:19; the manifest and the
+  tables use the GCA run.) `bwtbench.sif` is a writable sandbox **directory**,
+  not an image file, so its binary can be compared directly:
+
+  | | path | size | SHA-256 of first MB |
+  |---|---|--:|---|
+  | published | `…/filip/bwt/bwtbench.sif/opt/ULTRA/ultra` | 638,912 | `f11b614f2858f9f0…` |
+  | this attempt | `~/micromamba/bin/ultra` | 573,672 | `a475843c1879aeb5…` |
+
+  Different files, both self-reporting version 1.2.1. An earlier draft of this
+  README and of Methods 2.2 called them "the same binary"; that was wrong and was
+  corrected in `24cd12a`, and the table above is the evidence.
 - `ultra_h_p2000_6145581.log`: provenance header plus an hourly
   `PROGRESS ... out_bytes=` marker (output-file size; ULTRA writes through a
   4 KB stdio buffer, so the size is a coarse progress proxy). Growth was steady

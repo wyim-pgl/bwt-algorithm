@@ -1,0 +1,90 @@
+{
+  "best_tag": "p1_t2mm30",
+  "pool_rec": 65.44,
+  "pool_prec": 60.48,
+  "proxy_prec_offset": 1.33,
+  "proxy_floor": 58.99,
+  "full_validated": {
+    "recall": 57.62,
+    "precision": 61.04
+  },
+  "best_source": "TIER1_COPYADD=2;TIER1_COPYBASE=6;TIER1_EXT_COPIES=2;TIER1_FMSCAN=1;TIER1_MIN_ARRAY_LEN=20;TIER1_MIN_COPIES=2;TIER1_MIN_SCORE=20;TIER1_SHORT_MIN_ARRAY_LEN=18;TIER1_SHORT_MIN_SCORE=18;TIER1_SHORT_PERIOD_MAX=4;TIER2_MISMATCH=0.30;TIER2_SHORT_REQ_COPIES=2;",
+  "seeder_finding": "TIER2_APPROX_SEED recovers p10-20 arrays but region recall flat (already-touched regions) and bp precision 31->13.5% (low-complexity over-call) -> NOT used for adotto; opt-in/default-off retained for satellite use",
+  "FINAL": true,
+  "final_op_point": "cAB",
+  "final_env": "comboChi base + TIER2_MISMATCH=0.30 + TIER1_FMSCAN_MIN_DENSITY=0.45 + TIER1_FMSCAN_MIN_LLR=6.0",
+  "genome_validated": {
+    "v2_comboChi": {
+      "regions": 2237246,
+      "region_recall": 57.62,
+      "region_prec": 61.04,
+      "bp_recall": 35.11,
+      "bp_prec": 45.48
+    },
+    "mm30": {
+      "regions": 2170211,
+      "region_recall": 57.26,
+      "region_prec": 61.5,
+      "bp_recall": 38.92,
+      "bp_prec": 42.72
+    },
+    "cAB_FINAL": {
+      "regions": 2367682,
+      "region_recall": 59.04,
+      "region_prec": 58.98,
+      "bp_recall": 39.42,
+      "bp_prec": 42.31
+    }
+  },
+  "result": "region recall 57.62 -> 59.04 (+1.42pp), bp recall 35.11 -> 39.42 (+4.31pp), precision 58.98 holds the 57.66 floor; 82% unreachable at >=57.66% precision",
+  "NEW_TARGET": "recall->82% at precision>=~53% genome (ULTRA-level); proxy precision floor ~54.3%",
+  "phase3_proxy_floor": 54.3,
+  "phase3_gate_best": {
+    "tag": "a_spm9f17",
+    "pool_rec": 69.93,
+    "pool_prec": 54.85,
+    "env": "cAB + TIER1_SHORT_PERIOD_MAX=9 + TIER1_SHORT_MIN_ARRAY_LEN/SCORE=17"
+  },
+  "phase3_note": "gate ceiling at proxy floor 54.3 = ~70% recall (a_spm9f17 69.93/54.85); f16/f15 reach 74-78% rec but prec 46-41% (genome <53%). Need catch-all for 82%.",
+  "phase3_catchall": "BREAKTHROUGH: catch-all -> proxy recall 76-86% (was 70% gate ceiling). c_catch78 76.45/53.76 (~floor), c_catch72 84.05/50.01, c_catch68 85.94/45.52. Tuning to max recall at proxy prec ~54.3.",
+  "phase3_best_at_floor": {
+    "tag": "c_catch78",
+    "pool_rec": 76.45,
+    "pool_prec": 53.76
+  },
+  "phase3_frontier_proxy": {
+    "target53": "c_id76p50 76.91/53.70 (id0.76,maxP50)",
+    "hi": "c_catch72 84.05/50.01 (id0.72)",
+    "max": "c_catch68 85.94/45.52 (id0.68)",
+    "floorheld": "c_id74l30 72.10/55.13"
+  },
+  "PHASE3_FINAL": true,
+  "genome_frontier_catchall": {
+    "catchT_id0.76_maxP50": {
+      "regions": 3450936,
+      "region_recall": 72.88,
+      "region_prec": 52.72,
+      "bp_recall": 42.36,
+      "bp_prec": 32.47
+    },
+    "catchH_id0.72": {
+      "regions": 4378067,
+      "region_recall": 82.35,
+      "region_prec": 47.99,
+      "bp_recall": 44.76,
+      "bp_prec": 32.19
+    },
+    "catchM_id0.68": {
+      "regions": 5187230,
+      "region_recall": 84.42,
+      "region_prec": 42.61,
+      "bp_recall": 45.99,
+      "bp_prec": 31.18
+    }
+  },
+  "v2.2_op_points": {
+    "balanced (catchT, ~ULTRA precision)": "72.88% recall / 52.72% precision (+15.3pp recall over v2 at held ~53% precision)",
+    "max-recall (catchH, ~ULTRA recall)": "82.35% recall / 47.99% precision (beats ULTRA's 81.62% recall, 5.7pp below its precision)"
+  },
+  "result_phase3": "catch-all periodicity algorithm: recall 57.62 -> 72.88% @ 52.72% precision (ULTRA-precision point) OR 82.35% @ 47.99% (ULTRA-recall point, beats ULTRA recall). Frontier close to but slightly inside ULTRA's 81.62/53.65."
+}

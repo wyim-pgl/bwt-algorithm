@@ -9,6 +9,7 @@
  "sensitivity_1to1_maxcard": 29.06307919525057,
  "precision_1to1_maxcard": 53.874020213182504,
  "min_overlap": 0.5,
+ "strata_spec": "1-6,7-20,21-100,101-2000",
  "strata": {
   "1-6": {
    "truth": 1048225,
@@ -40,11 +41,11 @@
   "exact_end_pct": 2.12
  },
  "period": {
-  "scored_pairs": 0,
-  "exact_pct": 0.0,
-  "integer_multiple_pct": 0.0,
-  "within_20pct_pct": 0.0,
-  "outside_pct": 0.0
+  "scored_pairs": 518719,
+  "exact_pct": 63.53,
+  "integer_multiple_pct": 6.97,
+  "within_20pct_pct": 15.31,
+  "outside_pct": 14.19
  },
  "copies": {
   "scored_pairs": 0,

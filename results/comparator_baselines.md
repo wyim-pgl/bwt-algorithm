@@ -11,6 +11,30 @@ runtime.
 
 Sources: `results/manifest.tsv` (rows named), `manuscript.md` §2.2/§4.
 
+**Where the inherited competitor cost figures come from.** The earlier
+benchmarking round's GNU-time logs survive on the cluster, one per tool and
+assembly, under
+`/data/gpfs/assoc/pgl/filip/bwtandem_results/benchmarking_results/<tool>/logs/`.
+Each records the full `singularity exec ./bwtbench.sif …` command line, the
+elapsed wall clock and the maximum resident set size, so every competitor
+runtime and memory cell can be checked against a preserved file even though the
+SLURM accounting entries for those jobs are gone. Verified for human
+GCA_000001405.15 on 2026-09-02:
+
+| tool | elapsed | max RSS (kB) | as reported |
+|---|---|--:|---|
+| ULTRA | 29:46:49 | 1,758,540 | 29.8 h, 1.68 GB |
+| TRF | 33:43:46 | 1,518,668 | 33.7 h, 1.45 GB |
+| tantan | 51:46.94 | 281,316 | 0.9 h, 0.27 GB |
+| TRASH | 107:37:36 | 15,298,244 | 107.6 h, 14.59 GB |
+| mreps | 54:41.08 | 6,691,220 | not reported — the human run is the chr4-only defect |
+
+Every cost cell Table 1a prints for a competitor reproduces from these logs to the
+precision the table uses; none was found to disagree.
+
+A second log exists per tool for the RefSeq-flavoured `GCF_000001405.26`
+assembly; the manuscript tables use the GCA runs.
+
 ## Human GRCh38 (Tables 1a/1b/1c) — BWTandem searches 1–2,000 bp
 
 | Tool | Period range | Provenance | Note |

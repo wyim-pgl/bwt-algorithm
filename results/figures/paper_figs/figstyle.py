@@ -29,6 +29,8 @@ def setup():
         "axes.spines.top": False,
         "axes.spines.right": False,
         "pdf.fonttype": 42,  # editable text in Illustrator
+        "mathtext.fontset": "custom",
+        "mathtext.bf": "sans:bold",
     })
 
 

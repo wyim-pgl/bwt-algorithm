@@ -1,50 +1,59 @@
-# Paper figures workspace (seaborn)
+# Paper figures — delivered 2026-09-03
 
-Working directory for the manuscript's display items. **Implementing the
-plots is handed off — start from `HANDOFF_FILIP.md`** (English: per-figure
-titles, panel specs, data-file mapping, caption drafts, ground rules). The
-full adversarial design document behind it is `FIGURE_PLAN.md` (Korean,
-2026-08-31), including the list of figures that must NOT be made.
+All six figures are implemented and rendered. `rendered/` holds the PNG and PDF
+of each; the `plot_*.py` scripts that produced them are here, no longer stubs,
+and read their inputs from `data/*.csv`.
 
-## Layout
+| Figure | Renders | Status against the manuscript at `e232bcf` |
+|---|---|---|
+| Fig 1 accuracy trade-off | ✅ | current |
+| Fig 2 range cost | ✅ | **three defects, see below** |
+| Fig 3 sweep + audit | ✅ | current |
+| Fig 4 plant satellites | ✅ | current |
+| Fig S1 chromosome subset | ✅ | current |
+| Fig S2 post-merge | ✅ | current |
 
-- `prep_data.py` — regenerates every `data/*.csv` from the deposited evidence
-  (`results/regen/`, `results/manifest.tsv`, `results/audit11/`). The few
-  values that exist only as manuscript-table cells (maize competitor cost
-  points, Col-CEN Table 2) are hard-coded there with provenance comments.
-- `data/` — one CSV per panel input:
-  | file | feeds | source |
-  |---|---|---|
-  | fig1ab_pr_points.csv | Fig 1A/1B | results/figures/figure_curve_data.csv |
-  | fig1c_overlap_rules.csv | Fig 1C | recip_{none,0.25,0.50}.txt MATCHED RANGE |
-  | fig2a_paired_runs.csv | Fig 2A | manifest.tsv range-rep rows |
-  | fig2b_maize_scaling.csv | Fig 2B | manuscript Tables 3A/3B/3C cost cells |
-  | fig2c_human_cost.csv | Fig 2C | Table 1a cost cells |
-  | fig3a_idsweep.csv | Fig 3A | score_table1_idsweep.txt BASELINE |
-  | fig3b_audit.csv | Fig 3B | audit11/aggregate_reviewer2_20260831.txt |
-  | fig4a_colcen.csv | Fig 4A | manuscript Table 2 |
-  | fig4b_maize_coverage.csv | Fig 4B | table3bc_replacement.md |
-  | fig4c_band_filter_delta.csv | Fig 4C | table3bc_replacement.md |
-  | figS1_subset_sensitivity.csv | Fig S1 | heldout_*.txt MATCHED RANGE |
-  | figS2_postmerge.csv | Fig S2 | maize_extra_evidence.json coordinate_postmerge |
-- `figstyle.py` — shared seaborn theme; one stable colour per tool.
-- `plot_fig*.py` — one script per figure, implemented in the order
-  Fig 2 → 1 → 3 → 4 → S1 → S2 (App Note survivors first).
+## Fig 1 anticipated a decision we made the same day
 
-## Interpreter
+Panel C plots BWTandem's **post-hoc ≤100 bp** arm, labelled as such in the legend
+and stated in the caption, rather than the native `--max-period 100` rerun. That
+is the arm Table 1b now uses, for the reason recorded as `quarantine.md` §6.18:
+restricting BWTandem by re-running while restricting TRF by filtering is not a
+shared range. The figure and the table agree, and they were decided
+independently.
 
-seaborn 0.13 lives in:
+Panels A and B plot the P/B/F/H operating-point curve, which is Table 1d and
+stays native — so F reads 79.88% there and 78.87% in Table 1b. That is not a
+contradiction, but it is the kind of thing a referee asks about, and the caption
+should say which panel is which arm before submission.
 
-```
-/data/gpfs/assoc/pgl/bin/conda/conda_envs/bch709_vibe_coding/bin/python
-```
+## Fig 2 — do not ship as rendered
 
-## Non-negotiable honesty constraints (from FIGURE_PLAN.md)
+1. **Panel A is superseded data.** The 1.30 / 1.30 / 1.41 ratios come from
+   `data/fig2a_paired_runs.csv`, whose replicates all ran at commit `07ad6fa` —
+   the only commit where Tier 3's search window was fixed at 100 bp–100 kb
+   regardless of `--max-period` (`quarantine.md` §6.17). SLURM jobs
+   6147698/99/700 are re-measuring the same pairs at `0363d8b`, where the
+   ceiling bounds Tier 3 as well. **The panel, its title claim
+   ("20× costs 1.3–1.4×") and the CSV must be regenerated from those results.**
+   The x-axis phrase "requested/reportable maximum period" is the `07ad6fa`
+   framing and needs the same revision.
+2. **Axis label says "Peak memory (GB)".** Every memory figure in this paper is
+   a kibibyte count divided by 1024², relabelled GiB throughout the manuscript in
+   `63ccd07`. The axis and the `prep_data.py` comments still say GB.
+3. **Footnote says "Competitor FASTA scope ~5% larger".** Measured 2026-09-03:
+   3,209,286,105 bases against 3,088,269,832, i.e. **3.92%**, or 3.80% counting
+   unambiguous bases only.
 
-- Fig 1C's BWTandem series is the full-range output post-hoc filtered to
-  ≤100 bp, not the native H run — plot it as its own labelled series.
-- Fig 2 axis label is "requested/reportable maximum period", never
-  "searched range"; panels A/C are human, B is maize — no shared fit line.
-- Never truncate a recall axis to manufacture the 81.60-vs-81.62 "tie".
-- The audit panel shows raw stratified verdict counts; no population
-  extrapolation, no pie charts.
+## Fig 4 panel A omits three tools without saying so
+
+Table 2 has eleven rows; panel A plots six. TRASH, NCRF and mreps are absent and
+the caption does not say they were dropped or why. Today's Table 2 correction —
+the template row rebuilt as the true 397-region template-only union — therefore
+does not touch this figure, but the omission should be stated.
+
+## Regeneration
+
+`prep_data.py` builds `data/*.csv` from the deposited evidence; each `plot_*.py`
+reads one or more of those and writes to `rendered/`. Regenerate Fig 2 after the
+C-1 jobs land, then re-check the three items above.

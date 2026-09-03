@@ -132,8 +132,11 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [x] 위키의 "미커밋" ⚠️ 정리 + 개명 반영 ✅ (2026-09-03, wiki `50e863d`)
 - [!] **flaky `TestAdjacentGroundTruth::test_sensitivity`** ⛔ 클러스터 ASLR 이 꺼져 있어
       실패 레이아웃에 도달 불가. 관리자에게 노드 1대 ASLR 재활성화 요청 필요 (`quarantine.md` §9.1)
-- [ ] Filip 그림 6개 — **외부 의존, 제외 아님**. App Note 도 6개를 다 쓴다(본문 2 + 보충 4;
-      전환 계획서 참조). 브리프 `results/figures/paper_figs/HANDOFF_FILIP.md`
+- [~] **Filip 그림 6개 — 전달 완료 (2026-09-03), 통합됨**
+      6개 전부 구현·렌더됨(`results/figures/paper_figs/rendered/`, PNG+PDF). 스텁 0개.
+      Fig 1 은 C-2 결정(사후필터 arm)을 독립적으로 같은 방향으로 그렸다.
+      **Fig 2 는 그대로 못 쓴다** — 패널 A 가 `07ad6fa` 데이터라 C-1 후 재생성 필요,
+      축 라벨 `GB`→`GiB`, 각주 `~5%`→`3.92%`. 상세는 그 디렉터리의 README.
 - [x] `quarantine.md` 신설 (§1–§10, 폐기 대장) ✅ (2026-09-03, `0357cbd`)
 - [x] resume.md 격리 — 📌 정본 포인터 + ❌ MOVED 배너 4곳, 앵커 0 broken ✅ (2026-09-03, `0357cbd`)
 - [x] Codex 2차 의견 리뷰 전사본 예치 ✅ (2026-09-03, `0357cbd` / `docs/2026-09-03-codex-review-findings.md`)

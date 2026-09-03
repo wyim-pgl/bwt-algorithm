@@ -621,16 +621,29 @@ filip의 변환 BED는 6열이고 5열이 정수 period지만, BWTandem 자신�
 
 ### 8.2 `results/` 를 건드릴 때의 고정 순서
 
-`scripts/benchmark/hash_deposited_beds.sh`는 **워킹트리**를 해시해
-`results/manifest.sha256`을 잘라 다시 쓰는데, CI는 **커밋된 트리**를 검증한다.
-하루에 CI를 세 번, 세 가지 방식으로 깨뜨렸다(이슈 #31).
+`scripts/benchmark/hash_deposited_beds.sh` 는 **워킹트리**를 해시해
+`results/manifest.sha256` 과 `results/external_evidence.sha256` 을 잘라 다시 쓴다.
+CI 는 **커밋된 트리**를 검증한다. 하루에 CI 를 세 번, 세 가지 방식으로 깨뜨렸다(이슈 #31).
 
-1. 편집 완료 → `git add` → **그 다음** 재해시 → 테스트 → 커밋
-2. 실행 중에는 `results/` 아래를 절대 건드리지 않는다
-3. 2분을 훨씬 넘는다(외부 파일 약 75개, 일부 수 GB): `run_in_background` + 600 s 타임아웃.
-   포그라운드 kill은 매니페스트를 반쯤 쓴 채로 남긴다
-4. `.gitignore`가 `*.settings` 같은 증거 파일을 삼킨다 → `git add -f`.
-   `tests/test_deposit_hashes.py`가 해시된 경로의 미추적을 잡는다
+> ❌ **SUPERSEDED (2026-09-03):** 이 절은 한동안 순서를
+> `편집 → git add → 재해시 → 테스트 → 커밋` 이라 적었다. **위험하다.**
+> 해시 스크립트가 `git add` **뒤에** 체크섬 파일을 다시 쓰므로, 스테이징된 것은 옛 해시이고
+> 워킹트리만 새 해시인 상태로 커밋될 수 있다. 가드 테스트는 워킹트리를 보므로 그 커밋을
+> 통과시킨다. 스크립트 자신이 머리에 **"Run this LAST"** 라 적어 두었고, 그 실패가 이미
+> `e178707` 로 출하된 적이 있다. (Codex 계획 리뷰 2026-09-03 지적.)
+
+**올바른 순서**:
+
+1. `results/` 아래 **모든** 편집을 끝낸다 — 부분적으로 하지 않는다
+2. 해시 스크립트를 **포그라운드**로 돌린다. 백그라운드로 돌린다면 PID 를 `wait` 하고
+   종료 상태를 확인한 뒤 다음 단계로 간다 (2분을 훨씬 넘는다; 포그라운드 kill 은
+   매니페스트를 반쯤 쓴 채로 남긴다)
+3. **그 다음** 체크섬 파일 두 개를 포함해 전부 `git add`
+4. `git diff --cached` 를 눈으로 확인하고, `git status` 에 **미스테이징 `results/` 변경이 없는지** 본다
+5. 가드 테스트 → 커밋
+
+`.gitignore` 가 `*.settings` 같은 증거 파일을 삼킨다 → `git add -f`.
+`tests/test_deposit_hashes.py` 가 해시된 경로의 미추적을 잡는다.
 
 ### 8.3 이 Claude 세션 자체가 2 CPU / 4 GB SLURM 잡이다
 

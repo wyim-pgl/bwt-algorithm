@@ -145,7 +145,8 @@ caption = (
     "(P, B, F, H) are connected lines; competing tools are single points. (C) Region recall evaluated only for periods ≤100 bp across three overlap rules. "
     "ULTRA performs best, with BWTandem second. BWTandem data in (C) uses full-range output filtered post-hoc to ≤100 bp to ensure accurate boundary "
     "assessment. Reciprocal rules here stress-test boundary precision against a merged catalog rather than absolute ranking. The 2026 tools are excluded "
-    "from (C) as they lack period bounds."
+    "from (C) as they lack period bounds. Panels A and B plot the four native --max-period 100 operating points (Table 1d), where F reads "
+    "79.88% region recall; panel C plots the post-hoc filtered arm, which is what Table 1b reports, at 78.87%."
 )
 plt.figtext(0.06, -0.22, caption, ha="left", fontsize=14, wrap=True)
 

@@ -27,9 +27,13 @@ stays native — so F reads 79.88% there and 78.87% in Table 1b. That is not a
 contradiction, but it is the kind of thing a referee asks about, and the caption
 should say which panel is which arm before submission.
 
-## Fig 2 — do not ship as rendered
+## Fig 2 — one defect left, and it is the data
 
-1. **Panel A is superseded data.** The 1.30 / 1.30 / 1.41 ratios come from
+Two of the three defects are fixed as of 2026-09-03: the memory axis reads GiB,
+and the range-matching caveat moved into the caption with the measured 3.92%
+(a separate footnote collided with the caption once the caption grew).
+
+1. **Panel A is superseded data — still open.** The 1.30 / 1.30 / 1.41 ratios come from
    `data/fig2a_paired_runs.csv`, whose replicates all ran at commit `07ad6fa` —
    the only commit where Tier 3's search window was fixed at 100 bp–100 kb
    regardless of `--max-period` (`quarantine.md` §6.17). SLURM jobs
@@ -38,17 +42,16 @@ should say which panel is which arm before submission.
    ("20× costs 1.3–1.4×") and the CSV must be regenerated from those results.**
    The x-axis phrase "requested/reportable maximum period" is the `07ad6fa`
    framing and needs the same revision.
-2. **Axis label says "Peak memory (GB)".** Every memory figure in this paper is
-   a kibibyte count divided by 1024², relabelled GiB throughout the manuscript in
-   `63ccd07`. The axis and the `prep_data.py` comments still say GB.
-3. **Footnote says "Competitor FASTA scope ~5% larger".** Measured 2026-09-03:
-   3,209,286,105 bases against 3,088,269,832, i.e. **3.92%**, or 3.80% counting
-   unambiguous bases only.
+2. ~~Axis said "Peak memory (GB)"~~ — now GiB.
+3. ~~Footnote said "~5% larger"~~ — now 3.92%, in the caption.
 
-## Fig 4 panel A omits three tools without saying so
+The caption states which build panel A came from, so the figure is honest as it
+stands; it is the claim in the title that the re-measurement may move.
 
-Table 2 has eleven rows; panel A plots six. TRASH, NCRF and mreps are absent and
-the caption does not say they were dropped or why. Today's Table 2 correction —
+## Fig 4 panel A omits three tools — now said in the caption
+
+Table 2 has eleven rows; panel A plots six. TRASH, NCRF and mreps are absent, and
+the caption now names them. Today's Table 2 correction —
 the template row rebuilt as the true 397-region template-only union — therefore
 does not touch this figure, but the omission should be stated.
 
@@ -57,3 +60,16 @@ does not touch this figure, but the omission should be stated.
 `prep_data.py` builds `data/*.csv` from the deposited evidence; each `plot_*.py`
 reads one or more of those and writes to `rendered/`. Regenerate Fig 2 after the
 C-1 jobs land, then re-check the three items above.
+
+
+## Colour (2026-09-03)
+
+`figstyle.py` gives BWTandem the only saturated colour and mutes every competitor,
+so the eye lands on our tool first and the figures still read in grey scale. The
+competitor hues stay distinct from each other — ULTRA and TRF had to be pulled
+apart again after the first pass made them nearly identical in Fig 2B, where they
+are the only two series. Do not raise a competitor's saturation to make it
+visible; if one needs emphasis in a panel, say so in that panel's caption.
+
+Rendered with `/data/gpfs/assoc/pgl/bin/conda/conda_envs/anianns/bin/python`
+(matplotlib 3.10.9, seaborn 0.13.2). The `bwtandem` env has no matplotlib.

@@ -62,7 +62,7 @@ for idx, row in df_c.reset_index().iterrows():
 # Panel C2: Peak memory
 ax_c2 = fig.add_subplot(gs[3], sharey=ax_c1)
 ax_c2.set_title("Human (cost: peak memory)", fontweight="bold")
-ax_c2.set_xlabel("Peak memory (GB)")
+ax_c2.set_xlabel("Peak memory (GiB)")
 sns.stripplot(data=df_c, x="memory_gb", y="tool", hue="tool", legend=False, ax=ax_c2, 
               palette=figstyle.TOOL_COLORS, size=8, jitter=False, rasterized=True)
 for idx, row in df_c.reset_index().iterrows():
@@ -72,17 +72,20 @@ for idx, row in df_c.reset_index().iterrows():
 ax_c2.set_ylabel("")
 ax_c2.tick_params(labelleft=False)
 
-# Footnote for C
-ax_c1.annotate("*Runs are not range-matched. Competitor FASTA scope ~5% larger.",
-               xy=(0, -0.3), xycoords='axes fraction', ha='left', fontsize=8)
+# The range-matching caveat lives in the caption; a separate footnote collided with it.
 
 caption = (
     r"$\mathbf{Figure\ 2.}$ "
-    "(A) Computational cost of extending BWTandem's maximum period from 100 bp to 2,000 bp on GRCh38 across 3 replicates. "
+    "(A) Computational cost of extending BWTandem's maximum period from 100 bp to 2,000 bp on GRCh38 across 3 replicates, "
+    "all run at commit 07ad6fa, where the maximum-period argument filtered the report without bounding the Tier 3 search; "
+    "a re-measurement at the release build 0363d8b, where it bounds the search as well, is in progress. "
     "(B) Runtime scaling of ULTRA and TRF on maize Mo17 as the maximum period increases (log–log scale). "
-    "(C) Total computational resources (core-hours and peak memory) for human whole-genome processing. Points are labeled by their period cap."
+    "(C) Total computational resources (core-hours and peak memory) for human whole-genome processing. Points are labeled by their period cap; "
+    "these runs are not range-matched, and the competitor FASTA carries 3.92% more sequence."
 )
-plt.figtext(0.009, -0.03, caption, ha="left", fontsize=14, wrap=True)
+# va="top" so a caption that grows to three lines extends downward instead of
+# climbing into the axis labels.
+plt.figtext(0.009, -0.10, caption, ha="left", va="top", fontsize=14, wrap=True)
 plt.suptitle("Widening the requested period range 20× costs 1.3–1.4×.", y=1.01, fontsize=14)
 
 sns.despine()

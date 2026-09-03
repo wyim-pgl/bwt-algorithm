@@ -9,14 +9,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # One colour per tool, stable across every figure.
+#
+# BWTandem carries the only saturated colour; every competitor is a muted slate
+# so the eye lands on our tool first and the comparison stays readable in grey
+# scale. The hues still differ between competitors so they remain separable, but
+# their chroma is low enough that none of them competes with BWTandem for
+# attention. Do not raise a competitor's saturation to "make it visible" — if a
+# competitor needs emphasis in one panel, say so in that panel's caption.
+BWT = "#0B5FA5"          # the accent: only BWTandem gets it
 TOOL_COLORS = {
-    "BWTandem": "#1f4e79",
-    "ULTRA": "#c05621",
-    "tantan": "#2f855a",
-    "TRF": "#6b46c1",
-    "TRASH": "#718096",
-    "longdust": "#b7791f",
-    "AniAnn's": "#d53f8c",
+    "BWTandem": BWT,
+    "ULTRA": "#B5794A",
+    "tantan": "#6E8B7A",
+    "TRF": "#8C7BA8",
+    "TRASH": "#A9AFB8",
+    "longdust": "#A79274",
+    "AniAnn's": "#B08699",
 }
 BWT_POINT_ORDER = ["P", "B", "F", "H"]
 

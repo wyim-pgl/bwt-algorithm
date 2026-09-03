@@ -96,7 +96,8 @@ ax_c.annotate("* 2026 tools (longdust, AniAnn's) lack a banded arm and are omitt
 
 caption = (
     r"$\mathbf{Figure\ 4.}$ "
-    "(A) Centromere coverage and CEN180 monomer recall in Arabidopsis Col-CEN. "
+    "(A) Centromere coverage and CEN180 monomer recall in Arabidopsis Col-CEN, for the six de novo and 2026 tools; "
+    "Table 2 also lists mreps, NCRF and the two TRASH rows, which are omitted here. "
     "(B) Unfiltered coverage of curated maize satellite arrays. "
     "(C) Coverage lost when applying a period band."
 )

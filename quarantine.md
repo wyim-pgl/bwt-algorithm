@@ -295,6 +295,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 ### 6.4 2026 도구 메모리 셀 — 같은 표 안에서 규칙 불일치
 
 > ✅ **APPLIED (2026-09-03, `2901ff3`):** Table 2 의 두 셀을 0.06 / 0.48 로 교체.
+>
+> ✅ **APPLIED (2026-09-03, 다음 커밋):** 단위 라벨 전면 교체 — 메모리 `GB` **37곳**을 `GiB` 로 바꾸고 규약 문장을 변명에서 정의로 고쳤다. **숫자는 하나도 바꾸지 않았다.** 84행의 `3.15 GB` 만 메모리가 아니라 파일 크기여서 §6.5 로 따로 처리했다.
 
 | 셀 | 로그 KiB | GiB 규칙 | 현재 표기 |
 |---|--:|--:|--:|
@@ -306,6 +308,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 - **근거**: `exp1_human/tools2026/runs/*.time`. 표기 위치 `results/comparators2026/README.md:27-28`.
 
 ### 6.5 "roughly 5% more sequence" (manuscript.md:84)
+
+> ✅ **APPLIED (2026-09-03, 다음 커밋):** 실측 대체 — 경쟁 3,209,286,105 염기 vs BWTandem 3,088,269,832 → **+3.92%**(ACGT만 +3.80%). "roughly 4%"로 교체하고 파일 바이트(3.15 GB)를 염기 수로 바꿨다.
 
 - **왜**: 원고가 주는 두 수는 3.25 Gb와 3.15 GB → **+3.2%**. 게다가 하나는 염기,
   하나는 파일 바이트로 두 문장 만에 단위가 섞였다.

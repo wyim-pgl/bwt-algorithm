@@ -46,6 +46,15 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [ ] **§6.6** stride 공식에 프리셋 배수 포함, 포화점 재유도
 - [ ] **§6.4** 2026 도구 메모리 셀 2개: AniAnn's Col-CEN 0.50 → **0.48**, longdust 0.07 → **0.06**
 - [ ] **§6.12** TR-1 경계 오차 네 값(771 bp / 4.3 kb / 4,265 / 7,973)의 통계 정의 후 일치
+- [ ] **§6.24** Discussion 4.3 — Tier 1 도 FM-index 열거를 돌린다(`TIER1_FMSCAN=1`). 메커니즘 서술 정정
+- [ ] **§6.25** Abstract 의 "per-figure provenance manifest" 약속 삭제 (매핑 0건, 그림 프로그램 6/6 스텁)
+- [ ] **§6.26** S1.3 파라미터 범위를 "핵 염색체 5개"로 한정하거나 ChrC/ChrM 값 추가
+- [ ] **Codex R3-10** Discussion 4.2 에 세 게놈 × 두 패스 전체 행렬 명시
+      (gap-fill 은 세 게놈 전부, catch-all 은 human·maize 만)
+- [ ] **Codex R3-12** Limitations 에 native-path 미해결 flake 를 명시
+- [ ] **Codex R2-9** 밴드 손실 4건이 예치본과 0.01 pp 어긋남 — 반올림 규약 통일
+- [ ] **Codex R2-8** S2 의 Python/numpy 버전(3.11.14 / 2.3.1)이 예치 provenance(3.11.15 / 2.4.6)와 불일치,
+      매니페스트 스코어러 해시 2건도 실제와 다름
 - [ ] 위 수정 후 원고 전체에서 **GiB/GB 표기 일괄 점검** (§6.4·Codex 발견 12 — 숫자는 그대로, 라벨만)
 
 ### A-2. `results/` 수정 — ⚠️ 재해시 필수
@@ -66,10 +75,11 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 
 ## B. 남은 검증 — 목록을 닫기 전에
 
-- [~] **Codex 라운드 2** (Results ↔ 예치 산출물, "저장소엔 있는데 원고에 없는 불리한 수치" 탐색) — 실행 중
-- [ ] **Codex 라운드 3** (Discussion 메커니즘 주장 ↔ 실제 코드) — R2 종료 후 자동 실행
-- [ ] R2·R3 발견을 실물 대조 검증한 뒤 `quarantine.md` §6 에 추가
-- [ ] Codex 첫 리뷰의 **미검증 14건** 처리 (`todo.md` §B) — 검증하거나 명시적으로 기각
+- [x] **Codex 라운드 2** — Results ↔ 예치 산출물, 9건 ✅ (2026-09-03, `msreview/codex_out_R2.txt`)
+- [x] **Codex 라운드 3** — Discussion 메커니즘 ↔ 코드, 14건 ✅ (2026-09-03, `msreview/codex_out_R3.txt`)
+- [x] R2·R3 의 최중대 6건 실물 검증 후 §6 에 추가 ✅ (2026-09-03, §6.22–6.26 · §3.10)
+- [ ] R2·R3 의 나머지 17건 검증 또는 명시적 기각
+- [ ] Codex 첫 리뷰의 **미검증 14건** 처리 — 검증하거나 명시적으로 기각
 - [ ] Kimi 라운드 1–3 의 MEDIUM/LOW 중 미검증분 선별 검증
 - [ ] `TIER2_APPROX_SEED` at identity ≥ 0.88 — centromere/satellite 에 도움될 수 있으나 **미시험**.
       시험 없이 켜지 말 것 (이 논문 범위 밖일 수 있음)
@@ -91,6 +101,14 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
       원장 44건·ULTRA 표적을 어디까지 밝힐지, 22번 염색체 결과를 "선택 후 검증"으로 재서술할지
 - [?] **C-4. §3.8 — catch-all 0.72 선정의 선택-무관 증거.**
       maize/Arabidopsis 진실셋 또는 보류 human 염색체에서 재확인할지
+- [?] **C-9. §6.22 — AniAnn's 밴드 셀을 사전등록대로 넣을 것인가, period 기반 셀을 전부 철회할 것인가.**
+      사전등록 프로토콜은 채점 가능하다고 적었고, 예치 로그의 AniAnn's 밴드 recall(99.15%)이
+      BWTandem·TRF를 모두 앞선다. **저장소에 있는 불리한 수치가 원고에 없는 상태다.**
+- [?] **C-10. §6.23 — TRF period 열 복구 후 S4 재실행 여부.**
+      스코어러가 TRF 의 period 열을 버린다. 제대로 읽으면 TRF 의 period 일치도가
+      BWTandem·ULTRA 를 앞선다는 재계산이 있다(미검증). 재실행하면 S4 순위가 바뀐다.
+- [?] **C-11. §3.10 — Arabidopsis catch-all off 선택을 in-sample 로 표시할 것인가, 재설계할 것인가.**
+      선택 근거가 평가 진실셋에 대한 bp precision 비교(65.54 vs 60.72)였다.
 - [?] **C-5. §6.15 — TRASH 를 de novo 로 볼 것인가 template-guided 로 볼 것인가.**
       313행과 326행이 반대로 적고 있고, 분류에 따라 "largest de novo footprint" 주장이 바뀐다
 - [?] **C-6. 투고처** — GigaScience full paper(재현성 심사) vs Bioinformatics Original.

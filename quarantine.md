@@ -188,6 +188,19 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
   `docs/superpowers/plans/2026-06-23-exp1-recall-loop.md`. (Codex 라운드 1, 발견 2)
 - 🔗 [[3.8]] 과 같은 뿌리다 — 3.8은 임계값 하나, 이것은 캠페인 전체.
 
+### 3.10 Arabidopsis 설정(catch-all off)을 평가 진실셋을 보고 골랐다
+
+- **왜**: S2는 Arabidopsis만 catch-all을 끈다고 하고, 이유를 "where it costs base pair precision
+  without recovering centromeric arrays"라 적는다. 생존한 실험 기록
+  (`exp1_human/filip_repro/catchall_experiment_results.md`)은 **같은 `colcen_cen180.bed` 진실셋에
+  두 설정을 채점**하고 "Keep catch-all OFF for Col-CEN"으로 결론짓는다:
+  off = recall 99.67 / bp precision 65.54, on = 99.68 / 60.72.
+  즉 제출된 Table 2 설정은 **목표 평가 지표를 본 뒤** 불리한 precision을 피하려고 선택됐다.
+  보류된 Arabidopsis 위성 진실셋은 없고, catch-all-on 의 현재 빌드 행도 예치돼 있지 않다.
+- **대체물**: 없음 — Col-CEN을 튜닝 데이터로 선언하고 보류셋에서 평가하거나, 최소한 Table 2에
+  두 설정을 모두 보고하고 in-sample 임을 표시할 것. **미조치.** (Codex 라운드 2 발견 2)
+- 🔗 [[3.8]] [[3.9]] 와 같은 계열 — 세 게놈 중 둘에서 같은 패턴이 확인됐다.
+
 ---
 
 ## §4 명명 — 쓰면 안 되는 이름
@@ -229,7 +242,7 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ## §6 결과 셀 — 개별 폐기 (2026-09-03 확정, **수정 미적용**)
 
-> ⚠️ 아래 21건은 Codex(6.1-6.6, 6.17-6.21)와 Kimi 라운드 2·3(6.7-6.16)이 지적하고 **내가 실물 파일·표로 재현**한 것이다.
+> ⚠️ 아래 26건은 Codex 리뷰 4회(6.1-6.6, 6.17-6.26)와 Kimi 라운드 2·3(6.7-6.16)이 지적하고 **내가 실물 파일·표로 재현**한 것이다.
 > 원고·증거 트리에 **아직 그대로 있다**. 인용 금지, 수정 대상.
 
 ### 6.1 Table 2 의 TRASH 비용 셀 두 개
@@ -427,6 +440,61 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 - **대체값**: 원고를 **80%**로 고치고 catch-all 적용 사실을 공개할 것 (코드를 70%로 바꾸면
   영향받는 모든 결과를 재실행해야 한다).
 - **근거**: `manuscript.md:72,448` vs `bwtandem/autocorr.py:43`, `finder.py:541,622`.
+
+### 6.22 "the 2026 tools have no banded rows" — 예치 로그가 반증한다
+
+- **왜**: 사전등록 프로토콜(`docs/2026-09-01-longdust-anianns-benchmark-protocol.md`)은 AniAnn's가
+  "**period-banded rules using its periodicity column where a table's rule reads a period**"에
+  채점 가능하다고 **결과가 나오기 전에** 적었다. 원고는 결과가 나온 뒤 이를 뒤집는다.
+  그런데 예치된 Col-CEN 로그 12행이 AniAnn's 밴드 recall **99.24 / 99.15 / 99.15%** 를 들고 있고,
+  같은 로그의 BWTandem은 **99.73 / 91.92 / 95.21%**, TRF는 **97.55%** 다 —
+  **두 밴드 열에서 AniAnn's가 BWTandem과 TRF를 모두 앞선다.** §3.2는 BWTandem·ULTRA·TRF의
+  밴드 recall만 보고한다.
+- **대체값**: 사전등록대로 AniAnn's를 모든 해당 패널에 넣거나, array-level period가 무효라면
+  **CEN180 Count를 포함한 모든 period 기반 AniAnn's 셀을 철회**하고 등록 후 변경을 명시할 것. **미결정.**
+- **근거**: `results/comparators2026/score_2026_colcen.txt:12` vs `manuscript.md` §3.2.
+- ⚠️ **이것이 가장 위험한 유형이다** — 저장소에 있는 불리한 수치가 원고에 없다.
+  (Codex 라운드 2 발견 1. 인용된 BWTandem 값 91.31/94.68 은 내가 본 로그 행의 91.92/95.21 과
+  다르다 — 순서 관계만 검증됐고, 정확한 대조군 수치는 재확인이 필요하다.)
+
+### 6.23 "TRF's period column is empty because its BED's motif column holds the full array sequence"
+
+- **왜**: 거짓이다. `scripts/scoring/convert_to_bed.py` 는
+  `f"{chrom}\t{start}\t{end}\t{motif}\t{period}\tTRF\n"` 로 **5열에 period를 쓴다**.
+  실제 TRF BED 5열은 `6, 29, 76 …` 이다. period 열은 비어 있지 않고,
+  **one-to-one 스코어러가 그것을 버린다**(`--pred-col5 period` 로 호출되지만 `load()` 가 5열을
+  저장하지 않고 `period_of()` 는 `len(motif)` 만 돌려주는데, `--pred-motif-is-sequence` 가 motif를
+  비우므로 전부 결측이 된다).
+- **영향**: Codex가 같은 518,719 쌍에 5열을 제대로 읽어 재계산한 값은 TRF **63.53% exact** —
+  BWTandem 58.66%, ULTRA 59.61% 를 **앞선다**. 즉 S4의 period 순위가 뒤집힌다.
+  (기전은 내가 검증했고, 63.53% 수치 자체는 재실행 전까지 미검증.)
+- **대체값**: 스코어러에 명시적 `period` 필드를 두고 S4 재실행 후 예치. **미산출.**
+- **근거**: `scripts/scoring/convert_to_bed.py:72-94`, `scripts/scoring/score_one_to_one.py`,
+  `manuscript.md:518,537`.
+
+### 6.24 "the index-based step is the seeding of Tiers 2 and 3" — Tier 1 도 FM-index를 쓴다
+
+- **왜**: 321행은 "BWTandem itself still scans in Tier 1 … the index-based step is the seeding of
+  Tiers 2 and 3" 라 한다. 그러나 S2(456행)의 **모든** 논문 설정이 `TIER1_FMSCAN=1` 이고,
+  그러면 Tier 1은 잔여 서열에 대해 FM-index 모티프 열거 패스를 **추가로 돌린다**(`tier1.py:325`).
+- **대체값**: "Tier 1 = 슬라이딩 스캐너 + 능동적 FM-index 열거, Tier 2/3 = FM-index k-mer 시딩".
+- **근거**: `manuscript.md:321` vs `manuscript.md:456`, `bwtandem/tier1.py:325`.
+- ⚠️ 방향에 주의 — 이 오류는 FM-index 기여를 **과소** 서술한다. 그럼에도 메커니즘 서술이 틀렸다.
+
+### 6.25 Abstract 의 "per-figure provenance manifest" — 존재하지 않는다
+
+- **왜**: `results/manifest.tsv` 에 figure 매핑이 **0건**이고, `results/figures/paper_figs/` 의
+  그림 프로그램 **6개 전부**가 `# TODO: implement panels` 에서 끝난다.
+- **대체값**: 실제 per-panel 매니페스트가 생기기 전까지 Abstract 의 약속을 삭제할 것.
+- **근거**: `grep -ci fig results/manifest.tsv` = 0; `plot_*.py` 6/6 스텁.
+
+### 6.26 S1.3 의 Arabidopsis 파라미터 범위 — 소기관 염색체가 빠져 있다
+
+- **왜**: 427행은 표가 "세 게놈의 염색체들"의 값이라 하지만, Col-CEN 입력에는 ChrC·ChrM이 있고
+  예치 BED에 각각 156 / 291 콜이 있다. 파라미터는 서열마다 계산되므로 실제 값은
+  ChrC k=12 / stride=20 / max_occ=200, ChrM k=13 — **인쇄된 어느 범위에도 들어가지 않는다.**
+- **대체값**: "핵 염색체 5개에 한한 범위"로 한정하거나 소기관 값을 추가할 것.
+- **근거**: `manuscript.md:427`, `bwtandem/tier3.py:30`, `results/beds/README.md:8`.
 
 ---
 

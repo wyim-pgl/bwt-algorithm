@@ -416,6 +416,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.15 TRASH 분류가 문장마다 바뀐다 — 비교 주장을 보호하는 방향으로
 
+> ✅ **APPLIED (2026-09-03, 저자 결정 + 다음 커밋):** TRASH 는 de novo 모드가 있으므로 **de novo 로 분류**한다. 326행의 주장을 "largest de novo footprint **on human**" 으로 좁히고, TRASH 의 maize 120.64 GiB 를 template-guided 괄호에서 꺼내 본문에 명시했다.
+
 - **왜**: 313행은 TRASH를 period 범위를 미리 정할 필요가 없는 **de novo** 검출기의 예외로 든다.
   326행은 BWTandem이 "largest de novo-tool footprint on the two large genomes"라 주장하면서
   더 큰 수치를 "template-guided"로 밀어낸다 — 그 안에 **TRASH 120.64 GB (maize)** 가 들어 있다.

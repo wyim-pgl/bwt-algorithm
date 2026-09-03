@@ -86,7 +86,12 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 
 ---
 
-## C. 저자 결정이 필요한 것 — 내가 정할 수 없다
+## C. 저자 결정 — 2026-09-03 접수분
+
+> 📌 **투고처가 정해졌다: Bioinformatics *Application Note*.** 이것이 나머지 항목의 범위를 바꾼다 —
+> App Note 는 분량 제한이 엄격해 본문 표 대부분이 보충자료로 내려가거나 사라진다.
+> 전환 계획: `docs/2026-09-01-application-note-conversion-plan.md`.
+> **A 절 수정 중 사라질 표에 대한 것이 있는지 전환 시 재확인할 것.**
 
 - [?] **C-1. §6.17 — Tier 3 탐색 창 주장을 어떻게 할 것인가.**
       원고는 "the command-line maximum period filters its report rather than bounding its search"
@@ -104,22 +109,13 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [?] **C-9. §6.22 — AniAnn's 밴드 셀을 사전등록대로 넣을 것인가, period 기반 셀을 전부 철회할 것인가.**
       사전등록 프로토콜은 채점 가능하다고 적었고, 예치 로그의 AniAnn's 밴드 recall(99.15%)이
       BWTandem·TRF를 모두 앞선다. **저장소에 있는 불리한 수치가 원고에 없는 상태다.**
-- [?] **C-10. §6.23 — TRF period 열 복구 후 S4 재실행 여부.**
-      스코어러가 TRF 의 period 열을 버린다. 제대로 읽으면 TRF 의 period 일치도가
-      BWTandem·ULTRA 를 앞선다는 재계산이 있다(미검증). 재실행하면 S4 순위가 바뀐다.
+- [!] **C-10. TRF period 열 / S4 재실행 — 저자 회신 "없어", 해석 확인 필요** ⛔
 - [?] **C-11. §3.10 — Arabidopsis catch-all off 선택을 in-sample 로 표시할 것인가, 재설계할 것인가.**
       선택 근거가 평가 진실셋에 대한 bp precision 비교(65.54 vs 60.72)였다.
-- [?] **C-5. §6.15 — TRASH 를 de novo 로 볼 것인가 template-guided 로 볼 것인가.**
-      313행과 326행이 반대로 적고 있고, 분류에 따라 "largest de novo footprint" 주장이 바뀐다
-- [?] **C-6. 투고처** — GigaScience full paper(재현성 심사) vs Bioinformatics Original.
-      분석: `docs/2026-09-01-venue-and-positioning-analysis.md`
-- [?] **C-7. 제목** — 후보 5개. #27 은 현행 제목이 부록이 반증하는 메커니즘을 함의한다고 지적
-- [?] **C-8. Abstract 재구성** — #26·#28, #27/#28 의 증거 반영
-
----
-
-## D. 재실행·재측정이 필요한 것
-
+- [x] **C-5. TRASH = de novo** ✅ (2026-09-03, 저자 결정: TRASH 에 de novo 모드가 있다) — 326행을 human 한정으로 좁히고 TRASH 를 de novo 로 재분류. §6.15
+- [x] **C-6. 투고처 — Bioinformatics Application Note** ✅ (2026-09-03, 저자 결정)
+- [x] **C-7. 제목 — 현행 유지** ✅ (2026-09-03) `BWTandem: FM-index seeding for wide-period-range tandem repeat detection in assembled genomes` — 저자가 지정한 문구가 원고 현행과 동일. **#27(FM-index 인과 프레이밍 지적)은 저자 유지 결정으로 종결**
+- [ ] **C-8. Abstract 재구성 — 전체 이슈 정리 후로 연기** (저자 결정 2026-09-03)
 - [ ] **§6.20** `sacct -j ... --format=JobID,Elapsed,MaxRSS,State -P` 원문을 체크섬과 함께 예치.
       불가하면 예치된 `wait4` 값(17.37 / 19.97 / 1.31 GiB)을 그 이름으로 쓰도록 원고 수정
 - [ ] **§6.19** 누락 스코어러 3개 커밋 — `rescore_tables_3bc.py`, `score_exp3.py`, `score_overlap.py`.

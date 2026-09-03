@@ -33,27 +33,26 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 
 ### A-1. 원고만 수정 (재해시 불필요, CI 위험 없음)
 
-- [ ] **§6.7** Table 3C-b 캡션: "smallest banded loss" → TRF 0.87 이 최소. 차이값 14.36 → **14.88**
-- [ ] **§6.8** "at most 1.5 / 2.8 points" → 실제 최대 **1.54 / 2.81**
-- [ ] **§6.9** Table 1c: 캡션은 네 도구, 표는 세 행 — TRASH 행 추가하거나 캡션에서 제외 사유 명시
-- [ ] **§6.10** 본문 107행에 TRF 의 precision 두 값 추가 (97.18% vs 64.60%, 31.19 vs 29.25)
-- [ ] **§6.11** Table 2 캡션에 BWTandem 의 CEN180 bp precision 최저(57.08%) 사실 한 문장
-- [ ] **§6.13** S4 캡션 "lowest of the five tools" → **second-lowest** (tantan 3.42% < 8.68%)
-- [ ] **§6.14** "All competitor runs ... inside one Singularity container" → 예외 2건 명시
-- [ ] **§6.21** "at least 70%" → **80%**, catch-all 에도 적용됨을 공개
+- [x] **§6.7** Table 3C-b 캡션: "smallest banded loss" → TRF 0.87 이 최소. 차이값 14.36 → **14.88**
+- [x] **§6.8** "at most 1.5 / 2.8 points" → 실제 최대 **1.54 / 2.81**
+- [x] **§6.9** Table 1c: 캡션은 네 도구, 표는 세 행 — TRASH 행 추가하거나 캡션에서 제외 사유 명시
+- [x] **§6.10** 본문 107행에 TRF 의 precision 두 값 추가 (97.18% vs 64.60%, 31.19 vs 29.25)
+- [x] **§6.11** Table 2 캡션에 BWTandem 의 CEN180 bp precision 최저(57.08%) 사실 한 문장
+- [x] **§6.13** S4 캡션 "lowest of the five tools" → **second-lowest** (tantan 3.42% < 8.68%)
+- [x] **§6.14** "All competitor runs ... inside one Singularity container" → 예외 2건 명시
+- [x] **§6.21** "at least 70%" → **80%**, catch-all 에도 적용됨을 공개
 - [x] ~~§6.6 stride 공식~~ · ~~§6.16 stride 축소 모순~~ — **오탐으로 철회** ✅ (2026-09-03, `quarantine.md` §6.6·§6.16)
 - [ ] **§6.5** "roughly 5% more sequence" → 두 값을 같은 단위(염기)로 재계산 후 교체
-- [ ] **§6.4** 2026 도구 메모리 셀 2개: AniAnn's Col-CEN 0.50 → **0.48**, longdust 0.07 → **0.06**
+- [x] **§6.4** 2026 도구 메모리 셀 2개: AniAnn's Col-CEN 0.50 → **0.48**, longdust 0.07 → **0.06**
 - [ ] **§6.12** TR-1 경계 오차 네 값(771 bp / 4.3 kb / 4,265 / 7,973)의 통계 정의 후 일치
-- [ ] **§6.24** Discussion 4.3 — Tier 1 도 FM-index 열거를 돌린다(`TIER1_FMSCAN=1`). 메커니즘 서술 정정
-- [ ] **§6.25** Abstract 의 "per-figure provenance manifest" 약속 삭제 (매핑 0건, 그림 프로그램 6/6 스텁)
-- [ ] **§6.26** S1.3 파라미터 범위를 "핵 염색체 5개"로 한정하거나 ChrC/ChrM 값 추가
-- [ ] **Codex R3-10** Discussion 4.2 에 세 게놈 × 두 패스 전체 행렬 명시
-      (gap-fill 은 세 게놈 전부, catch-all 은 human·maize 만)
+- [x] **§6.24** Discussion 4.3 — Tier 1 도 FM-index 열거를 돌린다(`TIER1_FMSCAN=1`). 메커니즘 서술 정정
+- [x] **§6.25** Abstract 의 "per-figure provenance manifest" 약속 삭제 (매핑 0건, 그림 프로그램 6/6 스텁)
+- [x] **§6.26** S1.3 파라미터 범위를 "핵 염색체 5개"로 한정하거나 ChrC/ChrM 값 추가
+- [x] **Codex R3-10** Discussion 4.2 에 게놈×패스 행렬 명시 — 어블레이션이 있는 것과 없는 것을 구분
 - [ ] **Codex R3-12** Limitations 에 native-path 미해결 flake 를 명시
 - [ ] **Codex R2-9** 밴드 손실 4건이 예치본과 0.01 pp 어긋남 — 반올림 규약 통일
-- [ ] **Codex R2-8** S2 의 Python/numpy 버전(3.11.14 / 2.3.1)이 예치 provenance(3.11.15 / 2.4.6)와 불일치,
-      매니페스트 스코어러 해시 2건도 실제와 다름
+- [x] **Codex R2-8(정정)** 전체 게놈 실행은 3.11.14/2.3.1 이 맞다 — 다른 것은 p100 패널·식별도 스윕이며,
+      S2 에 그 별도 환경을 공개했다. 매니페스트 스코어러 해시 2건은 `results/` 라 A-2 로 이월
 - [ ] 위 수정 후 원고 전체에서 **GiB/GB 표기 일괄 점검** (§6.4·Codex 발견 12 — 숫자는 그대로, 라벨만)
 
 ### A-2. `results/` 수정 — ⚠️ 재해시 필수

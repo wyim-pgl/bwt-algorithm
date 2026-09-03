@@ -108,6 +108,18 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 | gap-fill ablation base | — | **1,294 calls / 91.72%** | 스코어링 버그 재산출 |
 | gap-fill ablation off/away | — | **991 / 85.38%, 993 / 85.57%** | 결론(약 5.8 pp)은 불변 |
 
+### 2026-09-03 적용분 — 원고 수정 완료 (커밋은 아래 §6 각 항목에)
+
+| 대상 | 폐기값 | 대체값 | 항목 |
+|---|--:|--:|---|
+| Table 3C-b 캡션, 최소 밴드 손실 | tantan 0.92 "최소" | **TRF 0.87 이 최소** | §6.7 |
+| Table 3C-b 캡션, BWTandem 대비 차이 | 14.36 | **14.88** | §6.7 |
+| 밴드 손실 상계 | at most 1.5 / 2.8 | **1.54 / 2.81** | §6.8 |
+| S4 (a) 최저 1:1 precision | BWTandem | **tantan (3.42 vs 8.68)** | §6.13 |
+| Table 2 longdust 메모리 ×2 | 0.07 GB | **0.06** | §6.4 |
+| Table 2 AniAnn's Col-CEN 메모리 | 0.50 GB | **0.48** | §6.4 |
+| gap-fill 유효염기 게이트 | 70% | **80%** (catch-all 도 동일) | §6.21 |
+
 **메모리 단위 주의**: 위 GB 표기는 `sacct MaxRSS`의 KiB를 1024²로 나눈 값이므로 **GiB**다.
 원고·증거 트리 전반의 "GB" 표기는 §6.4 참조.
 
@@ -282,6 +294,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.4 2026 도구 메모리 셀 — 같은 표 안에서 규칙 불일치
 
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** Table 2 의 두 셀을 0.06 / 0.48 로 교체.
+
 | 셀 | 로그 KiB | GiB 규칙 | 현재 표기 |
 |---|--:|--:|--:|
 | AniAnn's human | 550,700 | 0.53 | 0.53 ✅ |
@@ -318,6 +332,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 > 절반이었다. §3.1 과 같은 종류의 오탐이다 — 그래서 이 파일이 있다.
 ### 6.7 Table 3C-b 캡션 — 표가 반증하는 최상급과 틀린 차이값
 
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** 캡션을 TRF 0.87 최소 · 14.88 로 교체.
+
 - **무엇**: "the smallest banded loss of the four" (tantan −0.92) 와 "finishes 14.36 points
   above BWTandem".
 - **왜**: 같은 표의 손실 열이 TRF **−0.87** 로 tantan보다 작다 — 최상급이 거짓이다.
@@ -328,12 +344,16 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.8 "at most 1.5 / 2.8 points" — 하한을 반올림해 만든 거짓 상계
 
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** 1.54 / 2.81 로 교체.
+
 - **왜**: TRF의 최대 손실은 **1.54**, ULTRA는 **2.81**. "at most"는 정확한 상계이므로
   내림 반올림은 허용되지 않는다.
 - **대체값**: 1.6 / 2.9, 또는 1.54 / 2.81 을 그대로.
 - **근거**: `manuscript.md:280`.
 
 ### 6.9 Table 1c — 캡션이 네 도구, 표는 세 행 (TRASH 누락)
+
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** 캡션에 TRASH 층 행 미보고 사실과 그 근거를 명시 (행 추가는 채점 필요, 미완).
 
 - **왜**: 캡션은 "the stratum BWTandem, TRF, TRASH and the re-run tantan entered" 라 하지만
   표에는 BWTandem·TRF·tantan 세 행뿐이다. 경쟁 도구 한 행이 조용히 빠져 있다.
@@ -342,6 +362,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.10 >100 bp 층 서술 — TRF가 이기는 두 열만 빠짐
 
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** 본문 107행에 TRF 의 region/bp precision 추가.
+
 - **왜**: 본문 107행은 BWTandem 3.43% / 13.39% / precision 64.60% 을 쓰고 "TRF reaches 2.02%
   and 11.83%" 로 **recall 두 개만** 옮긴다. 같은 표에서 TRF의 region precision은 **97.18%**
   (BWTandem 64.60%), bp precision도 **31.19 vs 29.25** 로 TRF가 앞선다.
@@ -349,6 +371,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 - **근거**: `manuscript.md:107` vs `manuscript.md:141-145`.
 
 ### 6.11 Table 2 — 자기 도구의 최저 수치만 서술되지 않음
+
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** Table 2 캡션에 BWTandem 최저 bp precision 57.08% 와 그 사유 명시.
 
 - **왜**: BWTandem의 CEN180 bp precision **57.08%** 는 11행 중 **최저**다(차하위 ULTRA 58.08).
   캡션은 NCRF의 0, tantan의 공유 노드, AniAnn's의 높은 커버리지, longdust의 구조적 0까지
@@ -367,6 +391,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.13 Supplementary Table S4 캡션 — 자기 표가 반증하는 "최저"
 
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** S4 캡션을 tantan 최저 · BWTandem 차하위로 교체.
+
 - **무엇**: "**BWTandem's is the lowest of the five tools**" (panel (a) 1:1 precision).
 - **왜**: 같은 표에서 tantan **3.42%** < BWTandem **8.68%**. BWTandem은 **차하위**다.
 - **대체값**: "second-lowest", 또는 "lowest after tantan (8.68% vs 3.42%)".
@@ -375,6 +401,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
   자기비판 방향의 오류도 오류다. S4 수치를 산문으로 옮긴 다른 곳도 전수 재확인할 것.
 
 ### 6.14 "All competitor runs were executed inside one Singularity container"
+
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** 'All competitor runs except the two noted below' 로 교체.
 
 - **왜**: 같은 표의 두 행이 반증한다 — longdust "not run in the container"(487행),
   ULTRA p2000 "executed outside the Singularity sandbox"(489행).
@@ -450,6 +478,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.21 "at least 70% unambiguous A/C/G/T bases" — 코드는 80%다
 
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** Methods 와 S1.4 를 80% 로 교체하고 catch-all 적용을 공개.
+
 - **왜**: `bwtandem/autocorr.py:43` `DEFAULT_MIN_VALID_FRAC = 0.8`, 후보 블록과 각 분할 창
   양쪽에 적용된다. 벤치마크 커밋 `0363d8b`에서도 같다. **catch-all 패스에도 같은 미공개
   80% 게이트가 걸린다.** 이것은 문서 오탈자가 아니라 **활성 수용 임계값**이다.
@@ -490,6 +520,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.24 "the index-based step is the seeding of Tiers 2 and 3" — Tier 1 도 FM-index를 쓴다
 
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** Discussion 4.3 을 'Tier 1 = 스캐너 + FM-index 열거' 로 교체.
+
 - **왜**: 321행은 "BWTandem itself still scans in Tier 1 … the index-based step is the seeding of
   Tiers 2 and 3" 라 한다. 그러나 S2(456행)의 **모든** 논문 설정이 `TIER1_FMSCAN=1` 이고,
   그러면 Tier 1은 잔여 서열에 대해 FM-index 모티프 열거 패스를 **추가로 돌린다**(`tier1.py:325`).
@@ -499,12 +531,16 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.25 Abstract 의 "per-figure provenance manifest" — 존재하지 않는다
 
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** Abstract 에서 per-figure provenance manifest 약속 삭제.
+
 - **왜**: `results/manifest.tsv` 에 figure 매핑이 **0건**이고, `results/figures/paper_figs/` 의
   그림 프로그램 **6개 전부**가 `# TODO: implement panels` 에서 끝난다.
 - **대체값**: 실제 per-panel 매니페스트가 생기기 전까지 Abstract 의 약속을 삭제할 것.
 - **근거**: `grep -ci fig results/manifest.tsv` = 0; `plot_*.py` 6/6 스텁.
 
 ### 6.26 S1.3 의 Arabidopsis 파라미터 범위 — 소기관 염색체가 빠져 있다
+
+> ✅ **APPLIED (2026-09-03, `ff870e6`):** S1.3 을 핵 염색체 한정 + ChrC/ChrM 값 명시로 교체.
 
 - **왜**: 427행은 표가 "세 게놈의 염색체들"의 값이라 하지만, Col-CEN 입력에는 ChrC·ChrM이 있고
   예치 BED에 각각 156 / 291 콜이 있다. 파라미터는 서열마다 계산되므로 실제 값은

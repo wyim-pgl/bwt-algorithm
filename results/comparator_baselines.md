@@ -27,7 +27,7 @@ GCA_000001405.15 on 2026-09-02:
 | TRF | 33:43:46 | 1,518,668 | 33.7 h, 1.45 GB |
 | tantan | 51:46.94 | 281,316 | 0.9 h, 0.27 GB |
 | TRASH | 107:37:36 | 15,298,244 | 107.6 h, 14.59 GB |
-| mreps | 54:41.08 | 6,691,220 | not reported — the human run is the chr4-only defect |
+| mreps | 54:41.08 | 6,691,220 | 0.9 h, 6.38 GiB as printed — the human run is the chr4-only partial |
 
 Every cost cell Table 1a prints for a competitor reproduces from these logs to the
 precision the table uses; none was found to disagree.
@@ -39,7 +39,7 @@ assembly; the manuscript tables use the GCA runs.
 
 | Tool | Period range | Provenance | Note |
 |---|---|---|---|
-| TRF | max 500 (no min-period parameter) | published | 2,000 bp rerun infeasible: cancelled at 6.6 d incomplete |
+| TRF | max 500 (no min-period parameter) | published | 2,000 bp rerun: we stopped it incomplete at 6.6 d |
 | ULTRA | 1–100 (default) | published | default `-p 100`; 20x below BWTandem's max; 2,000 bp rerun infeasible: cancelled at 1 d 22 h with ~4% of the assembly done (manifest `ULTRA-p2000-attempt`) |
 | tantan | window 100 (default `-w`) | published | structurally zero in the 101–2,000 bp stratum |
 | tantan | 1–2,000 (re-run) | job 6085144 | range-corrected arm; prefer for Table 1c |

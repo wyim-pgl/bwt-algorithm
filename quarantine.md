@@ -270,6 +270,22 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.1 Table 2 의 TRASH 비용 셀 두 개
 
+> ✅ **APPLIED (2026-09-03, 다음 커밋):** 계약 결정 — **591행 파일을 폐기하고 진짜 template 전용
+> 합집합(397행)을 만들어 새로 채점했다.** 비용 셀만 고치는 안은 라벨이 여전히 거짓이었다:
+> 591행은 de novo 를 포함하므로 de novo 행이 template 행의 **부분집합**이었다.
+>
+> ```
+> CEN159 232 + CEN178 238 = 470 -> sort -u -> 397   (겹침 73)
+> 채점: 397 regions | cov 85.03% | CEN180 115 | bpPrec 86.40% | recall 99.69%
+> 비용: 6:18:29 + 25:22:40 = 31:41:09 = 31.69 h, 최대 RSS 2.63 GiB
+> de novo 행은 자기 로그로: 5:47:30 = 5.79 h, 1.29 GiB
+> ```
+>
+> 예치: `results/regen/colcen_trash_template_union.bed` + `_scored.txt`.
+> 매니페스트 행 53 이 그 파일을 가리키도록 바꿨다. Table 2 두 행과 캡션 교체.
+> unfiltered 정확도 셀 3종이 동일한 것은 같은 중심절 서열을 덮기 때문이고, 구분되는 것은
+> region 수와 CEN180 count 다 — 캡션에 그대로 적었다.
+
 - **무엇**: `TRASH (template)` 와 `TRASH (de novo)` 행의 `6.31 h / 1.32 GiB`.
 - **왜**: `Col-CEN_v1.2_trash.bed`(591행)는 세 실행의 **정확한 합집합**이다 —
   CEN159(232) + CEN178(238) + denovo(234) = 704행 → 중복 제거 591행, 양방향 차집합 0.
@@ -293,12 +309,16 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.3 AniAnn's 스레드 수
 
+> ✅ **APPLIED (2026-09-03, 다음 커밋):** 매니페스트 행 123·126·129·132 를 `2` 로 수정하고, `threads` 열이 **SLURM 할당**을 뜻한다는 계약을 `results/README.md` 에 명문화했다 (열 분리는 스키마 마이그레이션이라 하지 않음; tantan 의 활성 스레드 1 은 예외로 명시).
+
 - **무엇**: `results/manifest.tsv` 행 123·126·129·132 의 `threads=1`.
 - **왜**: sbatch와 모든 실행 로그가 `-j 2`, `--cpus-per-task=2`.
 - **대체값**: `2` (+ `manifest.sha256` 재해시 — §8.2 순서 준수).
 - **근거**: `exp1_human/tools2026/runs/run_anianns.sbatch:5,22,23`.
 
 ### 6.4 2026 도구 메모리 셀 — 같은 표 안에서 규칙 불일치
+
+> ✅ **APPLIED (2026-09-03, 다음 커밋):** `results/comparators2026/README.md` 의 `0.07`→`0.06`, `0.50`→`0.48`, `GB`→`GiB` 까지 반영 — 원고만 고쳤던 부분 수정을 닫았다.
 
 > ✅ **APPLIED (2026-09-03, `2901ff3`):** Table 2 의 두 셀을 0.06 / 0.48 로 교체.
 >

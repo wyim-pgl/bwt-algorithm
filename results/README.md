@@ -23,7 +23,10 @@ on human (TRF, ULTRA), neither of which completed.
 | `mo17_knob180_arrays.bed`, `mo17_tr1_arrays.bed`, `mo17_centc_arrays.bed` | the 25, 17 and 17 curated maize arrays from Chen et al. (2023) |
 
 The CEN180 coordinates are blastn hits of `CEN178_consensus.fa` against the
-assembly, filtered from 68,840 raw hits to the 66,683 deposited here; the raw hit set itself was not retained. **The blastn
+assembly, filtered from 68,840 raw hits to the 66,683 deposited here. The raw hit set was recovered and is
+deposited as `ground_truth/colcen_cen180_raw_blast_hits.bed`; the filtered coordinates are a strict
+subset of it, so the 2,157 dropped hits are enumerable. The identity values that drove the filter
+appear only in the filtered file, so the threshold is attested rather than recomputable. **The blastn
 version and command line were not retained.** The deposited coordinates are
 therefore the reproducible artefact, not the procedure that made them — every tool
 in Table 2 is scored against this one file, so no comparison in the paper depends
@@ -49,7 +52,24 @@ cgroup maximum from `sacct MaxRSS`, not GNU time, because BWTandem distributes
 chromosomes across worker processes and GNU time reports the maximum over
 children rather than their sum.
 
-**Competitor cost figures — not covered, and cannot be.** Rows whose
+### What the `threads` column means (2026-09-03)
+
+`threads` is the **SLURM allocation** (`--cpus-per-task`), not a measurement of how
+many threads the tool actually used. The two differ in one place we know of: the
+widened tantan runs were allocated 2 CPUs and ran at 99% CPU, i.e. one active
+thread. Splitting the column into `allocated_cpus` and `tool_threads` would be a
+schema migration touching every row, `results/README.md`, every consumer and the
+external `wp0/make_manifest.py` that regenerates the file, so the column keeps its
+meaning and the exceptions are named here instead.
+
+Corrected 2026-09-03: the four AniAnn's rows (123, 126, 129, 132) said `1`. The
+sbatch and every run log show `-j 2` under `--cpus-per-task=2`, so both readings
+are 2.
+
+**Competitor cost figures — SLURM accounting is gone, but the GNU-time logs are not.**
+As of 2026-09-03 the 40 `/usr/bin/time -v` logs behind every competitor cost cell are deposited
+under `competitor_logs/`, and all five human rows recompute from them exactly. What remains
+unavailable is the SLURM job accounting, which is a different artefact. Rows whose
 `producer_job` is the literal string `published` come from an earlier
 benchmarking round. The output files and the command lines survive; the job
 accounting records do not. Those rows therefore have empty `threads`, `elapsed`,

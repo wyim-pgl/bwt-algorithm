@@ -71,8 +71,14 @@ BWTandem 0 — it ran on the primary FASTA) are dropped before precision is
 computed, so denominators are comparable across tools run on different
 FASTA scopes. ULTRA, tantan and TRASH used `--pred-col5 period`; TRF used
 `--pred-col5 period --pred-motif-is-sequence` (its column 4 is the full
-array sequence, so prediction-period metrics are disabled while truth-based
-strata still fill). Ranges are those of each tool's Table 1a run (ULTRA
+array sequence, so the motif is ignored). Until 2026-09-03 that flag also
+discarded TRF's period, because `load()` kept column 5 only when it
+meant copies and `period_of()` then fell back to motif length: every TRF
+pair scored no period and the first deposited JSON recorded
+`"scored_pairs": 0`. The scorer now keeps an explicit period, and TRF's
+annotation-arm JSON was regenerated — only the five period fields move,
+and TRF's period-exact rate is 63.53%. The region-truth arm still shows
+zero for every tool, which is structural: that truth carries no period. Ranges are those of each tool's Table 1a run (ULTRA
 default ≤100 bp, tantan default ~100 bp window, TRF ≤500 bp, BWTandem
 1–2,000 bp) — *not* each tool's maximal supported range; the tantan
 2,000 bp re-run of Table 1c is not included here.
@@ -133,3 +139,23 @@ composition (e.g. the 21–100 bp band is 11.4% of ULTRA's matched pairs but
 BWTandem 58.66) should be read with that selection effect, and tantan's
 smaller matched set, in mind. Copy error is measurable only for BWTandem
 (34.15% median relative error against the rescaled annotation copy count).
+
+
+## Scorer provenance after the 2026-09-03 period fix
+
+The deposited JSONs were produced by two different versions of
+`scripts/scoring/score_one_to_one.py` and the manifest keeps both, rather than
+overwriting execution history with a hash that did not produce those files:
+
+- Every arm except TRF's annotation arm is the original execution, SLURM job
+  6146229 at repo commit `43543da`, and its manifest rows keep the scorer hash
+  recorded then.
+- `one_to_one_trf_annot_r50.json` was regenerated on 2026-09-03 with the fixed
+  scorer, whose sha256 begins `1972ef4727de1613`. Only the five `period` fields differ
+  from the file it replaces; `matched`, both sensitivities, both precisions, the
+  boundary statistics and all four strata are byte-identical, which is the check
+  that the fix did nothing but stop discarding column 5.
+
+Do not replace the historical scorer hashes on rows 106-120 with the new one. A
+hash in this manifest names the code that produced the artefact, and for those
+rows that is still the old scorer.

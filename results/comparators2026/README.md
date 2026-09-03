@@ -13,7 +13,8 @@ Tables 1a, 2, 3B and 3C.
 
 Inputs are the chromosome-only FASTAs of the regenerated BWTandem runs, so
 cost cells are comparable to the BWTandem rows and NOT to the 2024
-competitor rows (which consumed the ~5% larger accession-flavoured FASTA).
+competitor rows (which consumed the accession-flavoured FASTA, larger by 3.92% in bases:
+3,209,286,105 against 3,088,269,832, or 3.80% counting unambiguous bases only).
 Reproducer warning: AniAnn's exits 0 having annotated nothing when its
 pysam `.fai` build fails on an unwritable FASTA directory (first attempt,
 jobs 6146420/6146421) — symlink the FASTA beside a pre-built index.
@@ -22,10 +23,10 @@ jobs 6146420/6146421) — symlink the FASTA beside a pre-built index.
 
 | Arm | Wall clock | Peak RSS |
 |---|---|---|
-| longdust human default / `-k8 -w20000` | 27:56 / 2:00:36 | 0.47 GB |
-| longdust maize default / `-k8 -w20000` | 18:00 / 3:53:40 | 0.58 GB |
-| longdust Col-CEN default / `-k8 -w20000` | 1:56 / 10:23 | 0.07 GB |
-| AniAnn's human / maize / Col-CEN | 2:19:13 / 1:34:26 / 7:18 | 0.53 / 0.55 / 0.50 GB |
+| longdust human default / `-k8 -w20000` | 27:56 / 2:00:36 | 0.47 GiB |
+| longdust maize default / `-k8 -w20000` | 18:00 / 3:53:40 | 0.58 GiB |
+| longdust Col-CEN default / `-k8 -w20000` | 1:56 / 10:23 | 0.06 GiB |
+| AniAnn's human / maize / Col-CEN | 2:19:13 / 1:34:26 / 7:18 | 0.53 / 0.55 / 0.48 GiB |
 
 ## Conversion and scoring
 

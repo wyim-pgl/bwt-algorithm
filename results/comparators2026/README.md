@@ -41,13 +41,55 @@ array period) as the period column and no motif. Scoring job **6146742** (repo `
 (`scripts/scoring/score_2026_tools.py`), so the new rows come from exactly
 the code that produced the published rows.
 
-The deposited `score_2026_human.txt` is the log of the clean re-run, job
-**6147179** (repo `89ada02`, 0 dirty, 2026-09-02): every cell is identical to
-job 6146742's, whose own log ended in a `KeyError` in the frozen scorer's
-corroborator section — a block after the ones used here, reached because the
-wrapper had not passed `--adj ''`. The re-run also removed the
-`scripts/scoring/work/` scratch that the crashed run had left behind (and that
-`2b2beea` had committed by mistake).
+### The human log was replaced, and here is why that is safe to trust
+
+`score_2026_human.txt` is the log of the clean re-run, job **6147179** (repo
+`89ada02`, 0 dirty, 2026-09-02, node cpu-14). It replaced job **6146742**'s log,
+which ended in a `KeyError`. Swapping a deposited log is exactly where a reader
+should not have to take the authors' word, so the crashed log is deposited beside
+it as `score_2026_human_6146742_crashed.txt` and the equivalence is checkable:
+
+| file | SHA-256 (first 16) | lines |
+|---|---|--:|
+| `score_2026_human_6146742_crashed.txt` (job 6146742) | `2ff43f44ff53699f…` | 47 |
+| `score_2026_human.txt` (job 6147179) | `87bdf4f4fd420f10…` | 33 |
+
+```
+diff score_2026_human_6146742_crashed.txt score_2026_human.txt
+2,3c2,3
+<  generated  : 2026-09-02T07:57:33-0700      >  generated  : 2026-09-02T15:15:27-0700
+<  host       : cpu-50                        >  host       : cpu-14
+34,47d33
+<  (the 14-line traceback, absent from the re-run)
+```
+
+Those are the only differences. Every scored line — the PROVENANCE block's inputs
+and byte counts, and all three result blocks — is byte-identical; discounting the
+two header lines that record when and where the job ran, the sole remaining
+difference in the shared region is `host`. No cell moved.
+
+Three further points a sceptical reader needs, since the claim is about what the
+`--adj` flag can and cannot touch:
+
+- **The scorer itself did not change.** `git diff 7b2113d..89ada02 --
+  scripts/scoring/score_table1.py` is empty. The only source change in that
+  interval is the four-line wrapper edit in `score_2026_tools.py` that adds
+  `--adj ""`, plus the scratch directory being added and then removed.
+- **`--adj` reaches only the corroborator loop.** In `score_table1.py`, `adj_rules`
+  is used at `for rule in adj_rules:` (line 408) and nowhere earlier; the crash was
+  at line 421 inside that loop, on `prepared[("ULTRA", variant)]`. The baseline,
+  matched-range and stratum blocks — the ones these tables read — are computed and
+  printed before that loop begins, which is why they appear in full in the crashed
+  log too. Passing an empty `--adj` therefore removes a section that a
+  sources-only run cannot compute at all (it needs the ULTRA and tantan baselines
+  in `SOURCES`), and removes nothing else.
+- **The scratch directory is a separate event.** Job 6147179 regenerated its
+  outputs and, on a clean exit, `score_table1.py` removed its own
+  `scripts/scoring/work/` scratch, which the crashed run had left behind. Deleting
+  that directory *from the repository* was a commit, `bd32c8c`, not something a
+  job did; `2b2beea` had committed those 104 MB of intermediate BEDs by mistake.
+  The directory holds only scorer intermediates (`gt.bed` and per-tool
+  full/p100/strat BEDs), all regenerable by re-running the scorer.
 
 ## Headline results (full outputs in the three .txt files here)
 

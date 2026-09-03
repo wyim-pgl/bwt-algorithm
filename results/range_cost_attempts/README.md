@@ -8,13 +8,21 @@ are recorded in `results/manifest.tsv` under `table = range-cost`, in Methods
 
 | Attempt | Job | Threads | Elapsed at termination | Progress at termination | Manifest row |
 |---|---|---|---|---|---|
-| TRF 4.10.0rc2, `MAXP 2000` | 6076847 | 1 | 6 d 13 h 57 m (6.6 d; 4.7× its 33.7 h 500 bp run) | partial `-ngs` output, 379,077 lines | `TRF-p2000-attempt` |
-| ULTRA 1.2.1, `-t 2 -p 2000` | 6145581 | 2 | 1 d 22 h 15 m (1.55× its 29.8 h 100 bp run, which covered the whole file) | 138,425 calls, all on chr1 (NC_000001.11) up to 124,786,615 bp, ~4% of the 3.25 Gb file; output did not grow during the final 5 h | `ULTRA-p2000-attempt` |
+| TRF 4.10.0rc2, `MAXP 2000` | 6076847 | 1 | 6 d 13 h 57 m (6.6 d; 4.7×† its 33.7 h 500 bp run) | partial `-ngs` output, 379,077 lines | `TRF-p2000-attempt` |
+| ULTRA 1.2.1, `-t 2 -p 2000` | 6145581 | 2 | 1 d 22 h 15 m (1.55×† its 29.8 h 100 bp run) | 138,425 calls, all on chr1 (NC_000001.11) up to 124,786,615 bp, ~4% of the 3.25 Gb file; output did not grow during the final 5 h | `ULTRA-p2000-attempt` |
 
-Both ratios in that table divide a **terminated partial** run by a **completed** one,
-and both denominators (33.7 h, 29.8 h) are inherited GNU-time figures whose job
-records no longer exist (manuscript Section 2.2.1). They bound the cost from below;
-they are not like-for-like speed ratios.
+**† Neither ratio is a speed ratio.** Both divide a **terminated partial** run by a
+**completed** one — the ULTRA numerator covered about a twenty-fifth of the input,
+the TRF numerator an unknown fraction — so they bound the cost from below and
+nothing more. Both denominators are inherited GNU-time figures. Their SLURM
+accounting no longer exists (manuscript Section 2.2.1), but the GNU-time logs that
+produced them do survive and are quoted below and in
+`results/comparator_baselines.md`.
+
+The row values not drawn from the manifest come from: the TRF 500 bp wall clock,
+its surviving GNU-time log (`…/benchmarking_results/trf/logs/GCA_000001405.15_GRCh38_genomic_run.log`,
+33:43:46); the 14-day ceiling, the `cpu-s1-pgl-0` partition's `TIME_LIMIT` as
+reported by `squeue`.
 
 ## `ultra_p2000/`
 
@@ -39,9 +47,12 @@ they are not like-for-like speed ratios.
   | published | `…/filip/bwt/bwtbench.sif/opt/ULTRA/ultra` | 638,912 | `f11b614f2858f9f0…` |
   | this attempt | `~/micromamba/bin/ultra` | 573,672 | `a475843c1879aeb5…` |
 
-  Different files, both self-reporting version 1.2.1. An earlier draft of this
-  README and of Methods 2.2 called them "the same binary"; that was wrong and was
-  corrected in `24cd12a`, and the table above is the evidence.
+  Different files, both **self-reporting** version 1.2.1 — which is a matched
+  version string, not proof of matched code, since two builds can report the same
+  string. Read the pair as invocation- and input-matched, with the version taken
+  on the binaries' own word. An earlier draft of this README and of Methods 2.2
+  called them "the same binary"; that was wrong and was corrected in `24cd12a`,
+  and the table above is the evidence.
 - `ultra_h_p2000_6145581.log`: provenance header plus an hourly
   `PROGRESS ... out_bytes=` marker (output-file size; ULTRA writes through a
   4 KB stdio buffer, so the size is a coarse progress proxy). Growth was steady
@@ -54,19 +65,31 @@ they are not like-for-like speed ratios.
 
 The partial output itself (`ultra_human_p2000.tsv`, 9,781,248 bytes, 138,426
 lines including the header, first-megabyte SHA-256 `c30692f4351e9a0d…`) stays
-on the cluster at the path recorded in the manifest and is hashed in
+on the cluster at
+`/data/gpfs/assoc/pgl/devel/exp1_human/regen/ultra_p2000/ultra_human_p2000.tsv`,
+the path the manifest records, and is hashed in
 `results/external_evidence.sha256`; it is not scored. Note that the manifest's
 `lines` field for this row is the raw line count, 138,426, one more than the
 138,425 calls, because this row points at ULTRA's own TSV rather than at a
 converted BED as every other competitor row does.
 
 SLURM accounting (`sacct -j 6145581`): CANCELLED by the user at
-2026-09-02T15:20:13, Elapsed 1-22:15:07, batch-step MaxRSS 17,972,740 K
-(17.14 GB by the manifest's K/1024² convention; the published 100 bp run
-recorded 1.68 GB under GNU time). The cancellation was a decision, not a
-failure: at the pre-stall rate of about 3 Mb per hour the 3.2 Gb assembly
-extrapolates to well over a month, beyond the 14-day partition limit, and the
-run had produced no new output for five hours.
+2026-09-02T15:20:13, Elapsed 1-22:15:07, batch-step MaxRSS 17,972,740 K.
+The manifest's convention divides that by 1024², giving 17.14 — strictly GiB,
+since sacct's K is KiB, and the same holds for every memory figure in the
+manifest and the manuscript tables. The published 100 bp run's 1.68 comes from
+GNU time's own KiB field (1,758,540 kB) under the same conversion, so the two
+share a unit but **not** a method, a build, or an environment: cgroup peak
+versus GNU-time peak, local binary versus sandbox binary. The gap between them
+is not a measured memory regression and should not be read as one.
 
-No artefacts of the TRF attempt survive beyond its partial `-ngs` file, which
-is likewise on the cluster path recorded in the manifest.
+The cancellation was a decision, not a failure: at the pre-stall rate of about
+3 Mb per hour the 3.25 Gb file extrapolates to well over a month, beyond the
+14-day partition limit, and the run had produced no new output for five hours.
+That extrapolation rests on one chromosome and can err in either direction —
+what remains holds both easier euchromatin and 23 further centromeres, and the
+observed rate had already fallen to zero.
+
+No artefacts of the TRF attempt survive beyond its partial `-ngs` file, at
+`/data/gpfs/assoc/pgl/devel/exp1_human/wp0/fixcampaign/trf_hg38_p2000.ngs.dat`,
+the path the manifest records.

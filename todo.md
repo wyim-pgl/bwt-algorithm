@@ -107,7 +107,7 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [?] **C-9. §6.22 — AniAnn's 밴드 셀을 사전등록대로 넣을 것인가, period 기반 셀을 전부 철회할 것인가.**
       사전등록 프로토콜은 채점 가능하다고 적었고, 예치 로그의 AniAnn's 밴드 recall(99.15%)이
       BWTandem·TRF를 모두 앞선다. **저장소에 있는 불리한 수치가 원고에 없는 상태다.**
-- [!] **C-10. TRF period 열 / S4 재실행 — 저자 회신 "없어", 해석 확인 필요** ⛔
+- [x] **C-10. TRF period 열 복구 + S4 재채점 — 저자 지시대로 수행** ✅ (2026-09-03) 스코어러 2곳 수정, 테스트 교체(39 passed), TRF period-exact **63.53%**, 원고 S4 반영. ⏳ 예치 JSON 교체는 A-2 재해시와 함께
 - [x] **C-11. Arabidopsis catch-all off — (a) 최소 공개 채택** ✅ (2026-09-03, `d580840`) S2 에 65.54 vs 60.72 와 보류셋 부재 명시
 - [x] **C-5. TRASH = de novo** ✅ (2026-09-03, 저자 결정: TRASH 에 de novo 모드가 있다) — 326행을 human 한정으로 좁히고 TRASH 를 de novo 로 재분류. §6.15
 - [x] **C-6. 투고처 — Bioinformatics Application Note** ✅ (2026-09-03, 저자 결정)
@@ -115,6 +115,8 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [ ] **C-8. Abstract 재구성 — 전체 이슈 정리 후로 연기** (저자 결정 2026-09-03)
 - [ ] **§6.20** `sacct -j ... --format=JobID,Elapsed,MaxRSS,State -P` 원문을 체크섬과 함께 예치.
       불가하면 예치된 `wait4` 값(17.37 / 19.97 / 1.31 GiB)을 그 이름으로 쓰도록 원고 수정
+- [ ] **TRF S4 JSON 교체** — `results/one_to_one/one_to_one_trf_annot_r50.json` 을 재채점본으로.
+      스크래치패드에 대기: `trf_annot_periodfix.json`. **A-2 재해시와 한 번에**
 - [ ] **원장 예치** — `exp1_human/loop/{ledger.tsv,best.json}` 를 `results/` 에 예치 (C-3 (a) 의 나머지 절반).
       `results/` 를 건드리므로 **A-2 재해시와 한 번에**
 - [ ] **§6.19** 누락 스코어러 3개 커밋 — `rescore_tables_3bc.py`, `score_exp3.py`, `score_overlap.py`.

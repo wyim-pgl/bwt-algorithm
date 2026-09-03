@@ -517,6 +517,18 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.23 "TRF's period column is empty because its BED's motif column holds the full array sequence"
 
+> ✅ **APPLIED (2026-09-03, 저자 결정 C-10):** 스코어러를 고치고 TRF 만 재채점했다.
+> `load()` 에 col5=="period" 분기, `period_of()` 가 명시 period 우선. 재채점 결과 **period 5개 필드만**
+> 바뀌고 나머지 30개 필드는 예치본과 동일 — matched 518,719, sensitivity 29.06, precision 53.87, 층화 전부 불변.
+> **TRF period-exact = 63.53%** (Codex 보고치와 일치). 새 순위: tantan 73.54 > **TRF 63.53** >
+> ULTRA 59.61 > BWTandem 58.66 > TRASH 33.41 — BWTandem 이 3위/3에서 **4위/5**가 된다.
+> 원고 S4 표·캡션 반영 완료. **예치 JSON 교체는 `results/` 라 A-2 재해시와 함께.**
+>
+> ⚠️ **이 버그가 살아남은 이유**: 통과하는 테스트가 옛 동작을 고정하고 있었다 —
+> `test_pred_motif_is_sequence_disables_period_metric` 이 `scored_pairs == 0` 을 단언했고,
+> docstring 과 CLI help 도 같은 말을 했다. 셋이 서로를 뒷받침해 아무도 의심하지 않았다.
+> 테스트는 교체했다(`test_pred_motif_is_sequence_disables_only_the_motif`).
+
 - **왜**: 거짓이다. `scripts/scoring/convert_to_bed.py` 는
   `f"{chrom}\t{start}\t{end}\t{motif}\t{period}\tTRF\n"` 로 **5열에 period를 쓴다**.
   실제 TRF BED 5열은 `6, 29, 76 …` 이다. period 열은 비어 있지 않고,

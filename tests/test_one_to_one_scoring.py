@@ -154,6 +154,57 @@ class TestCLI:
         # copies: |50-50|/50, |16-33|/33, |15-20|/20, |4-14|/14
         assert res["copies"]["scored_pairs"] == 4
 
+    def test_trf_style_bed_scores_period_from_column_five(self, tmp_path):
+        """A BED whose column 4 is the full array sequence is still period-scored.
+
+        Regression for the defect found 2026-09-03: the converted TRF baseline
+        carries its period in column 5, and the scorer was invoked with
+        --pred-col5 period --pred-motif-is-sequence, but load() only stored
+        column 5 when it meant copies. period_of() then fell back to
+        len(motif), which --pred-motif-is-sequence had set to None, so every
+        TRF pair scored no period at all: the deposited
+        one_to_one_trf_r50.json recorded "scored_pairs": 0 and the manuscript
+        explained the empty column as a property of TRF's output rather than
+        of our scorer.
+        """
+        truth = _write_bed(tmp_path, "t.bed", [
+            ("c", 0, 100, "AT", 50),          # truth period 2
+            ("c", 200, 300, "ACG", 33),       # truth period 3
+        ])
+        # column 4 is the whole array, as TRF emits it; column 5 is the period
+        preds = _write_bed(tmp_path, "p.bed", [
+            ("c", 0, 100, "ATATATATATATAT", 2),     # exact
+            ("c", 200, 300, "ACGACGACGACGACG", 6),  # integer multiple of 3
+        ])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, preds, "--pred-col5", "period",
+                  "--pred-motif-is-sequence", "--json", out])
+        assert r.returncode == 0, r.stderr
+        res = json.load(open(out))
+        assert res["matched"] == 2
+        # the whole point: not zero
+        assert res["period"]["scored_pairs"] == 2
+        assert res["period"]["exact_pct"] == pytest.approx(50.0)
+        assert res["period"]["integer_multiple_pct"] == pytest.approx(50.0)
+        # len(motif) would have given 14 and 15, which match neither truth
+        # period, so a fallback to the motif cannot produce these rates
+
+    def test_explicit_period_agrees_with_motif_length_when_both_exist(self, tmp_path):
+        """--pred-col5 period must not move a BED whose column 4 is a real motif.
+
+        ULTRA, tantan and TRASH are scored with the same flag but carry a
+        genuine motif, where len(motif) equals column 5 on every record
+        checked. Preferring column 5 therefore has to leave them unchanged.
+        """
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "ACGT", 25)])
+        preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100, "ACGT", 4)])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, preds, "--pred-col5", "period", "--json", out])
+        assert r.returncode == 0, r.stderr
+        res = json.load(open(out))
+        assert res["period"]["scored_pairs"] == 1
+        assert res["period"]["exact_pct"] == pytest.approx(100.0)
+
     def test_truth_without_motif_skips_period_and_copies(self, tmp_path):
         truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100)])
         preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100, "AT", 50)])
@@ -219,9 +270,16 @@ class TestCLI:
         # period metrics still score (col4 is a real motif)
         assert res["period"]["scored_pairs"] == 1
 
-    def test_pred_motif_is_sequence_disables_period_metric(self, tmp_path):
-        # TRF-style BED: col4 is the whole array sequence, so a
-        # length-derived prediction period would be meaningless
+    def test_pred_motif_is_sequence_disables_only_the_motif(self, tmp_path):
+        """col4 being the whole array must not cost the prediction its period.
+
+        This test previously asserted scored_pairs == 0 here, pinning the
+        behaviour that produced an all-zero period block for TRF in the
+        deposited S4 (2026-09-03). The length of a full array sequence is
+        meaningless as a period, which is what --pred-motif-is-sequence is
+        for; it does not follow that a period given explicitly in column 5
+        should be discarded too.
+        """
         truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "AT", 50)])
         preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100, "AT" * 50, 2)])
         out = str(tmp_path / "r.json")
@@ -230,9 +288,21 @@ class TestCLI:
         assert r.returncode == 0, r.stderr
         res = json.load(open(out))
         assert res["matched"] == 1
-        assert res["period"]["scored_pairs"] == 0
+        # column 5 gives period 2, which matches the truth's len("AT")
+        assert res["period"]["scored_pairs"] == 1
+        assert res["period"]["exact_pct"] == pytest.approx(100.0)
         # truth-based strata still fill
         assert res["strata"]["1-6"]["matched"] == 1
+
+    def test_motif_is_sequence_without_period_column_scores_nothing(self, tmp_path):
+        """With no period to fall back on, the metric is still suppressed."""
+        truth = _write_bed(tmp_path, "t.bed", [("c", 0, 100, "AT", 50)])
+        preds = _write_bed(tmp_path, "p.bed", [("c", 0, 100, "AT" * 50, 50)])
+        out = str(tmp_path / "r.json")
+        r = _run([truth, preds, "--pred-motif-is-sequence", "--json", out])
+        assert r.returncode == 0, r.stderr
+        res = json.load(open(out))
+        assert res["period"]["scored_pairs"] == 0
 
     def test_deep_contested_chain_no_recursion_error(self):
         """A half-shifted pileup forces one augmenting path spanning the

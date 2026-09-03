@@ -22,9 +22,10 @@ when available, motif (col 4) and copies (col 5). Column-5 semantics differ
 between tools -- BWTandem BEDs carry a copy count there, but the converted
 ULTRA/tantan/TRF baselines carry the PERIOD (see convert_to_bed.py) -- so
 --pred-col5 must say which; 'period' disables the copy-error metric rather
-than silently comparing a period against a copy count. --pred-motif-is-
-sequence marks BEDs whose column 4 is the full array sequence (TRF), which
-disables prediction-period metrics while truth-based strata still fill.
+than silently comparing a period against a copy count, and the period it
+names is used directly. --pred-motif-is-sequence marks BEDs whose column 4
+is the full array sequence (TRF); that only suppresses the motif, so with
+--pred-col5 period such a BED is still scored on period.
 --truth-chroms-only drops predictions on sequences absent from the truth
 (e.g. unplaced scaffolds a chr1-22XY catalog can never match), so precision
 denominators are comparable across tools run on different FASTA scopes.
@@ -79,13 +80,25 @@ def load(path, need_cols=3, col5="copies", motif_is_sequence=False):
                 sys.exit(f"FATAL {path}:{i}: empty/inverted interval")
             motif = p[3] if len(p) > 3 and p[3] and not motif_is_sequence else None
             copies = None
+            period = None
             if len(p) > 4 and col5 == "copies":
                 try:
                     copies = float(p[4])
                 except ValueError:
                     pass
+            elif len(p) > 4 and col5 == "period":
+                # The converted competitor BEDs carry the period here. Keeping it
+                # is what lets a TRF-style BED -- column 4 the full array sequence,
+                # so len(motif) is meaningless -- still be scored on period.
+                try:
+                    period = int(float(p[4]))
+                except ValueError:
+                    pass
+                if period is not None and period <= 0:
+                    period = None
             rows.append({"chrom": chrom, "start": s, "end": e,
-                         "motif": motif, "copies": copies, "line": i})
+                         "motif": motif, "copies": copies, "period": period,
+                         "line": i})
     if not rows:
         sys.exit(f"FATAL: {path} contains no usable records")
     return rows
@@ -217,6 +230,11 @@ def one_to_one(truth, preds, min_frac):
 
 
 def period_of(rec):
+    # An explicit period from column 5 wins over the motif length: they agree
+    # wherever column 4 is a motif, and only the explicit value is available
+    # when column 4 is the full array sequence.
+    if rec.get("period"):
+        return rec["period"]
     return len(rec["motif"]) if rec["motif"] else None
 
 
@@ -245,7 +263,8 @@ def main():
                          "--pred-col5; 'period' disables the copy-error metric)")
     ap.add_argument("--pred-motif-is-sequence", action="store_true",
                     help="prediction column 4 is the full array sequence, not a "
-                         "motif (TRF-style); disables prediction-period metrics")
+                         "motif (TRF-style); the motif is ignored, but the period "
+                         "from --pred-col5 period is still scored")
     ap.add_argument("--strata", default="1-6,7-20,21-100,101-2000",
                     help="comma list of ascending truth period bands LO-HI "
                          "(default: 1-6,7-20,21-100,101-2000)")

@@ -265,7 +265,7 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ## §6 결과 셀 — 개별 폐기 (2026-09-03 확정, **수정 미적용**)
 
-> ⚠️ 아래 24건은 (§6.6·§6.16 은 오탐으로 철회, 기록은 보존) Codex 리뷰 4회(6.1-6.6, 6.17-6.26)와 Kimi 라운드 2·3(6.7-6.16)이 지적하고 **내가 실물 파일·표로 재현**한 것이다.
+> ⚠️ 아래 25건은 (§6.6·§6.16 은 오탐으로 철회, 기록은 보존) Codex 리뷰 4회(6.1-6.6, 6.17-6.26)와 Kimi 라운드 2·3(6.7-6.16)이 지적하고 **내가 실물 파일·표로 재현**한 것이다.
 > 원고·증거 트리에 **아직 그대로 있다**. 인용 금지, 수정 대상.
 
 ### 6.1 Table 2 의 TRASH 비용 셀 두 개
@@ -457,6 +457,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 6.18 "shared 100 bp range" 가 비대칭이다
 
+> ✅ **APPLIED (2026-09-03, 다음 커밋):** 저자 결정 C-2(a) — Table 1b 의 BWTandem 행을 **사후필터 행**(3,911,182 / 78.87 / 50.13 / 30.00 / 53.89)으로 교체해 TRF·TRASH 와 같은 방식으로 통일. 네이티브 재실행(79.88 / 50.62)은 민감도 분석으로 강등. 캡션도 재작성 — 옛 캡션은 "두 실행 범위가 다른 콜 세트를 낸다"는 이유로 네이티브를 썼는데, 그 이유가 곧 비대칭의 근거였다.
+
 - **왜**: BWTandem은 `--max-period 100` **네이티브 재실행**을 받았고, TRF는 500으로 돌린 뒤
   **사후 필터**됐다. TRF에도 네이티브 최대 주기 인자가 있으므로 피할 수 있는 비대칭이다.
   같은 스코어러로: 사후필터 BWTandem **recall 78.87 / prec 50.13**, 네이티브 BWTandem-F
@@ -500,6 +502,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 - **근거**: `manuscript.md:72,448` vs `bwtandem/autocorr.py:43`, `finder.py:541,622`.
 
 ### 6.22 "the 2026 tools have no banded rows" — 예치 로그가 반증한다
+
+> ✅ **APPLIED (2026-09-03, 다음 커밋):** 저자 결정 C-9(a) — 사전등록대로 AniAnn's 를 밴드 패널에 넣었다. **셀은 이미 예치돼 있었다**: human ≤100 `114 / 0.01 / 85.09 / 0.92 / 54.50`, 101–2000 `205 / 0.03 / 81.46 / 2.69 / 10.03` (`score_2026_human.txt:25-33`), Col-CEN 밴드 recall `99.15%` 양쪽 (`score_2026_colcen.txt:12`). Table 1b·1c 에 행 추가, §3.2 에 서술 추가, Table 1b 캡션의 "2026 tools have no rows here" 는 거짓이므로 정정.
 
 - **왜**: 사전등록 프로토콜(`docs/2026-09-01-longdust-anianns-benchmark-protocol.md`)은 AniAnn's가
   "**period-banded rules using its periodicity column where a table's rule reads a period**"에
@@ -571,6 +575,20 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
   ChrC k=12 / stride=20 / max_occ=200, ChrM k=13 — **인쇄된 어느 범위에도 들어가지 않는다.**
 - **대체값**: "핵 염색체 5개에 한한 범위"로 한정하거나 소기관 값을 추가할 것.
 - **근거**: `manuscript.md:427`, `bwtandem/tier3.py:30`, `results/beds/README.md:8`.
+
+### 6.27 §3.2 의 BWTandem 밴드 recall 91.31% / 94.68% 은 예치 출처가 없다
+
+- **왜**: 두 값은 `manuscript.md` 밖 어디에도 없다 (`grep -rl` on `results/` → 0건).
+  예치된 유일한 Col-CEN 밴드 소스는 `results/comparators2026/score_2026_colcen.txt` 이고
+  BWTandem 에 **91.92% / 95.21%** 를 준다. 다만 그 로그의 BWTandem 행은 밴드 콜 **1,380**
+  (이전 출력)이고 Table 2 가 보고하는 재생성본은 **1,533** 이므로, 두 수는 같은 실행이 아니다.
+- **즉**: 원고의 91.31/94.68 이 재생성본의 값일 수는 있으나 **그것을 보여주는 산출물이 예치돼
+  있지 않다.** 재생성 BED 로 밴드 채점을 다시 돌려 값을 확정하고 예치해야 한다.
+- **대체값**: **미산출.**
+- **근거**: `manuscript.md:184` vs `results/comparators2026/score_2026_colcen.txt:4`,
+  `manuscript.md:195` (Table 2 의 1,533).
+- 🔗 C-9(a) 처리 중 발견. AniAnn's 밴드 셀(99.15%)은 예치돼 있어 그대로 반영했고,
+  BWTandem 쪽 비교 상대만 출처가 없다.
 
 ---
 

@@ -109,15 +109,15 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [x] **#30** 경쟁 도구 GNU-time 로그 예치 + 해시 (현재 저장소 밖) ✅ (2026-09-03, `e4ae632`) 40개 예치, 5개 도구 전부 재현 확인
 - [x] **Codex 발견 10** CEN180 진실셋 생성 과정(BLAST 버전·명령·원시 68,840 hit) 복구 또는 ✅ (2026-09-03, `e4ae632`) **원시 hit 68,840개가 살아 있었다** — 예치하고 원고 정정
 - [ ] **#14** [HIGH] license, citation, package metadata, release versioning, CI
-- [x] **#26** 2026-tool 벤치마크 반영 ✅ (2026-09-03) C-9(a) 로 Table 1b·1c·§3.2 에 진입, 본문 언급 32곳 — **GitHub 닫기 대기**
+- [x] **#26** 2026-tool 벤치마크 반영 ✅ (2026-09-03) C-9(a) 로 Table 1b·1c·§3.2 에 진입, 본문 언급 32곳 · **GitHub 닫힘**
 - [x] **#27** 제목의 FM-index 인과 프레이밍 — **저자 유지 결정으로 종결** ✅ (2026-09-03, C-7)
 - [x] ~~#28~~ — **C-8 에 흡수**: Abstract 재구성 안에서 함께 처리된다
 - [x] ~~#29~~ — **C-1 에 흡수**: 재실행 결과가 이 주장의 운명을 정한다
-- [x] **#30** 경쟁 도구 GNU-time 로그 예치 ✅ (2026-09-03, `e4ae632`) 40개 + 5도구 재현 확인 — **GitHub 닫기 대기**
+- [x] **#30** 경쟁 도구 GNU-time 로그 예치 ✅ (2026-09-03, `e4ae632`) 40개 + 5도구 재현 확인 · **GitHub 닫힘**
 - [x] **#31** deposit-hash 워크플로 ✅ 완화됨 — `tests/test_deposit_hashes.py` 가 오늘 두 번 잡아냈고,
-      순서는 `quarantine.md` §8.2 에 성문화. 스크립트 자체 재작성은 하지 않는다 — **GitHub 닫기 대기**
+      순서는 `quarantine.md` §8.2 에 성문화. 스크립트 자체 재작성은 하지 않는다 · **GitHub 닫힘**
 - [x] **#32** 동등성 주장에 검사 첨부 ✅ `24cd12a`·`ccf04dd`·`e8ac50c` 가 두 건 모두 처리.
-      재발 방지는 `quarantine.md` 의 "대체물 없으면 없음이라 적는다" 규약이 맡는다 — **GitHub 닫기 대기**
+      재발 방지는 `quarantine.md` 의 "대체물 없으면 없음이라 적는다" 규약이 맡는다 · **GitHub 닫힘**
 - [~] **#33** 2차 의견 리뷰 — Kimi 3라운드·Codex 4라운드 **전부 완료**. 남은 것은 미검증분 처리(B절)
 
 ---
@@ -130,7 +130,7 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 > `env -u SBATCH_PARTITION -u SBATCH_ACCOUNT -u SBATCH_TIMELIMIT sbatch --partition=cpu-s2-core-0 --account=cpu-s2-pgl-0 ...`
 > s1 은 자기 6일짜리 annotation 잡으로 늘 막혀 있다 — 이걸로 시작 예정이 9/5 에서 즉시로 바뀌었다.
 
-- [ ] **origin 푸시** — 로컬이 17 커밋 앞섬
+- [x] **origin 푸시** ✅ (2026-09-03) `67f11b1..f57fcb0`, 21 커밋
 - [x] 위키의 "미커밋" ⚠️ 정리 + 개명 반영 ✅ (2026-09-03, wiki `50e863d`)
 - [!] **flaky `TestAdjacentGroundTruth::test_sensitivity`** ⛔ 클러스터 ASLR 이 꺼져 있어
       실패 레이아웃에 도달 불가. 관리자에게 노드 1대 ASLR 재활성화 요청 필요 (`quarantine.md` §9.1)

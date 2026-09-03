@@ -69,30 +69,15 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [ ] **Codex 발견 11** tantan 스레드/명령: 실제 활성 스레드 1, 확장 명령(`-w 500/2000/200`) 명시.
       `allocated_cpus` 와 도구 스레드를 열로 분리
 - [ ] **Codex 발견 14** 매니페스트의 `PENDING` 행 5개(8, 16–19)를 superseded 로 표시하거나 분리
-- [ ] 재해시 후 `pytest tests/test_deposit_hashes.py tests/test_env_var_docs.py`
-
----
-
-## B. 남은 검증 — 목록을 닫기 전에
-
+- [x] ~~재해시 후 pytest~~ — **항목 아님**: A-2 절차의 마지막 단계이지 독립 항목이 아니다
 - [x] **Codex 라운드 2** — Results ↔ 예치 산출물, 9건 ✅ (2026-09-03, `msreview/codex_out_R2.txt`)
 - [x] **Codex 라운드 3** — Discussion 메커니즘 ↔ 코드, 14건 ✅ (2026-09-03, `msreview/codex_out_R3.txt`)
 - [x] R2·R3 의 최중대 6건 실물 검증 후 §6 에 추가 ✅ (2026-09-03, §6.22–6.26 · §3.10)
 - [ ] R2·R3 의 나머지 17건 검증 또는 명시적 기각
 - [ ] Codex 첫 리뷰의 **미검증 14건** 처리 — 검증하거나 명시적으로 기각
 - [ ] Kimi 라운드 1–3 의 MEDIUM/LOW 중 미검증분 선별 검증
-- [ ] `TIER2_APPROX_SEED` at identity ≥ 0.88 — centromere/satellite 에 도움될 수 있으나 **미시험**.
-      시험 없이 켜지 말 것 (이 논문 범위 밖일 수 있음)
-
----
-
-## C. 저자 결정 — 2026-09-03 접수분
-
-> 📌 **투고처가 정해졌다: Bioinformatics *Application Note*.** 이것이 나머지 항목의 범위를 바꾼다 —
-> App Note 는 분량 제한이 엄격해 본문 표 대부분이 보충자료로 내려가거나 사라진다.
-> 전환 계획: `docs/2026-09-01-application-note-conversion-plan.md`.
-> **A 절 수정 중 사라질 표에 대한 것이 있는지 전환 시 재확인할 것.**
-
+- [x] ~~`TIER2_APPROX_SEED` at identity ≥ 0.88~~ — **제외** (2026-09-03): 미시험 연구 방향이지
+      논문 작업이 아니다. `quarantine.md` §9.3 으로 이관
 - [~] **C-1. Tier 3 탐색 창 — (b) 재실행 채택** (저자 결정 2026-09-03)
       100 vs 2,000 쌍을 `0363d8b` 로 재실행 중: SLURM `6147671`·`6147672`·`6147673`
       (`exp1_human/wp0/rangerep0363/`, 두 arm 을 한 잡에서 순차 실행해 노드 공유 보장).
@@ -124,13 +109,15 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [x] **#30** 경쟁 도구 GNU-time 로그 예치 + 해시 (현재 저장소 밖) ✅ (2026-09-03, `e4ae632`) 40개 예치, 5개 도구 전부 재현 확인
 - [x] **Codex 발견 10** CEN180 진실셋 생성 과정(BLAST 버전·명령·원시 68,840 hit) 복구 또는 ✅ (2026-09-03, `e4ae632`) **원시 hit 68,840개가 살아 있었다** — 예치하고 원고 정정
 - [ ] **#14** [HIGH] license, citation, package metadata, release versioning, CI
-- [ ] **#26** [MEDIUM] 2026-tool 벤치마크를 남은 서술에 반영
+- [x] **#26** 2026-tool 벤치마크 반영 ✅ (2026-09-03) C-9(a) 로 Table 1b·1c·§3.2 에 진입, 본문 언급 32곳 — **GitHub 닫기 대기**
 - [x] **#27** 제목의 FM-index 인과 프레이밍 — **저자 유지 결정으로 종결** ✅ (2026-09-03, C-7)
-- [ ] **#28** [HIGH] Abstract: caveat 이 우리 수치에만 붙고 경쟁 도구엔 안 붙음 → C-8
-- [ ] **#29** [MEDIUM] range-cost "sublinearity" 주장 → C-1 과 연동
-- [ ] **#30** [HIGH] 경쟁 도구 GNU-time 로그 예치 → D
-- [ ] **#31** [HIGH] deposit-hash 워크플로 (재해시 순서) → A-2 에서 실증됨
-- [ ] **#32** [MEDIUM] 증거 트리의 동등성 주장에 검사 첨부
+- [x] ~~#28~~ — **C-8 에 흡수**: Abstract 재구성 안에서 함께 처리된다
+- [x] ~~#29~~ — **C-1 에 흡수**: 재실행 결과가 이 주장의 운명을 정한다
+- [x] **#30** 경쟁 도구 GNU-time 로그 예치 ✅ (2026-09-03, `e4ae632`) 40개 + 5도구 재현 확인 — **GitHub 닫기 대기**
+- [x] **#31** deposit-hash 워크플로 ✅ 완화됨 — `tests/test_deposit_hashes.py` 가 오늘 두 번 잡아냈고,
+      순서는 `quarantine.md` §8.2 에 성문화. 스크립트 자체 재작성은 하지 않는다 — **GitHub 닫기 대기**
+- [x] **#32** 동등성 주장에 검사 첨부 ✅ `24cd12a`·`ccf04dd`·`e8ac50c` 가 두 건 모두 처리.
+      재발 방지는 `quarantine.md` 의 "대체물 없으면 없음이라 적는다" 규약이 맡는다 — **GitHub 닫기 대기**
 - [~] **#33** 2차 의견 리뷰 — Kimi 3라운드·Codex 4라운드 **전부 완료**. 남은 것은 미검증분 처리(B절)
 
 ---
@@ -147,12 +134,8 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [x] 위키의 "미커밋" ⚠️ 정리 + 개명 반영 ✅ (2026-09-03, wiki `50e863d`)
 - [!] **flaky `TestAdjacentGroundTruth::test_sensitivity`** ⛔ 클러스터 ASLR 이 꺼져 있어
       실패 레이아웃에 도달 불가. 관리자에게 노드 1대 ASLR 재활성화 요청 필요 (`quarantine.md` §9.1)
-- [ ] Filip 그림 6개 — 우리 손 밖. 브리프 `results/figures/paper_figs/HANDOFF_FILIP.md`
-
----
-
-## 완료 기록
-
+- [ ] Filip 그림 6개 — **외부 의존, 제외 아님**. App Note 도 6개를 다 쓴다(본문 2 + 보충 4;
+      전환 계획서 참조). 브리프 `results/figures/paper_figs/HANDOFF_FILIP.md`
 - [x] `quarantine.md` 신설 (§1–§10, 폐기 대장) ✅ (2026-09-03, `0357cbd`)
 - [x] resume.md 격리 — 📌 정본 포인터 + ❌ MOVED 배너 4곳, 앵커 0 broken ✅ (2026-09-03, `0357cbd`)
 - [x] Codex 2차 의견 리뷰 전사본 예치 ✅ (2026-09-03, `0357cbd` / `docs/2026-09-03-codex-review-findings.md`)

@@ -112,25 +112,17 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 
 ## D. 재실행·재측정이 필요한 것
 
-- [ ] **§6.20** `sacct -j ... --format=JobID,Elapsed,MaxRSS,State -P` 원문을 체크섬과 함께 예치.
-      불가하면 예치된 `wait4` 값(17.37 / 19.97 / 1.31 GiB)을 그 이름으로 쓰도록 원고 수정
-- [ ] **§6.27** Col-CEN 밴드 recall 을 재생성 BED 로 재채점 — 원고의 91.31/94.68 은 예치 출처가 없다
-- [ ] **TRF S4 JSON 교체** — `results/one_to_one/one_to_one_trf_annot_r50.json` 을 재채점본으로.
-      스크래치패드에 대기: `trf_annot_periodfix.json`. **A-2 재해시와 한 번에**
-- [ ] **원장 예치** — `exp1_human/loop/{ledger.tsv,best.json}` 를 `results/` 에 예치 (C-3 (a) 의 나머지 절반).
-      `results/` 를 건드리므로 **A-2 재해시와 한 번에**
-- [ ] **§6.19** 누락 스코어러 3개 커밋 — `rescore_tables_3bc.py`, `score_exp3.py`, `score_overlap.py`.
-      사설 클러스터 경로를 저장소 상대경로로 교체 (**Availability 약속이 현재 거짓**)
-- [ ] **Codex 발견 9** CEN180 identity 층화를 재생성 BED 로 재채점, 다섯째 층(99–100%, 100 monomers) 포함
-- [ ] **Codex 발견 8** 2026 도구를 Table 3B/3C 정본 스코어러로 재채점하고 출력 예치
-- [ ] **#30** 경쟁 도구 GNU-time 로그 예치 + 해시 (현재 저장소 밖)
-- [ ] **Codex 발견 10** CEN180 진실셋 생성 과정(BLAST 버전·명령·원시 68,840 hit) 복구 또는
-      "재현 불가한 legacy 편의 진실셋"으로 명시
-
----
-
-## E. 열린 이슈 (GitHub)
-
+- [x] **§6.20** `sacct -j ... --format=JobID,Elapsed,MaxRSS,State -P` 원문을 체크섬과 함께 예치. ✅ (2026-09-03, `e4ae632`) 34개 잡 sacct 예치, 헤드라인 3개 정확히 일치
+- [x] **§6.27** Col-CEN 밴드 recall 을 재생성 BED 로 재채점 — 원고의 91.31/94.68 은 예치 출처가 없다 ✅ (2026-09-03, `e4ae632`) **오탐이었다** — 재생성본이 91.31/94.68 을 그대로 준다. 산출물만 없었고 이제 예치됨
+- [x] **TRF S4 JSON 교체** — `results/one_to_one/one_to_one_trf_annot_r50.json` 을 재채점본으로. ✅ (2026-09-03, `e4ae632`)
+- [x] **원장 예치** — `exp1_human/loop/{ledger.tsv,best.json}` 를 `results/` 에 예치 (C-3 (a) 의 나머지 절반). ✅ (2026-09-03, `e4ae632`) `results/tuning_ledger/` + README
+- [x] **§6.19** 누락 스코어러 3개 커밋 — `rescore_tables_3bc.py`, `score_exp3.py`, `score_overlap.py`. ✅ (2026-09-03, `e4ae632`) 3개 커밋 + 클러스터 경로를 env 오버라이드로
+- [x] **Codex 발견 9** CEN180 identity 층화를 재생성 BED 로 재채점, 다섯째 층(99–100%, 100 monomers) 포함 ✅ (2026-09-03, `e4ae632`) 재생성본으로 재채점, 다섯째 층 추가
+- [ ] **Codex 발견 8 (범위 변경)** 정본 3B/3C 스코어러는 경쟁 도구 입력이 하드코딩이고 로드 시 원고 값을
+      검증하므로, 도구 추가는 재실행이 아니라 재작성이다. Codex 자신의 재계산도 보고된 셀이 동일하게
+      반올림된다고 한다. **실제 결함은 §2.2.4 의 부정확한 서술** — 그 문장을 고칠 것
+- [x] **#30** 경쟁 도구 GNU-time 로그 예치 + 해시 (현재 저장소 밖) ✅ (2026-09-03, `e4ae632`) 40개 예치, 5개 도구 전부 재현 확인
+- [x] **Codex 발견 10** CEN180 진실셋 생성 과정(BLAST 버전·명령·원시 68,840 hit) 복구 또는 ✅ (2026-09-03, `e4ae632`) **원시 hit 68,840개가 살아 있었다** — 예치하고 원고 정정
 - [ ] **#14** [HIGH] license, citation, package metadata, release versioning, CI
 - [ ] **#26** [MEDIUM] 2026-tool 벤치마크를 남은 서술에 반영
 - [x] **#27** 제목의 FM-index 인과 프레이밍 — **저자 유지 결정으로 종결** ✅ (2026-09-03, C-7)

@@ -40,10 +40,9 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [ ] **§6.11** Table 2 캡션에 BWTandem 의 CEN180 bp precision 최저(57.08%) 사실 한 문장
 - [ ] **§6.13** S4 캡션 "lowest of the five tools" → **second-lowest** (tantan 3.42% < 8.68%)
 - [ ] **§6.14** "All competitor runs ... inside one Singularity container" → 예외 2건 명시
-- [ ] **§6.16** stride 축소 조건: 432행과 440행 중 틀린 쪽 정정 (약 24 Mb 미만에서만 활성)
 - [ ] **§6.21** "at least 70%" → **80%**, catch-all 에도 적용됨을 공개
+- [x] ~~§6.6 stride 공식~~ · ~~§6.16 stride 축소 모순~~ — **오탐으로 철회** ✅ (2026-09-03, `quarantine.md` §6.6·§6.16)
 - [ ] **§6.5** "roughly 5% more sequence" → 두 값을 같은 단위(염기)로 재계산 후 교체
-- [ ] **§6.6** stride 공식에 프리셋 배수 포함, 포화점 재유도
 - [ ] **§6.4** 2026 도구 메모리 셀 2개: AniAnn's Col-CEN 0.50 → **0.48**, longdust 0.07 → **0.06**
 - [ ] **§6.12** TR-1 경계 오차 네 값(771 bp / 4.3 kb / 4,265 / 7,973)의 통계 정의 후 일치
 - [ ] **§6.24** Discussion 4.3 — Tier 1 도 FM-index 열거를 돌린다(`TIER1_FMSCAN=1`). 메커니즘 서술 정정

@@ -176,6 +176,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 
 ### 3.8 catch-all 식별도 0.72 를 평가 벤치마크 위에서 골랐다
 
+> ✏️ **PARTIAL (2026-09-03, 저자 결정 (a) 최소 공개):** 본문 S3 에 "0.72 는 in-sample 운영점" 명시 (커밋은 아래 §3.9 와 동일). **원장 예치는 미완** — `results/` 를 건드리므로 A-2 재해시와 함께 처리한다.
+
 - **무엇**: 운영점 `CATCHALL_MIN_IDENTITY=0.72`.
 - **왜**: 부록 S3가 스스로 밝힌다 — 스윕이 "scored with the Table 1a pipeline"으로,
   Table 1a가 보고하는 **바로 그 adotto 카탈로그**에 대해 채점됐고, 선택된 arm은
@@ -189,6 +191,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 - **근거**: `manuscript.md:508, 475, 479`. (Kimi 라운드 3, R3c#2 — 미조치)
 
 ### 3.9 "selected empirically on chromosomes 21 and 22" — 캠페인 규모가 공개되지 않았다
+
+> ✏️ **PARTIAL (2026-09-03, 저자 결정 (a) 최소 공개):** 본문 2.2.3 에 캠페인 규모(44건), 코드변경 포함, 관찰 후 accept/reject, ULTRA 표적, 22번 염색체는 post-selection validation 임을 명시. **원장 예치 미완**.
 
 - **무엇**: 설정 선택 경위에 대한 원고의 유일한 서술.
 - **왜**: 외부 원장 `exp1_human/loop/ledger.tsv` 에 **채점된 설정 평가 44건**이 있고(헤더 포함 45행),
@@ -206,6 +210,8 @@ grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된
 - 🔗 [[3.8]] 과 같은 뿌리다 — 3.8은 임계값 하나, 이것은 캠페인 전체.
 
 ### 3.10 Arabidopsis 설정(catch-all off)을 평가 진실셋을 보고 골랐다
+
+> ✏️ **PARTIAL (2026-09-03, 저자 결정 (a) 최소 공개):** S2 에 두 설정을 CEN180 진실셋에 채점한 수치(65.54 vs 60.72, recall 99.67/99.68)와 보류셋 부재를 명시.
 
 - **왜**: S2는 Arabidopsis만 catch-all을 끈다고 하고, 이유를 "where it costs base pair precision
   without recovering centromeric arrays"라 적는다. 생존한 실험 기록

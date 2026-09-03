@@ -49,10 +49,8 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [x] **§6.25** Abstract 의 "per-figure provenance manifest" 약속 삭제 (매핑 0건, 그림 프로그램 6/6 스텁)
 - [x] **§6.26** S1.3 파라미터 범위를 "핵 염색체 5개"로 한정하거나 ChrC/ChrM 값 추가
 - [x] **Codex R3-10** Discussion 4.2 에 게놈×패스 행렬 명시 — 어블레이션이 있는 것과 없는 것을 구분
-- [ ] **Codex R3-12** Limitations 에 native-path 미해결 flake 를 명시
-- [ ] **Codex R2-9** 밴드 손실이 예치본과 0.01 pp 어긋남 — 예치본은 knob180 tantan −0.51 / TRASH −0.34,
-      TR-1 TRASH −18.57 인데 원고는 0.50 / 0.35 / 18.6. **부분 수정 금지** — 표의 손실 열도 같은
-      반올림에서 나오므로, 미반올림 값에서 전 표를 재생성해야 새 불일치가 안 생긴다
+- [x] **Codex R3-12** Limitations 에 native-path flake 명시 ✅ (2026-09-03) §4.4 에 네 번째 한계로 추가 — 소진된 진단과 재현 불가 사유까지
+- [x] **Codex R2-9** 밴드 손실 반올림 ✅ (2026-09-03) 예치본 기준 전수 정정 — 3C-b 표 −0.92→−0.91, 캡션 0.92→0.91, 3B-b 캡션 0.50→0.51, ULTRA 상계 2.81→**2.82**(내 앞선 수정도 뺄셈이라 틀렸다), §4.4 의 같은 주장도
 - [x] **Codex R2-8(정정)** 전체 게놈 실행은 3.11.14/2.3.1 이 맞다 — 다른 것은 p100 패널·식별도 스윕이며,
       S2 에 그 별도 환경을 공개했다. 매니페스트 스코어러 해시 2건은 `results/` 라 A-2 로 이월
 - [x] 원고 전체 **GiB/GB 라벨 37곳 교체** ✅ (2026-09-03, 숫자 불변)
@@ -103,9 +101,7 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [x] **원장 예치** — `exp1_human/loop/{ledger.tsv,best.json}` 를 `results/` 에 예치 (C-3 (a) 의 나머지 절반). ✅ (2026-09-03, `e4ae632`) `results/tuning_ledger/` + README
 - [x] **§6.19** 누락 스코어러 3개 커밋 — `rescore_tables_3bc.py`, `score_exp3.py`, `score_overlap.py`. ✅ (2026-09-03, `e4ae632`) 3개 커밋 + 클러스터 경로를 env 오버라이드로
 - [x] **Codex 발견 9** CEN180 identity 층화를 재생성 BED 로 재채점, 다섯째 층(99–100%, 100 monomers) 포함 ✅ (2026-09-03, `e4ae632`) 재생성본으로 재채점, 다섯째 층 추가
-- [ ] **Codex 발견 8 (범위 변경)** 정본 3B/3C 스코어러는 경쟁 도구 입력이 하드코딩이고 로드 시 원고 값을
-      검증하므로, 도구 추가는 재실행이 아니라 재작성이다. Codex 자신의 재계산도 보고된 셀이 동일하게
-      반올림된다고 한다. **실제 결함은 §2.2.4 의 부정확한 서술** — 그 문장을 고칠 것
+- [x] **Codex 발견 8** §2.2.4 채점 경로 정확화 ✅ (2026-09-03) "no second scoring implementation exists" 는 거짓 — human 은 EXTRA·argv 도 덮고, maize 는 `score_maize_postmerge.py`(좌표 전용 진단)를 쓰지 정본 `rescore_tables_3bc.py` 가 아니다
 - [x] **#30** 경쟁 도구 GNU-time 로그 예치 + 해시 (현재 저장소 밖) ✅ (2026-09-03, `e4ae632`) 40개 예치, 5개 도구 전부 재현 확인
 - [x] **Codex 발견 10** CEN180 진실셋 생성 과정(BLAST 버전·명령·원시 68,840 hit) 복구 또는 ✅ (2026-09-03, `e4ae632`) **원시 hit 68,840개가 살아 있었다** — 예치하고 원고 정정
 - [ ] **#14** [HIGH] license, citation, package metadata, release versioning, CI

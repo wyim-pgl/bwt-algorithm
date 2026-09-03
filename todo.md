@@ -102,22 +102,21 @@ grep -n '^- \[?\]' todo.md    # 저자 결정 대기
 - [?] **C-2. §6.18 — matched-range 비대칭 처리.**
       BWTandem 네이티브 재실행(+1.01 pp) vs TRF 사후 필터.
       **선택지**: (a) 공통 비교를 사후필터 행으로 통일, (b) 모든 도구를 네이티브 100 으로 재실행
-- [?] **C-3. §3.9 — 튜닝 캠페인 공개 범위.**
-      원장 44건·ULTRA 표적을 어디까지 밝힐지, 22번 염색체 결과를 "선택 후 검증"으로 재서술할지
-- [?] **C-4. §3.8 — catch-all 0.72 선정의 선택-무관 증거.**
-      maize/Arabidopsis 진실셋 또는 보류 human 염색체에서 재확인할지
+- [~] **C-3. 튜닝 캠페인 — (a) 최소 공개 채택** ✅ 본문 반영 (2026-09-03, `d580840`) · ⏳ 원장 예치는 A-2 재해시와 함께
+- [x] **C-4. catch-all 0.72 — (a) 최소 공개 채택** ✅ (2026-09-03, `d580840`) S3 에 in-sample 명시
 - [?] **C-9. §6.22 — AniAnn's 밴드 셀을 사전등록대로 넣을 것인가, period 기반 셀을 전부 철회할 것인가.**
       사전등록 프로토콜은 채점 가능하다고 적었고, 예치 로그의 AniAnn's 밴드 recall(99.15%)이
       BWTandem·TRF를 모두 앞선다. **저장소에 있는 불리한 수치가 원고에 없는 상태다.**
 - [!] **C-10. TRF period 열 / S4 재실행 — 저자 회신 "없어", 해석 확인 필요** ⛔
-- [?] **C-11. §3.10 — Arabidopsis catch-all off 선택을 in-sample 로 표시할 것인가, 재설계할 것인가.**
-      선택 근거가 평가 진실셋에 대한 bp precision 비교(65.54 vs 60.72)였다.
+- [x] **C-11. Arabidopsis catch-all off — (a) 최소 공개 채택** ✅ (2026-09-03, `d580840`) S2 에 65.54 vs 60.72 와 보류셋 부재 명시
 - [x] **C-5. TRASH = de novo** ✅ (2026-09-03, 저자 결정: TRASH 에 de novo 모드가 있다) — 326행을 human 한정으로 좁히고 TRASH 를 de novo 로 재분류. §6.15
 - [x] **C-6. 투고처 — Bioinformatics Application Note** ✅ (2026-09-03, 저자 결정)
 - [x] **C-7. 제목 — 현행 유지** ✅ (2026-09-03) `BWTandem: FM-index seeding for wide-period-range tandem repeat detection in assembled genomes` — 저자가 지정한 문구가 원고 현행과 동일. **#27(FM-index 인과 프레이밍 지적)은 저자 유지 결정으로 종결**
 - [ ] **C-8. Abstract 재구성 — 전체 이슈 정리 후로 연기** (저자 결정 2026-09-03)
 - [ ] **§6.20** `sacct -j ... --format=JobID,Elapsed,MaxRSS,State -P` 원문을 체크섬과 함께 예치.
       불가하면 예치된 `wait4` 값(17.37 / 19.97 / 1.31 GiB)을 그 이름으로 쓰도록 원고 수정
+- [ ] **원장 예치** — `exp1_human/loop/{ledger.tsv,best.json}` 를 `results/` 에 예치 (C-3 (a) 의 나머지 절반).
+      `results/` 를 건드리므로 **A-2 재해시와 한 번에**
 - [ ] **§6.19** 누락 스코어러 3개 커밋 — `rescore_tables_3bc.py`, `score_exp3.py`, `score_overlap.py`.
       사설 클러스터 경로를 저장소 상대경로로 교체 (**Availability 약속이 현재 거짓**)
 - [ ] **Codex 발견 9** CEN180 identity 층화를 재생성 BED 로 재채점, 다섯째 층(99–100%, 100 monomers) 포함

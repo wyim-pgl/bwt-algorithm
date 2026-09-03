@@ -9,13 +9,23 @@ are recorded in `results/manifest.tsv` under `table = range-cost`, in Methods
 | Attempt | Job | Threads | Elapsed at termination | Progress at termination | Manifest row |
 |---|---|---|---|---|---|
 | TRF 4.10.0rc2, `MAXP 2000` | 6076847 | 1 | 6 d 13 h 57 m (6.6 d; 4.7× its 33.7 h 500 bp run) | partial `-ngs` output, 379,077 lines | `TRF-p2000-attempt` |
-| ULTRA 1.2.1, `-t 2 -p 2000` | 6145581 | 2 | 1 d 22 h 15 m (1.55× its 29.8 h 100 bp run) | 138,425 calls, all on chr1 (NC_000001.11) up to 124,786,615 bp, ~4% of the assembly; output did not grow during the final 5 h | `ULTRA-p2000-attempt` |
+| ULTRA 1.2.1, `-t 2 -p 2000` | 6145581 | 2 | 1 d 22 h 15 m (1.55× its 29.8 h 100 bp run, which covered the whole file) | 138,425 calls, all on chr1 (NC_000001.11) up to 124,786,615 bp, ~4% of the 3.25 Gb file; output did not grow during the final 5 h | `ULTRA-p2000-attempt` |
+
+Both ratios in that table divide a **terminated partial** run by a **completed** one,
+and both denominators (33.7 h, 29.8 h) are inherited GNU-time figures whose job
+records no longer exist (manuscript Section 2.2.1). They bound the cost from below;
+they are not like-for-like speed ratios.
 
 ## `ultra_p2000/`
 
-- `run_ultra_human_p2000.sbatch`: the submitted script. Identical to the
-  published human ULTRA invocation (`ultra -t 2 -o OUT.tsv FASTA`, the same
-  binary and the same GCA_000001405.15 FASTA) except for `-p 2000`.
+- `run_ultra_human_p2000.sbatch`: the submitted script. It matches the published
+  human ULTRA invocation (`ultra -t 2 -o OUT.tsv FASTA`, ULTRA 1.2.1, the same
+  GCA_000001405.15 FASTA) except for `-p 2000`. **One difference beyond the
+  period:** this run used a local installation of the binary
+  (`~/micromamba/bin/ultra`, recorded with its mtime in the log header), whereas
+  the published competitor runs were executed inside a Singularity sandbox
+  (manuscript Section 2.2). The two are version- and input-matched, not
+  environment-matched.
 - `ultra_h_p2000_6145581.log`: provenance header plus an hourly
   `PROGRESS ... out_bytes=` marker (output-file size; ULTRA writes through a
   4 KB stdio buffer, so the size is a coarse progress proxy). Growth was steady
@@ -29,7 +39,10 @@ are recorded in `results/manifest.tsv` under `table = range-cost`, in Methods
 The partial output itself (`ultra_human_p2000.tsv`, 9,781,248 bytes, 138,426
 lines including the header, first-megabyte SHA-256 `c30692f4351e9a0d…`) stays
 on the cluster at the path recorded in the manifest and is hashed in
-`results/external_evidence.sha256`; it is not scored.
+`results/external_evidence.sha256`; it is not scored. Note that the manifest's
+`lines` field for this row is the raw line count, 138,426, one more than the
+138,425 calls, because this row points at ULTRA's own TSV rather than at a
+converted BED as every other competitor row does.
 
 SLURM accounting (`sacct -j 6145581`): CANCELLED by the user at
 2026-09-02T15:20:13, Elapsed 1-22:15:07, batch-step MaxRSS 17,972,740 K

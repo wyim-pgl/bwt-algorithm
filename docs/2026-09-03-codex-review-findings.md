@@ -11,8 +11,8 @@ requester chose a different model. The verbatim output below is attempt 5's and 
 is final.
 
 **Six of its twenty findings have since been reproduced against the real files by
-the main session and are recorded in `ruleout.md` §6.1-6.6; the other fourteen are
-NOT verified** (`ruleout.md` §9.4). Do not act on an unverified finding.
+the main session and are recorded in `quarantine.md` §6.1-6.6; the other fourteen are
+NOT verified** (`todo.md` §B — 미검증). Do not act on an unverified finding.
 
 ---
 
@@ -337,7 +337,7 @@ No repository files were modified. The worktree still contains the pre-existing 
 ## What the main session verified
 
 Reproduced against the real files, and therefore actionable — full entries in
-`ruleout.md` §6.1-6.6:
+`quarantine.md` §6.1-6.6:
 
 1. **§6.1 (finding 1, HIGH).** `Col-CEN_v1.2_trash.bed` (591 lines) is the exact
    deduplicated union of three TRASH runs: CEN159 232 + CEN178 238 + denovo 234 =
@@ -365,7 +365,7 @@ Reproduced against the real files, and therefore actionable — full entries in
 
 The remaining fourteen findings were not checked and must not be used as the basis
 for an edit until they are. They are listed in the verbatim output above and
-summarised in `ruleout.md` §9.4. Two deserve a note:
+summarised in `todo.md` §B. Two deserve a note:
 
 - Finding 3 (truncated final record in the ULTRA/TRF partial outputs) would change how
   "138,425 calls ... to 124,786,615" should be worded. It is a claim about external
@@ -381,7 +381,7 @@ FINDINGS" section lists seventeen items it considered outside that set. Its
 disposition treats (a), (c) and the log-swap question as correctly fixed, and
 reports (b), (d), (e) and (f) as **incompletely propagated** — fixed in
 `manuscript.md` but surviving in `results/manifest.tsv`, `comparator_baselines.md`,
-`results/README.md` and the root `README.md`. That residue is `ruleout.md` §6.2.
+`results/README.md` and the root `README.md`. That residue is `quarantine.md` §6.2.
 
 (Kimi's six already-applied findings, for reference, so this
 section can mark overlap: (a) "every cell identical" claim across the

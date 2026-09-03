@@ -263,7 +263,7 @@ recall/precision frontier and the chosen operating point.
 > 22.41 GB. **Accuracy figures reproduce on all three genomes** — an earlier blanket
 > quarantine here was withdrawn after it turned out to rest on a scoring bug of
 > mine. Detail: `archive/2026-08-05-unreproducible/README.md`.
-> **Every retired figure, claim, name and job id now lives in `ruleout.md`** — check
+> **Every retired figure, claim, name and job id now lives in `quarantine.md`** — check
 > there before citing any number from this file or from `results/`.
 
 **Exp1 recall op-point (v2.1, precision-leader):** on top of the comboChi base,

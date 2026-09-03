@@ -1,20 +1,48 @@
-# ruleout.md — BWTandem 폐기 대장
+# quarantine.md — BWTandem 격리 대장
 
-> 📌 **정본**: 이 파일이 "쓰면 안 되는 것"의 유일한 정본이다. 폐기된 수치·주장·이름·ID를
-> 인용하기 전에 여기부터 grep 한다. 최종 갱신 **2026-09-03**.
-> 살아 있는 상태·다음 작업은 `resume.md`, 운영 규칙은 `CLAUDE.md`.
+> 📌 **정본**: 이 파일이 "**쓰면 안 되는 것**"의 유일한 정본이다. 최종 갱신 **2026-09-03**.
 
-이 파일의 근거와 규약: 랩 위키 `guide/handoff-hygiene.md` §"세 번째 층 — 프로젝트 단위
-`ruleout.md`". 문서 마커(❌/⚠️/✏️/🧊)는 사람을 막고, 경로 격리(`archive/`)는 스크립트를
-막고, 이 파일은 **새 세션이 폐기된 값을 다시 집어드는 것**을 막는다.
+## 이 파일에 무엇을 두는가
+
+**세 종류만 둔다.**
+
+1. **계획이 틀린 것** — 전제가 무너져 결론이 뒤집힌 것
+2. **이미 시도했는데 안 된 것** — 측정까지 하고 실패한 것
+3. **아예 배제·격리된 것** — 폐기된 수치·주장·이름·ID·경로
+
+**미해결은 여기 두지 않는다.** 아직 답이 없는 것, 검증이 남은 것, 해야 할 일은
+[`todo.md`](todo.md) 로 간다. 이 둘을 섞으면 "목록에 있으니 끝난 것"과 "목록에 있으니
+하지 말 것"이 구분되지 않는다.
+
+## 왜 두는가
+
+다음 문제를 풀 때 **오탐(False Positive) 판정 · 부수 피해 분석 · 위협 분석**의 기준선으로 쓴다.
+
+- **오탐 판정** — 새로 발견한 "결함"이 이미 여기서 기각된 것인지 먼저 본다.
+  §3.1 처럼 **자기 스코어링 버그가 만든 허상**을 진짜 결함으로 오인한 전례가 있다.
+- **부수 피해 분석** — 어떤 값을 고칠 때 그 값에 딸린 것이 무엇인지 본다.
+  §1.2 는 바이너리 하나가 **모든 벤치마크 수치**를 옮겼고, §8.1 은 한 줄짜리 캐스팅이
+  **모든 주기별 지표**를 오염시켰다.
+- **위협 분석** — 같은 함정에 다시 걸릴 경로를 §8 이 목록으로 들고 있다.
+
+살아 있는 상태는 `resume.md`, 할 일은 `todo.md`, 운영 규칙은 `CLAUDE.md`.
+
+이 파일의 근거와 규약: 랩 위키 `guide/handoff-hygiene.md` §"세 번째 층". 문서 마커
+(❌/⚠️/✏️/🧊)는 사람을 막고, 경로 격리(`archive/`)는 스크립트를 막고, 이 파일은
+**새 세션이 폐기된 값을 다시 집어드는 것**을 막는다.
+
+> ⚠️ **이름 주의 (2026-09-03):** 랩 위키의 규약 문서는 이 층의 파일명을 `ruleout.md` 로
+> 성문화했고 opuntia_analysis · TransGenic 이 그 이름을 쓴다. 이 저장소만 `quarantine.md`
+> 로 부른다 — "폐기(rule out)"가 미해결까지 담는 것으로 오독됐기 때문이다. 다른 프로젝트에서
+> 왔다면 `ruleout.md` 를 찾을 것: 같은 층, 같은 §1–§10 구조다.
 
 항목 형식은 고정이다: **무엇 / 왜 / 언제 / 대체물 / 근거 경로**.
 **대체물이 없으면 "없음"이라고 적는다** — 빈칸은 "나중에 채워도 된다"로 읽히지만
 "없음"은 그 주장을 아예 하지 말라는 뜻이다.
 
 ```bash
-grep -n '^### ' ruleout.md          # 폐기 항목 전수
-grep -rn 'ruleout.md' resume.md CLAUDE.md   # 이 파일로 연결된 격리 지점
+grep -n '^### ' quarantine.md       # 격리 항목 전수
+grep -rn 'quarantine.md' resume.md CLAUDE.md todo.md   # 이 파일로 연결된 지점
 ```
 
 ---
@@ -129,6 +157,37 @@ grep -rn 'ruleout.md' resume.md CLAUDE.md   # 이 파일로 연결된 격리 지
   근거가 되는 실행이 보고되지 않았다. (Kimi 라운드 1, manuscript.md:62)
 - **대체물**: 없음 — 수치를 부록에 넣거나 문장을 삭제. **미적용 상태.**
 
+### 3.8 catch-all 식별도 0.72 를 평가 벤치마크 위에서 골랐다
+
+- **무엇**: 운영점 `CATCHALL_MIN_IDENTITY=0.72`.
+- **왜**: 부록 S3가 스스로 밝힌다 — 스윕이 "scored with the Table 1a pipeline"으로,
+  Table 1a가 보고하는 **바로 그 adotto 카탈로그**에 대해 채점됐고, 선택된 arm은
+  "equals the Table 1a BWTandem row **by construction**"이다. 즉 헤드라인 human 수치는
+  평가셋 위에서 수행한 파라미터 탐색의 최대-recall 지점이다. 저장소의 자체 규칙은
+  "no GT overfitting"이다.
+- **완화 요인**: 곡선이 매끄럽고(0.76→0.72에서 recall 71.53→80.53) 공개도 이례적으로 솔직하다.
+  스파이크 집기는 아니다.
+- **대체물**: 없음 — 다만 **선택과 무관한 증거 1개**가 필요하다(maize/Arabidopsis 진실셋이나
+  보류된 human 염색체 부분집합에서 0.72 확인). 부록이 아니라 **본문**에 선정 경위를 밝힐 것.
+- **근거**: `manuscript.md:508, 475, 479`. (Kimi 라운드 3, R3c#2 — 미조치)
+
+### 3.9 "selected empirically on chromosomes 21 and 22" — 캠페인 규모가 공개되지 않았다
+
+- **무엇**: 설정 선택 경위에 대한 원고의 유일한 서술.
+- **왜**: 외부 원장 `exp1_human/loop/ledger.tsv` 에 **채점된 설정 평가 44건**이 있고(헤더 포함 45행),
+  환경 스윕과 **코드 변경**까지 포함한다. 계획 문서는 이를 "adaptive" coordinate descent라 부르고,
+  `best.json` 은 목표를 이렇게 적는다:
+  **`recall->82% at precision>=~53% genome (ULTRA-level)`**.
+  즉 비공식적 선택이 아니라 **평가에 쓰인 바로 그 카탈로그에 대한, 경쟁 도구를 기준점으로 삼은
+  최적화 캠페인**이다. 보류 염색체 결과는 유용하지만 다중성·목표 변경·적응적 중단·ULTRA 표적을
+  공개하지 않는다. 원장과 `best.json` 은 **저장소 밖에 있다.**
+- **대체물**: 평가 설정 수, 코드변경 대 파라미터전용 구분, 최초·수정 목표, 경쟁도구 표적,
+  수용/중단 규칙, 최종 선택 규칙을 명시하고 원장을 예치할 것. 22번 염색체 결과는
+  **선택 후 검증(post-selection validation)** 으로 서술할 것. **미조치.**
+- **근거**: `manuscript.md:94`; `exp1_human/loop/{ledger.tsv,best.json}`;
+  `docs/superpowers/plans/2026-06-23-exp1-recall-loop.md`. (Codex 라운드 1, 발견 2)
+- 🔗 [[3.8]] 과 같은 뿌리다 — 3.8은 임계값 하나, 이것은 캠페인 전체.
+
 ---
 
 ## §4 명명 — 쓰면 안 되는 이름
@@ -170,7 +229,7 @@ grep -rn 'ruleout.md' resume.md CLAUDE.md   # 이 파일로 연결된 격리 지
 
 ## §6 결과 셀 — 개별 폐기 (2026-09-03 확정, **수정 미적용**)
 
-> ⚠️ 아래 12건은 Codex 리뷰(6.1-6.6)와 Kimi 라운드 2(6.7-6.12)가 지적하고 **내가 실물 파일·표로 재현**한 것이다.
+> ⚠️ 아래 21건은 Codex(6.1-6.6, 6.17-6.21)와 Kimi 라운드 2·3(6.7-6.16)이 지적하고 **내가 실물 파일·표로 재현**한 것이다.
 > 원고·증거 트리에 **아직 그대로 있다**. 인용 금지, 수정 대상.
 
 ### 6.1 Table 2 의 TRASH 비용 셀 두 개
@@ -277,6 +336,98 @@ grep -rn 'ruleout.md' resume.md CLAUDE.md   # 이 파일로 연결된 격리 지
   일치시킬 것. **미산출.**
 - **근거**: `manuscript.md:234, 236, 240`.
 
+### 6.13 Supplementary Table S4 캡션 — 자기 표가 반증하는 "최저"
+
+- **무엇**: "**BWTandem's is the lowest of the five tools**" (panel (a) 1:1 precision).
+- **왜**: 같은 표에서 tantan **3.42%** < BWTandem **8.68%**. BWTandem은 **차하위**다.
+- **대체값**: "second-lowest", 또는 "lowest after tantan (8.68% vs 3.42%)".
+- **근거**: `manuscript.md:518` 캡션 vs `manuscript.md:521-529` 표.
+- ⚠️ **오류 방향이 자기에게 불리하다** — 그래서 "우리한테 엄격했네" 하고 자체 점검을 통과했다.
+  자기비판 방향의 오류도 오류다. S4 수치를 산문으로 옮긴 다른 곳도 전수 재확인할 것.
+
+### 6.14 "All competitor runs were executed inside one Singularity container"
+
+- **왜**: 같은 표의 두 행이 반증한다 — longdust "not run in the container"(487행),
+  ULTRA p2000 "executed outside the Singularity sandbox"(489행).
+- **대체값**: "All competitor runs except the two noted below".
+- **근거**: `manuscript.md:481` vs `487, 489`.
+- ✅ **Codex(발견 10)와 Kimi 라운드 3(R3c#3)이 독립적으로 같은 결함을 짚었다.**
+
+### 6.15 TRASH 분류가 문장마다 바뀐다 — 비교 주장을 보호하는 방향으로
+
+- **왜**: 313행은 TRASH를 period 범위를 미리 정할 필요가 없는 **de novo** 검출기의 예외로 든다.
+  326행은 BWTandem이 "largest de novo-tool footprint on the two large genomes"라 주장하면서
+  더 큰 수치를 "template-guided"로 밀어낸다 — 그 안에 **TRASH 120.64 GB (maize)** 가 들어 있다.
+  313행이 맞으면 326행은 거짓이다.
+- **대체값**: 두 곳의 분류를 일치시킬 것. TRASH가 de novo라면 주장을 "largest de novo footprint
+  **on human**"으로 한정해야 한다. **미결정.**
+- **근거**: `manuscript.md:313` vs `manuscript.md:326`.
+
+### 6.16 stride 축소가 "발동한다"와 "무력하다"가 같은 부록에 공존
+
+- **왜**: 432행은 stride가 "300 (lower only on an Arabidopsis chromosome whose prior-tier
+  coverage exceeds ~90%)" — 즉 실제 데이터에서 **발동했다**고 적는다. 440행은 그 축소가
+  "inert at chromosome scale ... the stride is 300 regardless of prior tier coverage"라고
+  정반대로 적는다. 440행 자신의 논거(~24 Mb 위에서만 clamp가 먼저 문다)가 오히려
+  24 Mb 아래에서는 발동함을 예측한다.
+- **대체값**: 참인 조건(약 24 Mb 미만에서만 활성)을 한 번만 적고 둘 중 틀린 쪽을 고칠 것.
+- **근거**: `manuscript.md:432` vs `manuscript.md:440`. §6.6과 같은 메커니즘이다.
+
+### 6.17 "The tier's search window is fixed at 100 bp to 100 kbp" — 옛 구현을 서술한다
+
+- **왜**: 현재 코드와 헤드라인 커밋 `0363d8b` 모두 `tier3_min = max(100, min_period)` /
+  `tier3_max = min(100_000, max_period)` 로 CLI 인자가 **탐색 자체를 좁힌다**. 소스 주석이
+  스스로 **"This is NOT output-neutral"** 이라고 적어 두었다. 부록의 jitter tolerance 0.04도
+  틀렸다 — `tolerance_ratio = 0.02 + 0.02*(max_period/100000)` 이므로 `--max-period 2000`에서
+  **0.0204**다. 고정 100–100,000 동작은 역사적 커밋 `07ad6fa`의 것이고,
+  **range-cost 실험 3쌍(`manifest.tsv:60-65`)이 바로 그 옛 커밋으로 돌았다.**
+- **대체값**: 두 코드 시대를 분리해 서술할 것. 현재 구현의 범위 비민감성은 100 vs 2,000 실험을
+  `0363d8b`나 현재 코드로 **다시 돌리기 전까지 주장할 수 없다**. **미산출.**
+- **근거**: `bwtandem/finder.py:116-139`, `bwtandem/tier3.py:38`, `manuscript.md:64,438`.
+- ⚠️ 이것은 문구 문제가 아니라 **논문 중심 주장의 근거 문제**다.
+
+### 6.18 "shared 100 bp range" 가 비대칭이다
+
+- **왜**: BWTandem은 `--max-period 100` **네이티브 재실행**을 받았고, TRF는 500으로 돌린 뒤
+  **사후 필터**됐다. TRF에도 네이티브 최대 주기 인자가 있으므로 피할 수 있는 비대칭이다.
+  같은 스코어러로: 사후필터 BWTandem **recall 78.87 / prec 50.13**, 네이티브 BWTandem-F
+  **79.88 / 50.62** — 네이티브 재실행이 **+1.01 pp**를 준다. §6.17이 최대 주기가 탐색을
+  바꾼다는 걸 확정했으므로 이 차이는 필터링 효과가 아니다.
+- **대체값**: 공통 비교에 사후필터 행을 쓰거나, 모든 도구를 네이티브 100으로 재실행할 것.
+- **근거**: `results/manifest.tsv:9-12,89-93`, `results/regen/score_table1_p100.txt:40-57`.
+
+### 6.19 Availability 약속이 거짓이다 — 스코어러 3개가 저장소에 없다
+
+- **왜**: 원고는 "Source code, scoring scripts and per-figure provenance"를 약속하고 독자가
+  "rerun the same code" 할 수 있다고 한다. 그러나 **도달 가능한 git 이력 전체에** 다음이 없다:
+  `scripts/scoring/rescore_tables_3bc.py`(매니페스트가 Table 3B/3C용으로 지목),
+  `scripts/scoring/score_exp3.py`(maize 래퍼들이 요구),
+  `scripts/score_overlap.py`(`score_table1.py --check-defs`가 요구).
+  provenance JSON은 대신 **사설 클러스터 경로**를 가리킨다.
+- **대체값**: 해당 파일과 의존물을 커밋하고 경로를 저장소 상대경로로 바꿀 것.
+- **근거**: `git log --all --diff-filter=A` 결과 0건; `results/regen/table3bc_provenance.json:3,13`.
+
+### 6.20 헤드라인 BWTandem 메모리 3개가 예치 증거에서 유도되지 않는다
+
+- **무엇**: `28.08` / `28.45` / `2.16 GB` (human / maize / Col-CEN, sacct MaxRSS라고 서술).
+- **왜**: 래퍼는 `wait4()`의 프로세스 트리 `ru_maxrss`만 기록하며, 예치된 값은
+  **17.369 / 19.968 / 1.307 GiB** 로 환산된다. 벽시계도 각각 약 33 / 29 / 5초 짧다.
+  **원시 `sacct` 출력이 저장소에도 외부 로그에도 남아 있지 않다** — sbatch는 나중에 직접
+  `sacct`를 돌리라고 지시할 뿐이다. 즉 정확한 cgroup 셀과 그 반올림을 독립 검증할 수 없다.
+- **대체값**: `sacct -j ... --format=JobID,Elapsed,MaxRSS,State -P` 원문을 체크섬과 함께 예치하거나,
+  예치된 `wait4` 값을 **그 이름으로** 쓸 것.
+- **근거**: `results/regen/regen_{human,maize,colcen}.provenance.json:10-11`,
+  `scripts/benchmark/run_with_provenance.sh:57-72`.
+
+### 6.21 "at least 70% unambiguous A/C/G/T bases" — 코드는 80%다
+
+- **왜**: `bwtandem/autocorr.py:43` `DEFAULT_MIN_VALID_FRAC = 0.8`, 후보 블록과 각 분할 창
+  양쪽에 적용된다. 벤치마크 커밋 `0363d8b`에서도 같다. **catch-all 패스에도 같은 미공개
+  80% 게이트가 걸린다.** 이것은 문서 오탈자가 아니라 **활성 수용 임계값**이다.
+- **대체값**: 원고를 **80%**로 고치고 catch-all 적용 사실을 공개할 것 (코드를 70%로 바꾸면
+  영향받는 모든 결과를 재실행해야 한다).
+- **근거**: `manuscript.md:72,448` vs `bwtandem/autocorr.py:43`, `finder.py:541,622`.
+
 ---
 
 ## §7 파일 경로 격리 대응표
@@ -357,32 +508,33 @@ env 레버 기반 recall/precision 프런티어는 **천장**에 있다.
 
 ---
 
-## §9 미해결 — 폐기도 채택도 아닌 것 (인용 금지)
+## §9 진단으로 배제된 것 — 다시 조사하지 말 것
 
-> 목록에 없으니 써도 된다"로 읽히는 것을 막기 위해 명시적으로 격리한다.
+> 여기 있는 것은 **돌려봤고 깨끗했던** 진단이다. 미해결 항목이 아니다 —
+> 아직 답이 없는 것은 [`todo.md`](todo.md) 에 있다.
 
-### 9.1 flaky `TestAdjacentGroundTruth::test_sensitivity`
+### 9.1 flaky `TestAdjacentGroundTruth::test_sensitivity` — 아래 진단은 전부 소진됐다
 
-memcheck·ASan(Cython 포함) 전부 클린, 환경 블록·mmap 베이스 스윕 약 1,640회 재현 0.
-클러스터가 진단 이후 ASLR을 끄면서(`randomize_va_space=0`) **실패 레이아웃에 도달할 수
-없는 상태**다. 원인 미확정 — "고쳤다"고 쓰지 말 것. 재현하려면 관리자에게 노드 1대
-ASLR 재활성화를 요청해야 한다. 추적기는 `docs/2026-08-10-flaky-test-instrumentation-campaign.md`.
+| 시도한 것 | 결과 |
+|---|---|
+| valgrind memcheck (프로덕션 빌드) | 클린 |
+| ASan 재빌드 — C 확장 4개 | 메모리 오류 0 |
+| ASan 재빌드 — Cython `_accelerators` (앞선 패스가 빠뜨린 것) | 클린 |
+| 환경 블록 크기 스윕 256종 ×5 | 실패 0 |
+| mmap 베이스 스윕 (`ulimit -s` ×9) | 실패 0 |
+| 같은 픽스처를 한 프로세스에서 반복 | 바이트 동일 |
+| Chr4(18.8 Mb) 환경 3종 | 바이트 동일 |
 
-### 9.2 `TIER1_STITCH_GAP`
+약 1,640회 전수 재현 0. **원인은 프로세스 메모리 레이아웃 조건부**이고, 클러스터가 진단 이후
+ASLR을 끄면서(`randomize_va_space=0`) 실패 레이아웃 자체에 도달할 수 없다.
+**위 진단을 다시 돌리는 것은 낭비다.** 재현하려면 관리자에게 노드 1대 ASLR 재활성화를
+요청해야 한다 — 그 요청은 `todo.md` F 절의 차단 항목이다.
+추적기 보존: `docs/2026-08-10-flaky-test-instrumentation-campaign.md`.
 
-chr21 단주기 recall에 ≈중립(+0.2 pp). 폐기도 채택도 아님 — 장주기 코어용으로 opt-in 유지.
+### 9.2 `TIER1_STITCH_GAP` — 측정했고 값이 없었다
 
-### 9.3 `TIER2_APPROX_SEED` at identity ≥ 0.88
-
-centromere/satellite에서 도움이 될 수 있으나 **미시험**. 시험 없이 켜지 말 것.
-
-### 9.4 2026-09-03 원고 교차 검증의 미확정 발견
-
-Kimi 라운드 1 5건 + Codex 20건 중 **§6에 올린 6건만 내가 실물로 재현**했다.
-나머지(예: TideHunter 제외 사유 불일치, 2,000 bp 상한 논지 문제, S1/S2 상수 개수 불일치,
-merge gap 10p→100p 불연속)는 **미검증**이다. 라운드 2·3이 진행 중이며,
-검증 전에는 원고 수정 근거로 쓰지 말 것.
-출력: `docs/2026-09-03-codex-review-findings.md`, 스크래치패드 `msreview/out_*.md`.
+chr21 단주기 recall 에 **+0.2 pp** (≈중립). 장주기 코어용으로 opt-in 유지하되,
+단주기 recall 을 올리려는 목적으로 다시 켜지 말 것.
 
 ---
 
@@ -395,3 +547,6 @@ merge gap 10p→100p 불연속)는 **미검증**이다. 라운드 2·3이 진행
    해당 절 링크**로 바꾼다. 연결이 없으면 규약 문서가 둘이 되고, 그것이 곧 중복 오해원이다.
 4. 정정의 정정도 쌓는다 — 앞선 판단을 지우지 말고 옆에 새 마커를 잇는다(§3.1이 그 예다).
 5. §6처럼 **수정 미적용** 항목은 적용될 때 §2로 옮기고 대체값을 확정한다.
+   수정 *작업* 자체는 이 파일이 아니라 `todo.md` 에 있다 — 여기는 "그 값을 쓰지 말라"만 적는다.
+6. **미해결을 여기 적지 않는다.** 검증이 남은 것, 답이 없는 것, 해야 할 일은 `todo.md` 로.
+   이 경계가 무너지면 이 파일은 "하지 말 것"이 아니라 "언젠가 볼 것"이 되어 기능을 잃는다.

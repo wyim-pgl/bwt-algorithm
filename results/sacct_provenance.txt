@@ -1,10 +1,16 @@
 # sacct provenance for every SLURM job named in results/manifest.tsv
-# captured 2026-09-03T14:00:46-07:00 on cpu-51
+# captured 2026-09-04T11:35:36-07:00 on cpu-51
 # command: sacct -j <ids> --format=JobID,JobName%28,Elapsed,MaxRSS,State,Start -P
 #
 # Deposited 2026-09-03 for quarantine.md §6.20: the manuscript cites SLURM
 # cgroup peaks, the run wrapper records only wait4 ru_maxrss, and no raw
 # accounting output survived in the repository until now.
+#
+# Re-captured 2026-09-04 to include the release-build range-cost jobs
+# 6147698/99/700. Note their MaxRSS covers BOTH arms of a pair: the two arms
+# run sequentially inside one job, so sacct cannot separate them. The per-arm
+# figures in range_cost_0363d8b/ are /usr/bin/time -v values, which are a
+# maximum over child processes rather than a concurrent total (quarantine.md §3.3).
 #
 JobID|JobName|Elapsed|MaxRSS|State|Start
 5981977|ultra_colcen_p500|10:07:11||COMPLETED|2026-08-03T12:04:09
@@ -118,3 +124,12 @@ JobID|JobName|Elapsed|MaxRSS|State|Start
 6146484|anianns_maize|01:34:30||COMPLETED|2026-09-02T05:03:55
 6146484.batch|batch|01:34:30|717976K|COMPLETED|2026-09-02T05:03:55
 6146484.extern|extern|01:34:31|1480K|OUT_OF_MEMORY|2026-09-02T05:03:55
+6147698|rangerep0363|11:19:29||COMPLETED|2026-09-03T13:49:10
+6147698.batch|batch|11:19:29|43087996K|COMPLETED|2026-09-03T13:49:10
+6147698.extern|extern|11:19:29|1480K|OUT_OF_MEMORY|2026-09-03T13:49:10
+6147699|rangerep0363|11:23:22||COMPLETED|2026-09-03T13:53:09
+6147699.batch|batch|11:23:22|44744592K|COMPLETED|2026-09-03T13:53:09
+6147699.extern|extern|11:23:22|1480K|OUT_OF_MEMORY|2026-09-03T13:53:09
+6147700|rangerep0363|11:09:11||COMPLETED|2026-09-03T13:53:09
+6147700.batch|batch|11:09:11|46782796K|COMPLETED|2026-09-03T13:53:09
+6147700.extern|extern|11:09:11|1480K|OUT_OF_MEMORY|2026-09-03T13:53:09

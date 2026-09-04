@@ -165,6 +165,8 @@ linked there to its source BED, scoring script and hash. Deposited evidence:
 [`results/beds/`](results/beds/) (the three whole-genome BWTandem BEDs),
 [`results/audit11/`](results/audit11/) (blinded specificity audit),
 [`results/one_to_one/`](results/one_to_one/) (strict one-to-one scoring),
+[`results/range_cost_0363d8b/`](results/range_cost_0363d8b/) (release-build
+range-cost pairs and job logs),
 [`results/figures/`](results/figures/) (operating-point figure and data).
 
 Headline results (human GRCh38 vs the GIAB adotto catalog, Arabidopsis
@@ -173,7 +175,7 @@ Col-CEN, maize Mo17; see the manuscript for every caveat):
 | Claim | Measurement |
 |---|---|
 | One wide-range pass | periods 1–2,000 bp in 12.6 h / 25.3 core-hours on GRCh38 (ULTRA: 29.8 h / 59.6 core-hours capped at 100 bp; not range-matched) |
-| Near-flat range cost | widening the reportable maximum 100→2,000 bp costs 1.30–1.41× in paired runs; we did not obtain completed 2,000 bp competitor runs on human (we stopped the TRF and ULTRA attempts terminated incomplete at 6.6 d and 1 d 22 h) |
+| Sublinear range cost | widening the maximum period 100→2,000 bp costs 1.77–1.82× (mean 1.79) in release-build paired runs; the superseded 1.30–1.41× estimate was too favourable because its narrow arm performed and discarded the long-period Tier 3 search; the TRF and ULTRA 2,000 bp attempts on human were terminated incomplete after 6.6 d and 1 d 22 h |
 | Shared-range accuracy | non-leading: ULTRA ranks first in region recall (81.62%); BWTandem 78.87% at the whole-genome configuration, restricted the same way its competitors are, 81.60% at a permissive setting with lower precision |
 | Long-period stratum | 3.43% of catalog regions above period 100 (ULTRA: none by construction) |
 | Plant satellites | Col-CEN CEN180 monomer recall 99.72% in 40 min; maize unfiltered coverage in the leading group |

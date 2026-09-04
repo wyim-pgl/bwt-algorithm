@@ -37,15 +37,15 @@
 - **우선순위:** 2
 - **형식:** 3패널
 - **패널 구성:**
-  - **A:** BWTandem 인간 paired runs. 각 replicate를 100→2,000 bp로 잇는 paired slope plot; y축 runtime, x축 maximum period. 세 쌍을 각각 연결하고 1.30×, 1.30×, 1.41×를 주석으로 표시.
+  - **A:** BWTandem 인간 paired runs. 각 replicate를 100→2,000 bp로 잇는 paired slope plot; y축 runtime, x축 maximum period. 세 쌍을 각각 연결하고 1.82×, 1.77×, 1.77×를 주석으로 표시.
   - **B:** maize에서 ULTRA와 TRF의 maximum period–runtime 관계. x축과 y축 모두 로그 척도 권장. ULTRA와 TRF는 각각 선으로 연결하되 “cross-tool mechanism comparison이 아닌 observed scaling”이라고 명시.
   - **C:** 인간 실행의 core-hours와 memory를 나란히 보여주는 두 개의 작은 horizontal dot plot. BWTandem, ULTRA, TRF만 포함하고 각 점 옆에 탐색 상한을 `2,000`, `100`, `500 bp`로 직접 표기.
 - **정확한 데이터 출처:**
   - A: `results/manifest.tsv`, `range-rep` 행:
-    - p100-r1 06:36:45 → p2000-r1 08:36:35
-    - p100-r2 06:34:45 → p2000-r2 08:34:32
-    - p100-r3 05:29:56 → p2000-r3 07:44:44
-    - 원고 §3.1 line 99의 비율: 1.30, 1.30, 1.41.
+    - p100-r1 04:01:05 → p2000-r1 07:18:21
+    - p100-r2 04:06:38 → p2000-r2 07:16:41
+    - p100-r3 04:01:22 → p2000-r3 07:07:45
+    - 원고 §3.1의 비율: 1.82, 1.77, 1.77(평균 1.79).
   - B:
     - ULTRA: manuscript Table 3A row, line 203, 0.23 h at period 6; Table 3C row, line 278, 12.9 h at period 200; Table 3B row, line 233, 34.7 h at period 500.
     - TRF: Table 3A line 202, 5.2 h at period 6; Table 3C line 277, 5.5 h at period 200; Table 3B line 232, 5.5 h at period 500.
@@ -53,9 +53,9 @@
     - Core-hours: abstract line 21 및 Introduction line 42—BWTandem 25.3, ULTRA 59.6, TRF 33.7 core-h.
     - Memory: Table 1a lines 113–116—BWTandem 28.08 GB, ULTRA 1.68 GB, TRF 1.45 GB.
     - Wall clock와 범위: 같은 Table 1a—12.6 h/2,000 bp, 29.8 h/100 bp, 33.7 h/500 bp.
-- **방어하는 주장:** BWTandem의 핵심 장점은 “정확도 1위”가 아니라 requested/reportable period 범위를 20배 늘렸을 때 비용 증가가 작았고, 인간 전장 실행에서 ULTRA보다 적은 측정 core-hours를 사용했다는 점.
+- **방어하는 주장:** BWTandem의 핵심 장점은 “정확도 1위”가 아니라 maximum-period 범위를 20배 늘렸을 때 릴리스 빌드 런타임이 평균 1.79배로 선형 미만 증가했고, 인간 전장 실행에서 ULTRA보다 적은 측정 core-hours를 사용했다는 점.
 - **설계 주의:**
-  - A의 narrow arm도 Tier 3 장주기 검색을 수행하고 결과를 버렸으므로 축 제목은 “searched period range”가 아니라 **requested/reportable maximum period**여야 한다.
+  - A의 `0363d8b` narrow arm은 `--max-period` 100에서 Tier 3의 장주기 탐색을 수행하지 않는다. 축 제목은 **maximum period**이며, narrow arm이 그 작업을 수행하고 버렸던 `07ad6fa` 1.30–1.41 비율은 superseded다.
   - B는 maize, A/C는 human이다. 패널 제목에 genome을 크게 명시하고 하나의 공통 회귀선이나 scaling exponent를 계산하지 않는다.
   - C의 실행은 range-matched가 아니며 FASTA scope도 다르다. 이를 캡션과 패널 내 각주에 표시한다.
 - **seaborn 난이도:** **중간.** paired plot과 로그축은 간단하지만, 서로 다른 genome·범위·provenance를 오해 없이 분리하는 주석 설계가 중요하다.
@@ -153,7 +153,7 @@
 
 ### 1순위: Figure 2 — 범위–비용과 인간 전장 계산비용
 
-이 도판이 방법의 가장 차별적인 가치 제안을 직접 보여준다. BWTandem은 정확도 1위가 아니므로 Application Note에서는 “무엇을 가능하게 하는가”가 중요하며, 100→2,000 bp에서 1.30–1.41배 비용 증가와 인간 실행의 25.3 대 59.6 core-hours가 그 답이다. 단, genome과 범위가 일치하지 않는 비교를 패널별로 명확히 분리해야 한다.
+이 도판이 방법의 가장 차별적인 가치 제안을 직접 보여준다. BWTandem은 정확도 1위가 아니므로 Application Note에서는 “무엇을 가능하게 하는가”가 중요하며, 100→2,000 bp에서 1.77–1.82배(평균 1.79) 비용 증가와 인간 실행의 25.3 대 59.6 core-hours가 그 답이다. 단, genome과 범위가 일치하지 않는 비교를 패널별로 명확히 분리해야 한다.
 
 ### 2순위: Figure 1 — 공유 범위 정확도–정밀도 절충
 
@@ -216,7 +216,7 @@ Figure 3의 audit는 중요한 한계지만 표 한 개로 압축 가능하고, 
 
 - **Figure 1:** “GRCh38의 공통 period 범위(≤100 bp)에서 BWTandem operating points는 recall 증가와 precision 감소의 절충을 보이며, ULTRA는 세 가지 region-overlap 규칙 모두에서 가장 높은 region recall을 유지한다.”
 
-- **Figure 2:** “BWTandem의 인간 paired runs에서는 reportable maximum period를 100에서 2,000 bp로 늘릴 때 runtime이 1.30–1.41배 증가한 반면, 별도의 maize 실행에서 ULTRA의 비용은 maximum period와 함께 급증했으며, 인간 cross-tool 비용 비교는 탐색 범위와 FASTA scope가 일치하지 않는다.”
+- **Figure 2:** “BWTandem의 `0363d8b` 인간 paired runs에서 maximum period를 100에서 2,000 bp로 늘릴 때 runtime이 1.77–1.82배(평균 1.79) 증가한 반면, 별도의 maize 실행에서 ULTRA의 비용은 maximum period와 함께 급증했으며, 인간 cross-tool 비용 비교는 탐색 범위와 FASTA scope가 일치하지 않는다. `07ad6fa`의 좁은 arm은 버릴 장주기 탐색 비용을 내서 이전 비율을 너무 낮췄다.”
 
 - **Figure 3:** “Catch-all identity 기준을 완화하면 full-range region recall이 62.59%에서 81.46%로 증가하고 precision은 54.72%에서 48.92%로 감소하며, 다른 도구와 catalog에 모두 없는 stratified calls의 단일 판독 audit에서는 400개 중 4개만 지지되었다.”
 

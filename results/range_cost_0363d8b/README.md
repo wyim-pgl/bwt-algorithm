@@ -14,7 +14,7 @@ discarded the result. At `0363d8b` the ceiling bounds Tier 3 as well
 
 ## Results
 
-| rep | job | node | p100 | p2000 | ratio | p100 MaxRSS | p2000 MaxRSS |
+| rep | job | node | p100 | p2000 | ratio | p100 GNU-time RSS | p2000 GNU-time RSS |
 |---|---|---|--:|--:|--:|--:|--:|
 | 1 | 6147698 | cpu-15 | 4:01:05 | 7:18:21 | 1.818 | 17.21 GiB | 17.37 GiB |
 | 2 | 6147699 | cpu-28 | 4:06:38 | 7:16:41 | 1.771 | 17.22 GiB | 17.37 GiB |
@@ -48,4 +48,8 @@ wide run against a narrow run that was not actually narrow.
   cleaner than the one it replaces but is not fully isolated.
 - Both arms of a pair run sequentially here; in the published pairs they ran
   concurrently. The spread is correspondingly narrower, 1.77-1.82 against 1.30-1.41.
-- Memory is effectively unchanged by the ceiling: 17.21 GiB at p100, 17.37 GiB at p2000.
+- Memory is effectively unchanged by the ceiling: 17.21 GiB at p100 against 17.37 GiB at p2000.
+  Those are `/usr/bin/time -v` figures, the maximum over child processes rather than the
+  concurrent total, so they are not comparable with a `sacct` cgroup peak (`quarantine.md`
+  §3.3). sacct records one MaxRSS per job covering both arms and cannot separate them:
+  41.09, 42.67 and 44.62 GiB for jobs 6147698, 6147699 and 6147700.

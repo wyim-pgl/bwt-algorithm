@@ -11,7 +11,9 @@ boundary-aware scoring results (Supplementary Table S4; see its README for
 the metric definitions). `ground_truth/` holds the curated coordinate sets
 every accuracy figure is scored against. `range_cost_attempts/` holds the
 evidence for the two competitor runs attempted at BWTandem's 2,000 bp ceiling
-on human (TRF, ULTRA), neither of which completed.
+on human (TRF, ULTRA), neither of which completed. `range_cost_0363d8b/`
+holds the three release-build BWTandem range-cost jobs and their authoritative
+measurement summary.
 
 ## ground_truth/
 
@@ -50,7 +52,10 @@ BWTandem row come from a single recorded SLURM execution. The `producer_job`,
 `elapsed`, `peak_rss_gb_sacct` and `node` columns identify it. Peak memory is the
 cgroup maximum from `sacct MaxRSS`, not GNU time, because BWTandem distributes
 chromosomes across worker processes and GNU time reports the maximum over
-children rather than their sum.
+children rather than their sum. The release-build `range-rep` rows are the one
+explicit exception: each job ran its 100 bp and 2,000 bp arms sequentially, so
+the manifest records the per-arm GNU-time MaxRSS deposited in
+`range_cost_0363d8b/`; `sacct` cannot separate the two arms of one job.
 
 ### What the `threads` column means (2026-09-03)
 
@@ -102,6 +107,8 @@ replacement does not exist, read `0e17d1a` — the repository HEAD when those ru
 were executed — or **`294f8ac`**, which is where the uncommitted `src/`
 modifications present in that working tree now live. Rows superseded by the
 regeneration are labelled as such in `manifest.tsv` rather than deleted.
+The superseded range-cost rows instead read `07ad6fa`, the only commit where
+`--max-period` did not bound the Tier 3 search.
 
 The two behavioural differences below separate `294f8ac` from the tree that ran
 the historical rows; they do not apply to the `0363d8b` rows, whose outputs are
@@ -130,7 +137,9 @@ the full evidence table.
 |---|---|
 | `1a`, `1b`, `1c`, `1d`, `1e` | human GRCh38 against adotto v1.2.1 |
 | `sweep` | the single-parameter catch-all identity sweep, full range |
-| `range-cost` | the 4-thread 1–2,000 bp arm; paired with row `1b` BWTandem for the range-cost claim. Cost-only, not scored. Also the two competitor matched-ceiling attempts (`TRF-p2000-attempt`, `ULTRA-p2000-attempt`), both terminated incomplete; see `range_cost_attempts/` |
+| `range-rep` | the three active four-thread release-build pairs at 100 and 2,000 bp; both arms ran sequentially in one job and share a node; see `range_cost_0363d8b/` |
+| `range-cost` | the two competitor matched-ceiling attempts (`TRF-p2000-attempt`, `ULTRA-p2000-attempt`), both terminated incomplete; see `range_cost_attempts/` |
+| `range-cost-superseded`, `range-rep-superseded` | the original pair and three replicate pairs at `07ad6fa`; retained for audit but superseded because the narrow arm performed and discarded the long-period Tier 3 search |
 | `2` | Arabidopsis Col-CEN v1.2 |
 | `ablation` | Col-CEN satellite gap-fill ablation, three arms from one job |
 | `3A`, `3B`, `3C`, `3B-b/3C-b` | Zea mays Mo17 |

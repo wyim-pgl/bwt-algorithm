@@ -19,7 +19,7 @@ gs = fig.add_gridspec(1, 4, width_ratios=[1, 1, 1, 1])
 ax_a = fig.add_subplot(gs[0])
 ax_a.set_title("A. Human (paired runs)", fontweight="bold")
 ax_a.set_ylabel("Runtime (h)")
-ax_a.set_xlabel("Requested/reportable\nmaximum period (bp)")
+ax_a.set_xlabel("Maximum period (bp)")
 ax_a.set_xticks([100, 2000])
 
 for rep in df_a["replicate"].unique():
@@ -27,15 +27,17 @@ for rep in df_a["replicate"].unique():
     ax_a.plot(subset["max_period_bp"], subset["runtime_h"], marker="o", 
               color=figstyle.TOOL_COLORS["BWTandem"], rasterized=True)
     
-ax_a.annotate("1.30×", (2000, 8.61), textcoords="offset points", xytext=(5, 5), va="bottom")
-ax_a.annotate("1.30×", (2000, 8.576), textcoords="offset points", xytext=(5, -5), va="top")
-ax_a.annotate("1.41×", (2000, 7.746), textcoords="offset points", xytext=(5, -2), va="center")
+# r1 and r2 end 0.03 h apart, so their labels collide if both are anchored to the
+# point. One label carries the pair, the other two are pushed clear.
+ax_a.annotate("1.82×", (2000, 7.306), textcoords="offset points", xytext=(6, 6), va="bottom")
+ax_a.annotate("1.77×", (2000, 7.278), textcoords="offset points", xytext=(6, -9), va="top")
+ax_a.annotate("1.77×", (2000, 7.129), textcoords="offset points", xytext=(6, 0), va="center")
 ax_a.set_xlim(50, 2500) # give room for annotations
 
 # Panel B: Maize scaling
 ax_b = fig.add_subplot(gs[1])
 ax_b.set_title("B. Maize (scaling)", fontweight="bold")
-ax_b.set_xlabel("Requested/reportable\nmaximum period (bp)")
+ax_b.set_xlabel("Maximum period (bp)")
 ax_b.set_ylabel("Runtime (h)")
 ax_b.set_xscale("log")
 ax_b.set_yscale("log")
@@ -76,9 +78,9 @@ ax_c2.tick_params(labelleft=False)
 
 caption = (
     r"$\mathbf{Figure\ 2.}$ "
-    "(A) Computational cost of extending BWTandem's maximum period from 100 bp to 2,000 bp on GRCh38 across 3 replicates, "
-    "all run at commit 07ad6fa, where the maximum-period argument filtered the report without bounding the Tier 3 search; "
-    "a re-measurement at the release build 0363d8b, where it bounds the search as well, is in progress. "
+    "(A) Extending BWTandem's maximum period from 100 bp to 2,000 bp on GRCh38 increased runtime 1.77–1.82× (mean 1.79) across 3 replicates, "
+    "all run at commit 0363d8b, where the maximum-period argument bounds the Tier 3 search. "
+    "The superseded 1.30–1.41× result came from commit 07ad6fa, where the 100 bp arm still performed and discarded the long-period search. "
     "(B) Runtime scaling of ULTRA and TRF on maize Mo17 as the maximum period increases (log–log scale). "
     "(C) Total computational resources (core-hours and peak memory) for human whole-genome processing. Points are labeled by their period cap; "
     "these runs are not range-matched, and the competitor FASTA carries 3.92% more sequence."
@@ -86,7 +88,7 @@ caption = (
 # va="top" so a caption that grows to three lines extends downward instead of
 # climbing into the axis labels.
 plt.figtext(0.009, -0.10, caption, ha="left", va="top", fontsize=14, wrap=True)
-plt.suptitle("Widening the requested period range 20× costs 1.3–1.4×.", y=1.01, fontsize=14)
+plt.suptitle("Widening the maximum-period range 20× costs 1.77–1.82×.", y=1.01, fontsize=14)
 
 sns.despine()
 plt.tight_layout()

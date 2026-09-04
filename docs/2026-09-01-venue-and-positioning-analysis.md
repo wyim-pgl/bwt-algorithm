@@ -61,7 +61,8 @@ catalog holds **zero truth annotations above primitive period 500 bp**, so
 that band is not adjudicable against adotto at all; the >500 bp evidence
 base is the satellite experiments (Col-CEN, maize, CHM13 HOR arrays), and
 above 2 kb is AniAnn's/longdust territory with no accuracy evidence of
-ours. The near-flat range cost stays as a
+ours. The release-build range cost is sublinear rather than near-flat:
+the 20× widening costs 1.77–1.82× runtime (mean 1.79). It stays as a
 supporting scalability point — the field review (Liu & Li 2026,
 *Brief. Bioinform.* 27(1):bbag031) names scalability, not long-period
 coverage, among open problems.

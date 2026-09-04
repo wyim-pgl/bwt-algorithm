@@ -13,11 +13,11 @@ operational summary and is self-sufficient). Interpreter with seaborn 0.13:
 `pdf.fonttype=42`). Implementation order: **Fig 2 → 1 → 3 → 4 → S1 → S2**
 (the two Application-Note survivors first).
 
-**Ground rules (non-negotiable, from the adversarial review):**
+**Ground rules (non-negotiable, from the adversarial review and the release-build re-measurement):**
 - Never truncate a recall axis to manufacture the 81.60-vs-81.62 "tie".
-- Fig 2's x-axis label is **"requested/reportable maximum period (bp)"**,
-  never "searched range"; panels A/C are human, B is maize — no shared fit
-  line or scaling exponent across panels.
+- Fig 2's x-axis label is **"maximum period (bp)"**. At `0363d8b` that
+  argument bounds the Tier 3 search; panels A/C are human, B is maize — no
+  shared fit line or scaling exponent across panels.
 - Fig 1C's BWTandem series is the full-range output post-hoc filtered to
   ≤100 bp, not the native H run — label it as its own series; do not reuse
   the P/B/F/H connecting line there.
@@ -61,13 +61,15 @@ overlap rule.*
   merged, slop-padded catalog, not a ranking metric."
 
 ## Figure 2 — Range–cost behaviour and whole-genome compute cost
-**Title:** *Widening the requested period range 20× costs 1.3–1.4×.*
+**Title:** *Widening the maximum-period range 20× costs 1.77–1.82×.*
 3 panels (A/C human, B maize — say so in the panel titles).
 
 - **2A** Paired slope plot, BWTandem human replicates. Data
   `data/fig2a_paired_runs.csv`: three replicate pairs 100→2,000 bp;
-  annotate each pair's ratio (1.30×, 1.30×, 1.41×). y runtime (h),
-  x requested/reportable maximum period.
+  annotate each pair's ratio (1.82×, 1.77×, 1.77×). y runtime (h),
+  x maximum period. These are release-build jobs 6147698/99/700 at
+  `0363d8b`; the `07ad6fa` values are superseded because the narrow arm
+  performed and discarded the long-period Tier 3 search.
 - **2B** ULTRA and TRF runtime vs maximum period on maize, log–log. Data
   `data/fig2b_maize_scaling.csv`. Two connected series; annotate "observed
   scaling on maize runs, not a cross-tool mechanism comparison".
@@ -78,14 +80,16 @@ overlap rule.*
   only — footnote it). Data
   `data/fig2c_human_cost.csv`. Label each point with its period cap
   (2,000 / 100 / 500 bp). Footnote: runs are not range-matched and the
-  competitor FASTA scope was ~5% larger. Second footnote line: neither
+  competitor FASTA scope was 3.92% larger. Second footnote line: neither
   competitor could be run at BWTandem's 2,000 bp ceiling — the TRF and ULTRA
   2,000 bp attempts were terminated incomplete at 6.6 d and 1 d 22 h
   (manifest rows `TRF-p2000-attempt`, `ULTRA-p2000-attempt`). Do not plot
   them as points; the footnote is enough.
-- **Caption draft:** "(A) Paired BWTandem runs on GRCh38: raising the
-  requested/reportable maximum period from 100 to 2,000 bp costs
-  1.30–1.41× in wall clock across three replicate pairs. (B) Observed
+- **Caption draft:** "(A) Paired BWTandem runs on GRCh38 at commit
+  `0363d8b`: raising the maximum period from 100 to 2,000 bp costs
+  1.77–1.82× in wall clock across three replicate pairs (mean 1.79).
+  The superseded 1.30–1.41× result came from `07ad6fa`, where the 100 bp
+  arm still performed and discarded the long-period Tier 3 search. (B) Observed
   runtime versus maximum period for ULTRA and TRF on maize Mo17 (log–log);
   the two tools scale differently, and no cross-tool mechanism comparison
   is implied. (C) Measured cost of the human whole-genome runs
@@ -93,7 +97,7 @@ overlap rule.*
   each point labelled with its period cap — the runs are not
   range-matched, and matched-ceiling competitor runs do not exist: the TRF
   and ULTRA attempts at 2,000 bp were terminated incomplete after 6.6 days
-  and 1 d 22 h. BWTandem's 28.08 GB peak is the cost of the design."
+  and 1 d 22 h. BWTandem's 28.08 GiB peak is the cost of the design."
 
 ## Figure 3 — Sensitivity levers and the audit of unsupported unique calls
 **Title:** *Recall-favouring settings buy recall with precision, and the

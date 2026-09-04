@@ -52,6 +52,12 @@ ad3e8c166d8f5d92bf444199c46f800f643f0bc75f41b7a462b0291c398bebb2  /data/gpfs/ass
 d91998cedca052c1786bc3be15df15e9860fe1bab0f0be3aaf6a9d59162b73c2  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/out/idsweep_0.76.bed
 c17c811426347248a398ed14a059d2c2c769e80f85ec58b744755fe3008174aa  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/out/idsweep_0.80.bed
 75d4d6341df352dcc9a47ddc04f66a29c7802a899a48827e887034ba4f80d6e1  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/out/idsweep_off.bed
+abaec2c84857545442f7c3b1979d26baf11d95af1a7b07d3c9d5250bd7e02e49  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/rangerep0363/rep1_p100.bed
+ce38015ceedd70d32d9812781c41e901d1b128d0ffb213591843b536311931ef  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/rangerep0363/rep1_p2000.bed
+e85c5f33dd7cf4a45e7a415bb6ce194098948f3d0479962c5b55769326e49126  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/rangerep0363/rep2_p100.bed
+ece8cd1cedad55585b00785499569852ee3842e7eb5d8faf2eedbfe38849e47b  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/rangerep0363/rep2_p2000.bed
+d9430dee7c8e79d5e3de87e51f5369cad1a6217f60bb311fe2102211f4cf9070  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/rangerep0363/rep3_p100.bed
+f3ae06232461d4a5cfb524bd652cd65200fa5137dc943626c5031ec52b095fc2  /data/gpfs/assoc/pgl/devel/exp1_human/wp0/rangerep0363/rep3_p2000.bed
 e9df20edbcdda405da35aa1b744ea1b18c3279b85ae1f206ad06ef20c2adce98  /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/mreps/GCA_000001405.15_GRCh38_genomic.bed
 fcc802b5e8114ba06aa9ccacc5df8b88fe7f4f7bd57bb35873938232c4440392  /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/ncrf/Col-CEN_v1.2_output.bed
 fed82852805e7014d611e37fc8eb3ee1e2643864ed282ecc200dc2d02c4e955d  /data/gpfs/assoc/pgl/filip/bwtandem_results/beds/ncrf/GCA_022117705.1_Zm-Mo17-REFERENCE-CAU-T2T-assembly_genomic_ncrf_TAG_exp3A_microsatellite.bed

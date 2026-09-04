@@ -9,7 +9,8 @@
 
 Decision context: shared-range accuracy is honestly non-leading (ULTRA
 first by ~1pp), so the publishable claim is **capability** — one pass over
-periods 1 bp–2,000 bp at a 1.30–1.41× cost for a 20× wider range, with the
+periods 1 bp–2,000 bp at a 1.77–1.82× cost (mean 1.79) for a 20× wider
+range, with the
 only tractable >500 bp coverage — not superiority. The Application Note
 format sells exactly that; the full-paper track stays viable at venues that
 value the benchmark methodology itself (venue analysis pending; this plan
@@ -22,10 +23,14 @@ is venue-agnostic and parameterized where formats differ).
    State ULTRA-first plainly in the same breath as the 1pp gap and the 20×
    range — the abstract already does this; compress it.
 2. **Figure 1 = current Fig 2 (range–cost).** Panels: paired 100→2,000 bp
-   runs (1.30–1.41×); maize ULTRA/TRF scaling; human core-hours/memory
-   dot plots. This is the value proposition. If the running ULTRA `-p 2000`
+   release-build runs (1.77–1.82×; mean 1.79); maize ULTRA/TRF scaling;
+   human core-hours/memory dot plots. This is the value proposition. If the running ULTRA `-p 2000`
    measurement (job 6145581) lands before submission, its wall clock (or
    documented non-completion) becomes the killer annotation on panel C.
+
+   The earlier 1.30–1.41× BWTandem estimate is superseded. All of its pairs
+   ran at `07ad6fa`, where the narrow arm still performed and discarded the
+   long-period Tier 3 search, making that comparison too favourable.
 3. **Figure 2 = current Fig 1 (shared-range accuracy).** P/B/F/H curve +
    competitors + overlap-rule robustness. Keeps us honest and preempts the
    "you hid the ranking" review.

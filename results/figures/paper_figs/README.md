@@ -4,10 +4,10 @@ All six figures are implemented and rendered. `rendered/` holds the PNG and PDF
 of each; the `plot_*.py` scripts that produced them are here, no longer stubs,
 and read their inputs from `data/*.csv`.
 
-| Figure | Renders | Status against the manuscript at `e232bcf` |
+| Figure | Renders | Status after the 2026-09-04 C-1 application |
 |---|---|---|
 | Fig 1 accuracy trade-off | ✅ | current |
-| Fig 2 range cost | ✅ | **three defects, see below** |
+| Fig 2 range cost | ✅ | source and data current; **rerender pending** |
 | Fig 3 sweep + audit | ✅ | current |
 | Fig 4 plant satellites | ✅ | current |
 | Fig S1 chromosome subset | ✅ | current |
@@ -28,26 +28,26 @@ stays native — so F reads 79.88% there and 78.87% in Table 1b. That is not a
 contradiction, but it is the kind of thing a referee asks about, and the caption
 should say which panel is which arm before submission.
 
-## Fig 2 — one defect left, and it is the data
+## Fig 2 — release-build data applied; rerender pending
 
-Two of the three defects are fixed as of 2026-09-03: the memory axis reads GiB,
-and the range-matching caveat moved into the caption with the measured 3.92%
-(a separate footnote collided with the caption once the caption grew).
+All three source defects are fixed as of 2026-09-04. The memory axis reads GiB,
+the range-matching caveat is in the caption with the measured 3.92%, and panel A
+now uses the release-build re-measurement.
 
-1. **Panel A is superseded data — still open.** The 1.30 / 1.30 / 1.41 ratios come from
-   `data/fig2a_paired_runs.csv`, whose replicates all ran at commit `07ad6fa` —
-   the only commit where Tier 3's search window was fixed at 100 bp–100 kb
-   regardless of `--max-period` (`quarantine.md` §6.17). SLURM jobs
-   6147698/99/700 are re-measuring the same pairs at `0363d8b`, where the
-   ceiling bounds Tier 3 as well. **The panel, its title claim
-   ("20× costs 1.3–1.4×") and the CSV must be regenerated from those results.**
-   The x-axis phrase "requested/reportable maximum period" is the `07ad6fa`
-   framing and needs the same revision.
-2. ~~Axis said "Peak memory (GB)"~~ — now GiB.
-3. ~~Footnote said "~5% larger"~~ — now 3.92%, in the caption.
+1. ~~Panel A used `07ad6fa` data.~~ The CSV and annotations now contain the
+   `0363d8b` ratios **1.82 / 1.77 / 1.77** (mean **1.79**) from SLURM jobs
+   6147698/99/700. The old 1.30 / 1.30 / 1.41 ratios are superseded: at
+   `07ad6fa` the narrow arm still performed the long-period Tier 3 search and
+   discarded its output, making the old comparison too favourable.
+2. ~~The x-axis said "requested/reportable maximum period".~~ It now says
+   "maximum period", because `--max-period` bounds the Tier 3 search at
+   `0363d8b`.
+3. ~~Axis said "Peak memory (GB)".~~ It now says GiB.
+4. ~~Footnote said "~5% larger".~~ It now says 3.92% in the caption.
 
-The caption states which build panel A came from, so the figure is honest as it
-stands; it is the claim in the title that the re-measurement may move.
+The tracked PNG and PDF still show the superseded panel. They remain stale until
+the plotting script is rerun; this update intentionally changes only its source
+and input data.
 
 ## Fig 4 panel A omits three tools — now said in the caption
 
@@ -59,8 +59,8 @@ does not touch this figure, but the omission should be stated.
 ## Regeneration
 
 `prep_data.py` builds `data/*.csv` from the deposited evidence; each `plot_*.py`
-reads one or more of those and writes to `rendered/`. Regenerate Fig 2 after the
-C-1 jobs land, then re-check the three items above.
+reads one or more of those and writes to `rendered/`. Rerender Fig 2 from the
+updated source and CSV before submission.
 
 
 ## Colour (2026-09-03)

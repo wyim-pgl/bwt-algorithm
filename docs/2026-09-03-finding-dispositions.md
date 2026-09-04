@@ -70,7 +70,7 @@ stranger can re-run, for rejections and confirmations alike.
 | R3-2 | 400-call audit evidence not reproducible as claimed | `DUPLICATE` | Same defect as R2-6 | see R2-6 |
 | R3-3 | Scoring scripts and ground-truth intervals not all present | `RESOLVED` | rescore_tables_3bc.py, score_exp3.py and score_overlap.py deposited with cluster paths made env-overridable; raw BLAST hit set deposited | e4ae632 |
 | R3-4 | Machine-readable run provenance does not record the controlling environment | `CONFIRMED` | regen_*.provenance.json records the command but not the env vars that select the configuration; the launch wrapper is not deposited | OPEN |
-| R3-5 | S1.3 reports the wrong Tier-3 jitter tolerance for every run | `CONFIRMED` | manuscript.md:440 asserts a 0.04 ceiling in every run; tier3.py gives 0.02 + 0.02*(max_period/1e5) = 0.0204 at --max-period 2000 | OPEN — tied to §6.17 and C-1 |
+| R3-5 | S1.3 reports the wrong Tier-3 jitter tolerance for every run | `RESOLVED` | tier3.py gives 0.02 + 0.02*(max_period/1e5); S1.3 now reports 0.02002 at --max-period 100 and 0.0204 at --max-period 2000, and §6.17/C-1 records the release-build re-measurement | 2026-09-04 (C-1) |
 | R3-6 | S1.4 gives neither the implemented autocorrelation definition nor the valid-base threshold | `PARTIAL` | The 70%/80% half is fixed in 2901ff3; the autocorrelation definition is still absent | PARTIAL |
 | R3-7 | Per-figure provenance manifest does not exist and the figure programs are stubs | `PARTIAL` | The Abstract promise was removed in 2901ff3; all six plot_*.py still end at a TODO and no final figure is tracked | PARTIAL — blocks submission |
 | R3-8 | A manuscript-plus-repository reader cannot regenerate the benchmark | `PARTIAL` | Substantially improved by e4ae632; the 75 absolute cluster paths remain | PARTIAL |
@@ -85,15 +85,15 @@ stranger can re-run, for rejections and confirmations alike.
 
 | Verdict | Count |
 |---|--:|
-| `CONFIRMED` | 18 |
-| `RESOLVED` | 13 |
+| `CONFIRMED` | 17 |
+| `RESOLVED` | 14 |
 | `PARTIAL` | 10 |
 | `DUPLICATE` | 1 |
 | `REJECTED` | 1 |
 | **total** | **43** |
 
-Nothing in the three Codex rounds is "unverified" any more. 13 were fixed by
-today's commits and name the commit. 18 are confirmed and open, each naming the
+Nothing in the three Codex rounds is "unverified" any more. 14 were fixed and
+name the resolving commit or date. 17 are confirmed and open, each naming the
 check that reproduced it. 10 are partial — fixed on one surface and live on another,
 which is the failure mode behind most of today's rework, so both sides are named
 rather than the item being called done.

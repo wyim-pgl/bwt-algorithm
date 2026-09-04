@@ -1,0 +1,13 @@
+/bin/bash: warning: setlocale: LC_ALL: cannot change locale (C.UTF-8)
+START Thu Sep  3 13:49:11 PDT 2026 HOST cpu-15 REP=1 CODE=0363d8b(detached worktree)
+0363d8bdc83cb8fb8e62c19d665479ce878e9f70
+3477cfbb758be70c214c7470d844512e  -
+--- ARM MAXP=100 start Thu Sep  3 13:49:11 PDT 2026 ---
+exit=0 calls=3993151
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 4:01:05
+	Maximum resident set size (kbytes): 18049936
+--- ARM MAXP=2000 start Thu Sep  3 17:50:17 PDT 2026 ---
+exit=0 calls=4014108
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 7:18:21
+	Maximum resident set size (kbytes): 18218836
+DONE Fri Sep  4 01:08:39 PDT 2026

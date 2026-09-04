@@ -12,6 +12,7 @@ and read their inputs from `data/*.csv`.
 | Fig 4 plant satellites | ✅ | current |
 | Fig S1 chromosome subset | ✅ | current |
 | Fig S2 post-merge | ✅ | current |
+| Fig 5 array structure | ✅ | new 2026-09-03, not yet placed in the manuscript |
 
 ## Fig 1 anticipated a decision we made the same day
 
@@ -73,3 +74,35 @@ visible; if one needs emphasis in a panel, say so in that panel's caption.
 
 Rendered with `/data/gpfs/assoc/pgl/bin/conda/conda_envs/anianns/bin/python`
 (matplotlib 3.10.9, seaborn 0.13.2). The `bwtandem` env has no matplotlib.
+
+
+## Fig 5 — array self-similarity (new, 2026-09-03)
+
+One satellite array per species, drawn two ways: the pairwise window-identity
+matrix as a 45-degree-rotated triangle, and a self dot plot over the same
+interval. Regions are BWTandem's own calls:
+
+| Species | Region | Reported motif |
+|---|---|--:|
+| Human GRCh38 | chr1:122,257,803–122,317,803 (60 kb) | 1,866 bp |
+| Arabidopsis Col-CEN | Chr4:4,985,644–5,045,644 (60 kb) | 178 bp |
+| Maize Mo17 | CM039157.1:53,652,014–53,678,133 (26 kb) | 155 bp |
+
+Windows are compared by shared canonical 13-mers (containment against the smaller
+window) rather than by alignment, so one indel costs a few k-mers instead of
+shifting everything downstream. Containment, not Jaccard, so a window straddling
+an array edge is not penalised for being half empty.
+
+What it shows: the human array carries regular bands at a spacing consistent with
+its 1,866 bp reported motif — the multi-monomer higher-order repeat — while
+CEN180 and CentC show finer, less regular structure. The dot plots carry the same
+information as line ladders and keep the monomer period legible.
+
+Two things to know before reusing it. The dot-plot sampling stride is calibrated
+per panel to a fixed point budget, so the strides differ between rows and are
+printed in each title; do not compare point density across panels. And the
+identity colour scale is fixed at 0–1 across all three, which is why the human
+panel reads darker — its 13-mer containment between distant windows really is
+lower, not a scaling artefact.
+
+It is not referenced by the manuscript yet.
